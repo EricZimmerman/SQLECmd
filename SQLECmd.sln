@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29806.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLECmd", "SQLECmd\SQLECmd.csproj", "{161984A4-3E8B-4D84-A83A-C236DB18D25A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLMap", "SQLMap\SQLMap.csproj", "{E1535E5F-29F3-4BB3-9023-A6D39863676B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLMap.Test", "SQLMap.Test\SQLMap.Test.csproj", "{AC2CCD58-CE57-4DA6-BB91-755FAA841C70}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{161984A4-3E8B-4D84-A83A-C236DB18D25A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{161984A4-3E8B-4D84-A83A-C236DB18D25A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{161984A4-3E8B-4D84-A83A-C236DB18D25A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{161984A4-3E8B-4D84-A83A-C236DB18D25A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1535E5F-29F3-4BB3-9023-A6D39863676B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1535E5F-29F3-4BB3-9023-A6D39863676B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1535E5F-29F3-4BB3-9023-A6D39863676B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1535E5F-29F3-4BB3-9023-A6D39863676B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC2CCD58-CE57-4DA6-BB91-755FAA841C70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC2CCD58-CE57-4DA6-BB91-755FAA841C70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC2CCD58-CE57-4DA6-BB91-755FAA841C70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC2CCD58-CE57-4DA6-BB91-755FAA841C70}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A95F59DD-5D05-44B1-AB4C-EC21C6591A5D}
+	EndGlobalSection
+EndGlobal
