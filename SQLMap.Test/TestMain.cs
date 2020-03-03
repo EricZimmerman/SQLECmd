@@ -70,7 +70,7 @@ namespace SQLMap.Test
         public void Test()
         {
             var s = new SQLMap();
-            s.Test(@"..\..\..\TestFiles\Contacts.db");
+            s.Test(@"C:\Temp\Contacts.db");
         }
     }
 }

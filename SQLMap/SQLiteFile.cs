@@ -16,17 +16,23 @@ namespace SQLMap
                 throw new FileNotFoundException($"'{path}' not found");
             }
 
-            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
-
-            if (fs.Length < 8)
+            using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read))
             {
-                return false;
+
+                if (fs.Length < 8)
+                {
+                    return false;
+                }
+
+                using (var br = new BinaryReader(fs))
+                {
+                    var fileSig = br.ReadInt64();
+
+                    return fileSig == Sig;
+                }
+                
             }
 
-            using var br = new BinaryReader(fs);
-            var fileSig = br.ReadInt64();
-
-            return fileSig == Sig;
         }
 
 
