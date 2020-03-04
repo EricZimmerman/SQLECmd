@@ -1,10 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
+using System.Linq;
+using CsvHelper;
 using FluentAssertions;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
 using NUnit.Framework;
+using ServiceStack.OrmLite;
+using ServiceStack.OrmLite.Dapper;
 
 namespace SQLMap.Test
 {
@@ -34,9 +41,17 @@ namespace SQLMap.Test
             LogManager.Configuration = config;
         }
 
+
+        /// <summary>
+        /// For normal mode, the database name is the first check to see if any maps exist.
+        /// In hunting mode, the name does not matter and all maps must be checked via IdentityQuery
+        /// </summary>
+
         [Test]
         public void FindSqlFiles()
         {
+            LoadMaps();
+
             _logger.Info("Looking for SQLite databases...");
 
             var dir = @"..\..\..\TestFiles";
@@ -52,6 +67,85 @@ namespace SQLMap.Test
                     if (SQLiteFile.IsSQLiteFile(fileSystemEntry))
                     {
                         _logger.Info($"\t '{fileSystemEntry}' is a sqlite database");
+
+
+                        var fName = Path.GetFileName(fileSystemEntry);
+
+                        var maps = SQLMap.MapFiles.Values.Where(t =>
+                            string.Equals(t.FileName, fName, StringComparison.InvariantCultureIgnoreCase)).ToList();
+
+                        if (maps.Any())
+                        {
+                            _logger.Info($"Found at least one map for '{fName}'");
+
+                            foreach (var map in maps)
+                            {
+                                _logger.Info(map);
+
+
+                                var dbFactory = new OrmLiteConnectionFactory($"{fileSystemEntry}",SqliteDialect.Provider);
+
+                                using (var db = dbFactory.Open())
+                                {
+                                    _logger.Info($"Verifying database via '{map.IdentifyQuery}'");
+                                    var id = db.ExecuteScalar<string>(map.IdentifyQuery);
+
+                                    if (string.Equals(id,map.IdentifyValue,StringComparison.InvariantCultureIgnoreCase) == false)
+                                    {
+                                        _logger.Warn($"Got value '{id}' from IdentityQuery, but expected '{map.IdentifyValue}'. Queries will not be processed!");
+                                        continue;
+                                    }
+
+
+
+                                    _logger.Info($"Map queries found: {map.Queries.Count:N0}. Processing...");
+                                    foreach (var queryInfo in map.Queries)
+                                    {
+                                        try
+                                        {
+                                            _logger.Info($"Dumping information for '{queryInfo.Name}'. BaseFilename: {queryInfo.BaseFileName}");
+
+                                            var foo = db.Query<dynamic>(queryInfo.Query);
+
+                                            //  var bar = (IDictionary<string, object>) foo.First();
+
+                                            //  _logger.Info($"Headers: {string.Join(",",bar.Keys)}");
+
+                                            using (var writer = new StringWriter())
+                                            {
+                                                using (var csv = new CsvWriter(writer,CultureInfo.InvariantCulture))
+                                                {
+                                                    //  csv.WriteDynamicHeader(foo.First());
+                                                    //   csv.NextRecord();
+                        
+                                                    // foreach(IDictionary<string, object> row in foo) {
+                                                    //     Console.WriteLine("row:");
+                                                    //     foreach(var pair in row) {
+                                                    //         Console.WriteLine("  {0} = {1}", pair.Key, pair.Value);
+                                                    //     }
+                                                    // }
+
+                                                    csv.WriteRecords(foo);
+                        
+                                                    _logger.Info(writer.ToString());
+                                                }
+                                            }
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            _logger.Error(e.Message);
+                                        }
+                                        
+
+                                    }
+                                }
+
+
+
+                            }
+                        }
+
+
                         foundFiles += 1;
                     }
                 }
@@ -63,6 +157,15 @@ namespace SQLMap.Test
             }
 
             foundFiles.Should().Be(1);
+
+        }
+
+        [Test]
+        public void LoadMaps()
+        {
+            _logger.Info("Loading maps!");
+
+            SQLMap.LoadMaps(@"D:\OneDrive\!Projects\sqliteTestFiles");
 
         }
 

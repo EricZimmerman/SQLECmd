@@ -1,12 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="15.0.0" />
+    <PackageReference Include="AlphaFS" Version="2.2.6" />
+    <PackageReference Include="CsvHelper" Version="15.0.1" />
+    <PackageReference Include="FluentValidation" Version="8.6.2" />
+    <PackageReference Include="NLog" Version="4.6.8" />
     <PackageReference Include="ServiceStack.OrmLite.Sqlite.Core" Version="5.8.0" />
+    <PackageReference Include="ServiceStack.Text" Version="5.8.0" />
+    <PackageReference Include="ServiceStack.Text.Core" Version="5.8.0" />
+    <PackageReference Include="YamlDotNet" Version="8.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Maps\" />
   </ItemGroup>
 
 </Project>
