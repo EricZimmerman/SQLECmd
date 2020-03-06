@@ -13,7 +13,7 @@ using NUnit.Framework;
 using ServiceStack.OrmLite;
 using ServiceStack.OrmLite.Dapper;
 
-namespace SQLMap.Test
+namespace SQLMaps.Test
 {
     public class TestMain
     {
@@ -74,6 +74,17 @@ namespace SQLMap.Test
                         var maps = SQLMap.MapFiles.Values.Where(t =>
                             string.Equals(t.FileName, fName, StringComparison.InvariantCultureIgnoreCase)).ToList();
 
+
+                        var outPath = @"C:\temp\sqlout";
+                        if (Directory.Exists(outPath))
+                        {
+                            Directory.Delete(outPath,true);
+                        }
+
+                        var baseTime = DateTimeOffset.UtcNow;
+
+                        Directory.CreateDirectory(outPath);
+
                         if (maps.Any())
                         {
                             _logger.Info($"Found at least one map for '{fName}'");
@@ -95,9 +106,7 @@ namespace SQLMap.Test
                                         _logger.Warn($"Got value '{id}' from IdentityQuery, but expected '{map.IdentifyValue}'. Queries will not be processed!");
                                         continue;
                                     }
-
-
-
+                                    
                                     _logger.Info($"Map queries found: {map.Queries.Count:N0}. Processing...");
                                     foreach (var queryInfo in map.Queries)
                                     {
@@ -111,7 +120,12 @@ namespace SQLMap.Test
 
                                             //  _logger.Info($"Headers: {string.Join(",",bar.Keys)}");
 
-                                            using (var writer = new StringWriter())
+                                            var outName =
+                                                $"{baseTime:yyyyMMddHHmmss}_{queryInfo.BaseFileName}.csv";
+
+                                            var fullOutName = Path.Combine(outPath, outName);
+
+                                            using (var writer = new StreamWriter(new FileStream(fullOutName,FileMode.CreateNew))) //var writer = new StringWriter()
                                             {
                                                 using (var csv = new CsvWriter(writer,CultureInfo.InvariantCulture))
                                                 {
@@ -127,8 +141,12 @@ namespace SQLMap.Test
 
                                                     csv.WriteRecords(foo);
                         
-                                                    _logger.Info(writer.ToString());
+                                                    //_logger.Info(writer.ToString());
+
+                                                    csv.Flush();
+                                                    writer.Flush();
                                                 }
+                                                
                                             }
                                         }
                                         catch (Exception e)

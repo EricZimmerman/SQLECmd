@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using FluentValidation;
 
-namespace SQLMap
+namespace SQLMaps
 {
     public class MapFile
     {

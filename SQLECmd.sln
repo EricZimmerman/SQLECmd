@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLECmd", "SQLECmd\SQLECmd.csproj", "{161984A4-3E8B-4D84-A83A-C236DB18D25A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SQLECmd", "SQLECmd\SQLECmd.csproj", "{161984A4-3E8B-4D84-A83A-C236DB18D25A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLMap", "SQLMap\SQLMap.csproj", "{E1535E5F-29F3-4BB3-9023-A6D39863676B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SQLMaps", "SQLMap\SQLMaps.csproj", "{E1535E5F-29F3-4BB3-9023-A6D39863676B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLMap.Test", "SQLMap.Test\SQLMap.Test.csproj", "{AC2CCD58-CE57-4DA6-BB91-755FAA841C70}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SQLMap.Test", "SQLMap.Test\SQLMap.Test.csproj", "{AC2CCD58-CE57-4DA6-BB91-755FAA841C70}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

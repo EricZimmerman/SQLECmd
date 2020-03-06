@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace SQLMap
+namespace SQLMaps
 {
     public static class SQLiteFile
     {

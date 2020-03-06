@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <AssemblyName>SQLMaps</AssemblyName>
+    <RootNamespace>SQLMaps</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,9 +11,9 @@
     <PackageReference Include="CsvHelper" Version="15.0.1" />
     <PackageReference Include="FluentValidation" Version="8.6.2" />
     <PackageReference Include="NLog" Version="4.6.8" />
-    <PackageReference Include="ServiceStack.OrmLite.Sqlite.Core" Version="5.8.0" />
+    <PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="5.8.0" />
     <PackageReference Include="ServiceStack.Text" Version="5.8.0" />
-    <PackageReference Include="ServiceStack.Text.Core" Version="5.8.0" />
+    
     <PackageReference Include="YamlDotNet" Version="8.1.0" />
   </ItemGroup>
 
