@@ -372,40 +372,44 @@ namespace SQLECmd
 
             }
 
-            var baseTime = DateTimeOffset.UtcNow;
+            
 
             //need to run thru each map and see if we get any IdentityQuery matches
             //process each one that matches
             foreach (var map in maps)
             {
+                _logger.Debug($"Processing map '{map.Description}' with Id '{map.Id}'");
+
                 var dbFactory = new OrmLiteConnectionFactory($"{fileName}",SqliteDialect.Provider);
+
+                var baseTime = DateTimeOffset.UtcNow;
 
                  using (var db = dbFactory.Open())
                  {
-                     _logger.Info($"Verifying database via '{map.IdentifyQuery}'");
+                     _logger.Info($"\tVerifying database via '{map.IdentifyQuery}'");
                      var id = db.ExecuteScalar<string>(map.IdentifyQuery);
 
                      if (string.Equals(id,map.IdentifyValue,StringComparison.InvariantCultureIgnoreCase) == false)
                      {
-                         _logger.Warn($"Got value '{id}' from IdentityQuery, but expected '{map.IdentifyValue}'. Queries will not be processed!");
+                         _logger.Warn($"\tGot value '{id}' from IdentityQuery, but expected '{map.IdentifyValue}'. Queries will not be processed!");
                          continue;
                      }
                                     
-                     _logger.Info($"Map queries found: {map.Queries.Count:N0}. Processing...");
+                     _logger.Info($"\tMap queries found: {map.Queries.Count:N0}. Processing queries...");
                      foreach (var queryInfo in map.Queries)
                      {
+                         _logger.Debug($"Processing query '{queryInfo.Name}'");
+
                          try
                          {
-                             
-
                              var results = db.Query<dynamic>(queryInfo.Query);
 
                              var outName =
-                                 $"{baseTime:yyyyMMddHHmmss}_{map.CSVPrefix}_{queryInfo.BaseFileName}_{map.Id}.csv";
+                                 $"{baseTime:yyyyMMddHHmmssffffff}_{map.CSVPrefix}_{queryInfo.BaseFileName}_{map.Id}.csv";
 
                              var fullOutName = Path.Combine(_fluentCommandLineParser.Object.CsvDirectory, outName);
 
-                             _logger.Info($"Dumping information for '{queryInfo.Name}' to '{fullOutName}'");
+                             _logger.Info($"\tDumping information for '{queryInfo.Name}' to '{fullOutName}'");
 
                              using (var writer = new StreamWriter(new FileStream(fullOutName,FileMode.CreateNew)))
                              {
@@ -418,20 +422,19 @@ namespace SQLECmd
                                      csv.Flush();
                                      writer.Flush();
                                  }
-                                                
                              }
                          }
                          catch (Exception e)
                          {
-                             _logger.Error(e.Message);
+                             _logger.Fatal($"Error processing map '{map.Description}' with Id '{map.Id}' for query '{queryInfo.Name}':");
+                             _logger.Error($"\t{e.Message.Replace("\r\n","\r\n\t")}");
                          }
-                                        
 
                      }
                  }
             }
 
-
+            Console.WriteLine();
         }
 
         private static readonly HashSet<string> _seenHashes = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);

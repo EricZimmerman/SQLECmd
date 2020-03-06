@@ -1,0 +1,21 @@
+Description: Health Db database
+Author: Eric Zimmerman
+Email: saericzimmerman@gmail.com
+Id: 72b96792-3d42-4244-af22-c227d2440b12
+Version: 0.2
+CSVPrefix: HealthDb
+FileName: healthdb.sqlite
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='workout_sessions' OR name='alarm_events' OR name='workout_builders');
+IdentifyValue: 3
+Queries:
+    -
+        Name: Device history
+        Query: | 
+                SELECT
+                manufacturer,
+                hardware,
+                software,
+                datetime(source_devices.creation_date+978307200,'unixepoch') AS "iOS_Install_or_Upgrade_Date"
+                FROM
+                source_devices
+        BaseFileName: DeviceHistory

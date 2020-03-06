@@ -1,0 +1,51 @@
+Description: HealthDb Secure database
+Author: Eric Zimmerman
+Email: saericzimmerman@gmail.com
+Id: 72b96792-3d42-4246-af42-c457d1540b23
+Version: 0.2
+CSVPrefix: HealthDBSecure
+FileName: healthdb_secure.sqlite
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='workouts' OR name='workout_events' OR name='medical_records');
+IdentifyValue: 3
+Queries:
+    -
+        Name: Samples
+        Query: |
+                Select
+                datetime(samples.start_date+978307200,'unixepoch','localtime') as "Start Date",
+                datetime(samples.end_date+978307200,'unixepoch','localtime') as "End Date",
+                samples.data_id, 
+                case
+                when samples.data_type = 3 then "weight"
+                when samples.data_type = 7 then "steps"
+                when samples.data_type = 8 then "dist in m"
+                when samples.data_type = 9 then "resting energy"
+                when samples.data_type = 10 then "active energy"
+                when samples.data_type = 12 then "flights climbed"
+                when samples.data_type = 67 then "weekly calorie goal"
+                when samples.data_type = 70 then "watch on"
+                when samples.data_type = 75 then "stand"
+                when samples.data_type = 76 then "activity"
+                when samples.data_type = 79 then "workout"
+                when samples.data_type = 83 then "some workouts"
+                end as "activity type",
+                quantity,
+                original_quantity,
+                unit_strings.unit_string,
+                original_unit,
+                correlations.correlation,
+                correlations.object,
+                correlations.provenance
+                string_value,
+                metadata_values.data_value,
+                metadata_values.numerical_value,
+                metadata_values.value_type,
+                metadata_keys.key
+                from samples
+                left outer join quantity_samples on samples.data_id = quantity_samples.data_id
+                left outer join unit_strings on quantity_samples.original_unit = unit_strings.RowID
+                left outer join correlations on samples.data_id = correlations.object
+                left outer join metadata_values on metadata_values.object_id = samples.data_id
+                left outer join metadata_keys on metadata_keys.ROWID = metadata_values.key_id
+                order by "Start Date" desc
+        BaseFileName: Samples

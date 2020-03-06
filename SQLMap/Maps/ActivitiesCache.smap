@@ -1,0 +1,46 @@
+Description: ActivitiesCache Windows Timeline
+Author: Eric Zimmerman
+Email: saericzimmerman@gmail.com
+Id: d0022b46-3896-4b9f-a9e5-499241eba806
+Version: 0.2
+CSVPrefix: ActivitiesCache
+FileName: ActivitiesCache.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='Activity' OR name='Activity_PackageId' OR name='ActivityOperation');
+IdentifyValue: 3
+Queries:
+    -
+        Name: Activity Package Id
+        Query: |
+                Select substr(hex(ActivityId), 1, 8)
+                || '-' || substr(hex(ActivityId), 9, 4)
+                || '-' || substr(hex(ActivityId), 13, 4)
+                || '-' || substr(hex(ActivityId), 17, 4)
+                || '-' || substr(hex(ActivityId), 21, 12) as ActivityId,Platform,PackageName,
+                datetime(ExpirationTime,'unixepoch','localtime') as ExpirationTime from Activity_PackageId
+        BaseFileName: ActivityPackageId
+    -
+        Name: Activity Operation
+        Query: |
+                Select OperationOrder,AppId,ActivityType,
+                datetime(LastModifiedTime,'unixepoch','localtime') as LastModifiedTime,
+                datetime(ExpirationTime,'unixepoch','localtime') as ExpirationTime,
+                datetime(CreatedTime,'unixepoch','localtime') as CreatedTime,
+                datetime(EndTime,'unixepoch','localtime') as EndTime,
+                datetime(LastModifiedOnClient,'unixepoch','localtime') as LastModifiedOnClient,PlatformDeviceId from ActivityOperation;
+        BaseFileName: ActivityOperation
+    -
+        Name: Activity
+        Query: |
+                Select substr(hex(Id), 1, 8)
+                || '-' || substr(hex(Id), 9, 4)
+                || '-' || substr(hex(Id), 13, 4)
+                || '-' || substr(hex(Id), 17, 4)
+                || '-' || substr(hex(Id), 21, 12) as Id,payload,
+                datetime(LastModifiedTime,'unixepoch','localtime') as LastModifiedTime,
+                datetime(ExpirationTime,'unixepoch','localtime') as ExpirationTime,
+                datetime(CreatedInCloud,'unixepoch','localtime') as CreatedInCloud,
+                datetime(StartTime,'unixepoch','localtime') as StartTime,datetime(EndTime,'unixepoch','localtime') as EndTime,
+                datetime(LastModifiedOnClient,'unixepoch','localtime') as LastModifiedOnClient,
+                datetime(OriginalLastModifiedOnClient,'unixepoch','localtime') as OriginalLastModifiedOnClient,
+                ActivityType,IsLocalOnly,ETag,PackageIdHash,PlatformDeviceId from Activity
+        BaseFileName: Activity
