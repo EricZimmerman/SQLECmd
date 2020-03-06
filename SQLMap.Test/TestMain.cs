@@ -187,11 +187,6 @@ namespace SQLMaps.Test
 
         }
 
-        [Test]
-        public void Test()
-        {
-            var s = new SQLMap();
-            s.Test(@"C:\Temp\Contacts.db");
-        }
+       
     }
 }

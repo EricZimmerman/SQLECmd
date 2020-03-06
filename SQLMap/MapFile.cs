@@ -12,10 +12,17 @@ namespace SQLMaps
         public string Email { get; set; }
         public string Id { get; set; }
         public double Version { get; set; }
+
+        /// <summary>
+        /// Value to prepend to CSV file names. Useful to group results together
+        /// </summary>
+        public string CSVPrefix { get; set; }
+
         /// <summary>
         /// The database's 'normal' filename to look
         /// </summary>
         public string FileName { get; set; }
+        
 
         /// <summary>
         /// The SQL statement used to identify this database
@@ -66,6 +73,7 @@ namespace SQLMaps
         public MapFileMapValidator()
         {
             RuleFor(q => q.Description).NotNull();
+            RuleFor(q => q.CSVPrefix).NotNull();
             RuleFor(q => q.Author).NotEmpty();
             RuleFor(q => q.Email).NotEmpty();
             RuleFor(q => q.Id).NotEmpty();

@@ -3,6 +3,7 @@ Author: Eric Zimmerman
 Email: saericzimmerman@gmail.com
 Id: 83b99299-2d84-4844-af25-c727d3440b19
 Version: 0.2
+CSVPrefix: Contacts
 FileName: Contacts.db # Used when in non-hunting mode. In hunting mode, sqlite files will be identified by their header. This mode will let you sweep for changes/unknown databases across a directory
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='Customers' OR name='Total');
 IdentifyValue: 2 #Both tables should exist. this is always treated as a string

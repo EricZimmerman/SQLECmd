@@ -5,7 +5,20 @@
     <TargetFrameworks>net462</TargetFrameworks>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Version>0.5.0.0</Version>
+    <ApplicationIcon>DatabaseSearch.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net462|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net462|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="bin\Debug\SQLite.Interop.dll" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AlphaFS" Version="2.2.6" />
@@ -13,12 +26,28 @@
     <PackageReference Include="Exceptionless" Version="4.3.2027" />
     <PackageReference Include="FluentCommandLineParser-netstandard" Version="1.4.3.13" />
     <PackageReference Include="NLog" Version="4.6.8" />
+    <PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="5.8.0" />
     <PackageReference Include="ServiceStack.Text" Version="5.8.0" />
     <PackageReference Include="SharpZipLib" Version="1.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SQLMap\SQLMaps.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

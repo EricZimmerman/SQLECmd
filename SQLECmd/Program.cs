@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using Alphaleonis.Win32.Filesystem;
 using Alphaleonis.Win32.Security;
+using CsvHelper;
 using Exceptionless;
 using Fclp;
 using ICSharpCode.SharpZipLib.Zip;
@@ -13,7 +16,14 @@ using NLog;
 using NLog.Config;
 using NLog.Targets;
 using ServiceStack;
+using ServiceStack.OrmLite;
+using ServiceStack.OrmLite.Dapper;
+using SQLECmd.Properties;
 using SQLMaps;
+using Directory = Alphaleonis.Win32.Filesystem.Directory;
+using File = Alphaleonis.Win32.Filesystem.File;
+using FileInfo = Alphaleonis.Win32.Filesystem.FileInfo;
+using Path = Alphaleonis.Win32.Filesystem.Path;
 
 namespace SQLECmd
 {
@@ -178,6 +188,8 @@ namespace SQLECmd
 
             LogManager.ReconfigExistingLoggers();
 
+            DumpSqliteDll();
+
             var sw = new Stopwatch();
             sw.Start();
 
@@ -280,9 +292,32 @@ namespace SQLECmd
             }
 
             _logger.Info($"\r\nProcessed {_processedFiles.Count:N0} file{extra} in {sw.Elapsed.TotalSeconds:N4} seconds\r\n");
+
+            if (File.Exists("SQLite.Interop.dll"))
+            {
+                try
+                {
+                    File.Delete("SQLite.Interop.dll");
+                }
+                catch (Exception)
+                {
+                    _logger.Warn("Unable to delete 'SQLite.Interop.dll'. Delete manually if needed.\r\n");
+                }
+            }
+                
         }
 
         private static readonly List<string> _processedFiles  = new List<string>();
+
+        private static void DumpSqliteDll()
+        {
+            var sqllitefile = "SQLite.Interop.dll";
+
+           // if (Environment.Is64BitProcess)
+                File.WriteAllBytes(sqllitefile, Resources.SQLite_Interop);
+        //    else
+         //       File.WriteAllBytes(sqllitefile, Resources.x86SQLite_Interop);
+        }
 
         private static void ProcessFile(string fileName)
         {
@@ -323,16 +358,77 @@ namespace SQLECmd
 
             _processedFiles.Add(fileName);
 
+            var maps = new List<MapFile>();
 
             if (_fluentCommandLineParser.Object.Hunt)
             {
-                //need to run thru each map and see if we get any IdentityQuery matches
-                //process each one that matches
+                maps = SQLMap.MapFiles.Values.ToList();
             }
             else
             {
                 //only find maps tht match the db filename
-                //process each one for identityQuery info
+                maps = SQLMap.MapFiles.Values.Where(t => string.Equals(t.FileName, Path.GetFileName(fileName),
+                    StringComparison.InvariantCultureIgnoreCase)).ToList();
+
+            }
+
+            var baseTime = DateTimeOffset.UtcNow;
+
+            //need to run thru each map and see if we get any IdentityQuery matches
+            //process each one that matches
+            foreach (var map in maps)
+            {
+                var dbFactory = new OrmLiteConnectionFactory($"{fileName}",SqliteDialect.Provider);
+
+                 using (var db = dbFactory.Open())
+                 {
+                     _logger.Info($"Verifying database via '{map.IdentifyQuery}'");
+                     var id = db.ExecuteScalar<string>(map.IdentifyQuery);
+
+                     if (string.Equals(id,map.IdentifyValue,StringComparison.InvariantCultureIgnoreCase) == false)
+                     {
+                         _logger.Warn($"Got value '{id}' from IdentityQuery, but expected '{map.IdentifyValue}'. Queries will not be processed!");
+                         continue;
+                     }
+                                    
+                     _logger.Info($"Map queries found: {map.Queries.Count:N0}. Processing...");
+                     foreach (var queryInfo in map.Queries)
+                     {
+                         try
+                         {
+                             
+
+                             var results = db.Query<dynamic>(queryInfo.Query);
+
+                             var outName =
+                                 $"{baseTime:yyyyMMddHHmmss}_{map.CSVPrefix}_{queryInfo.BaseFileName}_{map.Id}.csv";
+
+                             var fullOutName = Path.Combine(_fluentCommandLineParser.Object.CsvDirectory, outName);
+
+                             _logger.Info($"Dumping information for '{queryInfo.Name}' to '{fullOutName}'");
+
+                             using (var writer = new StreamWriter(new FileStream(fullOutName,FileMode.CreateNew)))
+                             {
+                                 using (var csv = new CsvWriter(writer,CultureInfo.InvariantCulture))
+                                 {
+                                     csv.WriteRecords(results);
+                                    
+                                    _logger.Debug($"Wrote {csv.Context.Row:N0} rows (including header)");
+
+                                     csv.Flush();
+                                     writer.Flush();
+                                 }
+                                                
+                             }
+                         }
+                         catch (Exception e)
+                         {
+                             _logger.Error(e.Message);
+                         }
+                                        
+
+                     }
+                 }
             }
 
 
