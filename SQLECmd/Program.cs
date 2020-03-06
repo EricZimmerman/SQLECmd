@@ -58,11 +58,17 @@ namespace SQLECmd
             _fluentCommandLineParser.Setup(arg => arg.JsonDirectory)
                 .As("json")
                 .WithDescription(
-                    "Directory to save JSON formatted results to."); // This, --csv, or --xml required
+                    "Directory to save JSON formatted results to.\r\n"); // This, --csv, or --xml required
             // _fluentCommandLineParser.Setup(arg => arg.JsonName)
             //     .As("jsonf")
             //     .WithDescription(
             //         "File name to save JSON formatted results to. When present, overrides default name");
+
+            _fluentCommandLineParser.Setup(arg => arg.Dedupe)
+                .As("dedupe")
+                .WithDescription(
+                    "Deduplicate -f or -d files based on SHA-1. First file found wins. Default is TRUE")
+                .SetDefault(true);
 
             _fluentCommandLineParser.Setup(arg => arg.Hunt)
                 .As("hunt")
@@ -221,27 +227,23 @@ namespace SQLECmd
                 }
 
                 ProcessFile(Path.GetFullPath(_fluentCommandLineParser.Object.File));
-
             }
             else
             {
                 //Directories
-                _logger.Info($"Looking for database files in '{_fluentCommandLineParser.Object.Directory}'");
+                _logger.Info($"Looking for files in '{_fluentCommandLineParser.Object.Directory}'");
                 _logger.Info("");
-                
-                //need to build this out based on hunt
-                //if hunt is on, all files should be looked at
-                //if off, only the filenames in the maps should be used
 
                 var dirEnumOptions =
                     DirectoryEnumerationOptions.Files | DirectoryEnumerationOptions.Recursive |
                     DirectoryEnumerationOptions.SkipReparsePoints | DirectoryEnumerationOptions.ContinueOnException |
                     DirectoryEnumerationOptions.BasicSearch;
 
-                var f = new DirectoryEnumerationFilters();
-
-                f.RecursionFilter = entryInfo => !entryInfo.IsMountPoint && !entryInfo.IsSymbolicLink;
-                f.ErrorFilter = (errorCode, errorMessage, pathProcessed) => true;
+                var f = new DirectoryEnumerationFilters
+                {
+                    RecursionFilter = entryInfo => !entryInfo.IsMountPoint && !entryInfo.IsSymbolicLink,
+                    ErrorFilter = (errorCode, errorMessage, pathProcessed) => true
+                };
 
                 var dbNames = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
@@ -251,16 +253,12 @@ namespace SQLECmd
                 }
                 else
                 {
-                    //get list of files from maps
-                    //compare to file list found in enumerator
-                    
                     foreach (var mapFile in SQLMap.MapFiles)
                     {
                         dbNames.Add(mapFile.Value.FileName);
                     }
 
                     f.InclusionFilter = fsei => dbNames.Contains(fsei.FileName);
-
                 }
 
                 var files2 =
@@ -270,9 +268,7 @@ namespace SQLECmd
                 {
                     ProcessFile(file);
                 }
-
             }
-
 
             sw.Stop();
 
@@ -284,9 +280,6 @@ namespace SQLECmd
             }
 
             _logger.Info($"\r\nProcessed {_processedFiles.Count:N0} file{extra} in {sw.Elapsed.TotalSeconds:N4} seconds\r\n");
-
-
-
         }
 
         private static readonly List<string> _processedFiles  = new List<string>();
@@ -311,11 +304,41 @@ namespace SQLECmd
 
             _logger.Debug($"'{fileName}' is a SQLite file!");
 
+            if (_fluentCommandLineParser.Object.Dedupe)
+            {
+                var sha = File.GetHash(fileName, HashType.SHA1);
+
+                if (_seenHashes.Contains(sha))
+                {
+                    _logger.Error($"Skipping '{fileName}' as a file with SHA-1 '{sha}' has already been processed");
+                    return;
+                }
+
+                _logger.Debug($"Adding '{fileName}' SHA-1 '{sha}' to seen hashes collection");
+                _seenHashes.Add(sha);
+            }
+
+
             _logger.Warn($"Processing '{fileName}'...");
 
             _processedFiles.Add(fileName);
 
+
+            if (_fluentCommandLineParser.Object.Hunt)
+            {
+                //need to run thru each map and see if we get any IdentityQuery matches
+                //process each one that matches
+            }
+            else
+            {
+                //only find maps tht match the db filename
+                //process each one for identityQuery info
+            }
+
+
         }
+
+        private static readonly HashSet<string> _seenHashes = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
         private static void UpdateFromRepo()
         {
@@ -475,7 +498,7 @@ namespace SQLECmd
 
 
  //       public bool Vss { get; set; }
-  //      public bool Dedupe { get; set; }
+        public bool Dedupe { get; set; }
         public bool Sync { get; set; }
     }
 }
