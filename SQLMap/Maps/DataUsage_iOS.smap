@@ -1,0 +1,20 @@
+Description: DataUsage Database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: 83b99299-2d84-4844-af22-c227d2440b12
+Version: 0.2
+CSVPrefix: DataUsage
+FileName:DataUsage.sqlite
+
+Queries:
+    -
+        Name: DataUsage
+        Query: | 
+               Select
+		ZPROCESS.Z_PK,
+		dateTime(ZFIRSTTIMESTAMP + 978307200, 'UNIXEPOCH') AS "First Timestamp",
+		dateTime(ZTIMESTAMP + 978307200, 'UNIXEPOCH') AS "Last Timestamp",
+		ZBUNDLENAME,
+		ZPROCNAME
+		From ZPROCESS
+   BaseFileName: DataUsage

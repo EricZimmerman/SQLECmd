@@ -1,0 +1,22 @@
+Description: iOS Accounts (3/4) database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: 83b99299-2d84-4844-af22-c227d2440b12
+Version: 0.2
+CSVPrefix: Accounts
+FileName: accounts3.db accounts4.db
+Queries:
+    -
+        Name: Accounts
+        Query: | 
+                SELECT
+		Z_PK,
+		ZACCOUNTTYPE AS "Account Type",
+		ZPARENTACCOUNT AS "Parent Account",
+		ZUSERNAME AS "Username",
+		DATETIME(ZDATE+978307200,'UNIXEPOCH') AS "TIMESTAMP",
+		ZACCOUNTDESCRIPTION AS "Account Description",
+		ZIDENTIFIER AS "Identifier",
+		ZOWNINGBUNDLEID AS "Bundle ID"
+		FROM ZACCOUNT
+        BaseFileName: Accounts
