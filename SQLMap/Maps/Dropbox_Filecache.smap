@@ -1,0 +1,36 @@
+Description: Dropbox Filecache Database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: 83b99299-2d84-4844-af22-c227d2440b12
+Version: 0.2
+CSVPrefix: Dropbox Filecache
+FileName: filecache.db
+Queries:
+    -
+        Name: Drobpox
+        Query: | 
+           	SELECT
+		id,
+		server_path,
+		parent_path,
+		local_host_id,
+		local_filename,
+		local_infinite_details,
+		local_size,
+		datetime(local_mtime,'unixepoch') AS "Local Modified Time",
+		datetime(local_ctime,'unixepoch') AS "Local Created Time",
+		local_attrs,
+		datetime(local_timestamp,'unixepoch') AS "Local Timestamp",
+		local_user_id,
+		Local_sync_type,
+		updated_filename,
+		updated_host_id,
+		updated_size,
+		datetime(updated_mtime) AS "Updated Modified Time",
+		datetime(updated_timestamp) AS "Updated Timestamp",
+		updated_dir,
+		updated_user_id,
+		updated_sync_type
+		from file_journal
+		order by "local created time" desc
+        BaseFileName: Dropbox File Cache

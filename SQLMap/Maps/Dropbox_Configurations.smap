@@ -1,0 +1,16 @@
+Description: Dropbox database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: 83b99299-2d84-4844-af22-c227d2440b12
+Version: 0.2
+CSVPrefix: Dropbox Configurations
+FileName: config.db
+Queries:
+    -
+        Name: Drobpox
+        Query: | 
+             SELECT
+		key,
+		VALUE
+		from config  
+        BaseFileName: Dropbox Configurations

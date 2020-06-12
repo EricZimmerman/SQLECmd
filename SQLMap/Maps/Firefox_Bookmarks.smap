@@ -1,0 +1,24 @@
+Description: Firefox Bookmarks Database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: 83b99299-2d84-4844-af22-c227d2440b12
+Version: 0.2
+CSVPrefix: Browser
+FileName:browser.db
+
+Queries:
+    -
+        Name: Browser
+        Query: | 
+               SELECT
+		_id,
+		title,
+		url,
+		datetime(created/1000,'unixepoch') AS "Created",
+		datetime(modified/1000,'unixepoch') AS "Modified",
+		CASE
+		when deleted=0 then "Not Deleted"
+		when deleted=1 then "Deleted"
+		end AS "State"
+		from bookmarks
+   BaseFileName: Browser

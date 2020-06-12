@@ -1,0 +1,18 @@
+Description: Android Launcher Database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: 83b99299-2d84-4844-af22-c227d2440b12
+Version: 0.2
+CSVPrefix: Launcher
+FileName:launcher.db
+
+Queries:
+    -
+        Name: Launcher
+        Query: | 
+               SELECT
+		_id,
+		intent AS "Application",
+		datetime(modified/1000,'unixepoch') AS "Modified"
+		from favorites
+   BaseFileName: Launcher

@@ -2,7 +2,7 @@
   "profiles": {
     "SQLECmd": {
       "commandName": "Project",
-      "commandLineArgs": "-d C:\\Temp\\ --csv C:\\Temp\\csvout"
+      "commandLineArgs": "-d C:\\Temp\\test --csv C:\\Temp\\csvout --hunt"
     }
   }
 }

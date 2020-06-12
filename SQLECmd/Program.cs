@@ -284,6 +284,17 @@ namespace SQLECmd
 
             sw.Stop();
 
+            if (_unmatchedDbs.Any())
+            {
+                Console.WriteLine();
+                _logger.Fatal($"At least one database was found with no corresponding map.");
+
+                foreach (var unmatchedDb in _unmatchedDbs)
+                {
+                    DumpUnmatched(unmatchedDb);
+                }
+            }
+            
             var extra = string.Empty;
 
             if (_processedFiles.Count > 1)
@@ -307,6 +318,26 @@ namespace SQLECmd
                 
         }
 
+        private static void DumpUnmatched(string unmatchedDb)
+        {
+            var dbFactory = new OrmLiteConnectionFactory($"{unmatchedDb}",SqliteDialect.Provider);
+
+            using (var db = dbFactory.Open())
+            {
+                _logger.Debug($"\tGetting table names");
+                var reader=   db.ExecuteReader("SELECT name FROM sqlite_master WHERE type='table' order by name");
+
+                var tables = new List<string>();
+                while (reader.Read())
+                {
+                    tables.Add(reader[0].ToString());
+                }
+                
+                _logger.Info($"\tFile name: '{unmatchedDb}', Tables: {string.Join(",",tables)}");                
+                     
+            }
+        }
+
         private static readonly List<string> _processedFiles  = new List<string>();
 
         private static void DumpSqliteDll()
@@ -318,6 +349,8 @@ namespace SQLECmd
         //    else
          //       File.WriteAllBytes(sqllitefile, Resources.x86SQLite_Interop);
         }
+
+
 
         private static void ProcessFile(string fileName)
         {
@@ -335,7 +368,6 @@ namespace SQLECmd
                 
                 return;
             }
-            
 
             _logger.Debug($"'{fileName}' is a SQLite file!");
 
@@ -353,7 +385,6 @@ namespace SQLECmd
                 _seenHashes.Add(sha);
             }
 
-
             _logger.Warn($"Processing '{fileName}'...");
 
             _processedFiles.Add(fileName);
@@ -369,10 +400,9 @@ namespace SQLECmd
                 //only find maps tht match the db filename
                 maps = SQLMap.MapFiles.Values.Where(t => string.Equals(t.FileName, Path.GetFileName(fileName),
                     StringComparison.InvariantCultureIgnoreCase)).ToList();
-
             }
 
-            
+            var foundMap = false;
 
             //need to run thru each map and see if we get any IdentityQuery matches
             //process each one that matches
@@ -386,14 +416,17 @@ namespace SQLECmd
 
                  using (var db = dbFactory.Open())
                  {
-                     _logger.Info($"\tVerifying database via '{map.IdentifyQuery}'");
+                     _logger.Debug($"\tVerifying database via '{map.IdentifyQuery}'");
                      var id = db.ExecuteScalar<string>(map.IdentifyQuery);
 
                      if (string.Equals(id,map.IdentifyValue,StringComparison.InvariantCultureIgnoreCase) == false)
                      {
-                         _logger.Warn($"\tGot value '{id}' from IdentityQuery, but expected '{map.IdentifyValue}'. Queries will not be processed!");
+                         _logger.Debug($"\t\tGot value '{id}' from IdentityQuery, but expected '{map.IdentifyValue}'. Queries will not be processed!");
                          continue;
                      }
+
+                     //if we find any matches, its not unmatched anymore
+                     foundMap = true;
                                     
                      _logger.Info($"\tMap queries found: {map.Queries.Count:N0}. Processing queries...");
                      foreach (var queryInfo in map.Queries)
@@ -409,7 +442,7 @@ namespace SQLECmd
 
                              var fullOutName = Path.Combine(_fluentCommandLineParser.Object.CsvDirectory, outName);
 
-                             _logger.Info($"\tDumping information for '{queryInfo.Name}' to '{fullOutName}'");
+                             _logger.Info($"\tDumping '{queryInfo.Name}' to '{fullOutName}'");
 
                              using (var writer = new StreamWriter(new FileStream(fullOutName,FileMode.CreateNew)))
                              {
@@ -434,9 +467,16 @@ namespace SQLECmd
                  }
             }
 
+            if (foundMap == false)
+            {
+                _logger.Info($"\tNo maps found for '{fileName}'. Adding to unmatched database list");
+                _unmatchedDbs.Add(fileName);
+            }
+
             Console.WriteLine();
         }
 
+        private static readonly HashSet<string> _unmatchedDbs = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
         private static readonly HashSet<string> _seenHashes = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
         private static void UpdateFromRepo()
