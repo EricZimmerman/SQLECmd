@@ -287,7 +287,7 @@ namespace SQLECmd
             if (_unmatchedDbs.Any())
             {
                 Console.WriteLine();
-                _logger.Fatal($"At least one database was found with no corresponding map.");
+                _logger.Fatal($"At least one database was found with no corresponding map (Use --debug for more details about discovery process)");
 
                 foreach (var unmatchedDb in _unmatchedDbs)
                 {
@@ -324,7 +324,7 @@ namespace SQLECmd
 
             using (var db = dbFactory.Open())
             {
-                _logger.Debug($"\tGetting table names");
+                _logger.Trace($"\tGetting table names for '{unmatchedDb}'");
                 var reader=   db.ExecuteReader("SELECT name FROM sqlite_master WHERE type='table' order by name");
 
                 var tables = new List<string>();
@@ -378,6 +378,7 @@ namespace SQLECmd
                 if (_seenHashes.Contains(sha))
                 {
                     _logger.Error($"Skipping '{fileName}' as a file with SHA-1 '{sha}' has already been processed");
+                    Console.WriteLine();
                     return;
                 }
 
@@ -421,14 +422,14 @@ namespace SQLECmd
 
                      if (string.Equals(id,map.IdentifyValue,StringComparison.InvariantCultureIgnoreCase) == false)
                      {
-                         _logger.Debug($"\t\tGot value '{id}' from IdentityQuery, but expected '{map.IdentifyValue}'. Queries will not be processed!");
+                         _logger.Error($"\tGot value '{id}' from IdentityQuery, but expected '{map.IdentifyValue}'. Queries will not be processed!");
                          continue;
                      }
 
                      //if we find any matches, its not unmatched anymore
                      foundMap = true;
                                     
-                     _logger.Info($"\tMap queries found: {map.Queries.Count:N0}. Processing queries...");
+                     _logger.Error($"\tMap queries found: {map.Queries.Count:N0}. Processing queries...");
                      foreach (var queryInfo in map.Queries)
                      {
                          _logger.Debug($"Processing query '{queryInfo.Name}'");
