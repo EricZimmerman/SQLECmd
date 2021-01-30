@@ -11,14 +11,14 @@ Queries:
         Name: Browser
         Query: | 
                SELECT
-		_id,
-		title,
-		url,
-		datetime(created/1000,'unixepoch') AS "Created",
-		datetime(modified/1000,'unixepoch') AS "Modified",
-		CASE
-		when deleted=0 then "Not Deleted"
-		when deleted=1 then "Deleted"
-		end AS "State"
-		from bookmarks
+                _id,
+                title,
+                url,
+                datetime(created/1000,'unixepoch') AS "Created",
+                datetime(modified/1000,'unixepoch') AS "Modified",
+                CASE
+                when deleted=0 then "Not Deleted"
+                when deleted=1 then "Deleted"
+                end AS "State"
+                from bookmarks
    BaseFileName: Browser

@@ -10,9 +10,9 @@ Queries:
         Name: Frosting
         Query: | 
                 select
-		pk,
-		apk_path,
-		datetime(last_updated/1000,'UNIXEPOCH','localtime') AS "Last Updated",
-		data
-		from frosting
+                pk,
+                apk_path,
+                datetime(last_updated/1000,'UNIXEPOCH','localtime') AS "Last Updated",
+                data
+                from frosting
         BaseFileName: Frosting/App Tracker

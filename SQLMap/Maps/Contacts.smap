@@ -32,7 +32,7 @@ Queries:
 #                Id: Hex
 #                Timestamp: Epoch
 #                SomeOther: EpochMillisecond
-#		 Chrome timestamps and Mac (9 and 18 digit) timestamps
-#		 BLOBS - images, gzip, binary plists, plists, etc.
-#		 Base 64 for certain payloads
+#                Chrome timestamps and Mac (9 and 18 digit) timestamps
+#                BLOBS - images, gzip, binary plists, plists, etc.
+#                Base 64 for certain payloads
 #        Protobuff

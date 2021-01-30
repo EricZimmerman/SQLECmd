@@ -11,8 +11,8 @@ Queries:
         Name: Launcher
         Query: | 
                SELECT
-		_id,
-		intent AS "Application",
-		datetime(modified/1000,'unixepoch') AS "Modified"
-		from favorites
+                _id,
+                intent AS "Application",
+                datetime(modified/1000,'unixepoch') AS "Modified"
+                from favorites
    BaseFileName: Launcher

@@ -10,7 +10,7 @@ Queries:
         Name: Drobpox
         Query: | 
              SELECT
-		key,
-		VALUE
-		from config  
+                key,
+                VALUE
+                from config  
         BaseFileName: Dropbox Configurations

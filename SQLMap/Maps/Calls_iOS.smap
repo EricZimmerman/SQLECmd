@@ -10,17 +10,17 @@ Queries:
         Name: Calls
         Query: | 
                 select
-		z_pk AS "Call Sequence #",
-		zaddress AS "Phone Number",
-		zduration AS "Call in Seconds",
-		case
-		when zoriginated = 0 then "Incoming"
-		when zoriginated = 1 then "Outgoing"
-		end AS "Call Direction",
-		case
-		when zanswered = 0 then "Call Missed"
-		when zanswered = 1 then "Call Answered"
-		end as "Call Status",
-		datetime(zdate+978307200,'unixepoch','localtime') AS "Timestamp"
-		from zcallrecord
+                z_pk AS "Call Sequence #",
+                zaddress AS "Phone Number",
+                zduration AS "Call in Seconds",
+                case
+                when zoriginated = 0 then "Incoming"
+                when zoriginated = 1 then "Outgoing"
+                end AS "Call Direction",
+                case
+                when zanswered = 0 then "Call Missed"
+                when zanswered = 1 then "Call Answered"
+                end as "Call Status",
+                datetime(zdate+978307200,'unixepoch','localtime') AS "Timestamp"
+                from zcallrecord
         BaseFileName: Calls

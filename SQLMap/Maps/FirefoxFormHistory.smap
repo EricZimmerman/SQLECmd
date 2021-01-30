@@ -10,13 +10,13 @@ Queries:
         Name: Firefox Form History
         Query: | 
                select
-		id,
-		fieldname,
-		value,
-		timesUsed,
-		datetime(firstUsed/1000000,'unixepoch','localtime') AS "First Used",
-		datetime(lastUsed/1000000,'unixepoch','localtime') AS "Last Used",
-		guid
-		from moz_formhistory
-		order by fieldname desc
+                id,
+                fieldname,
+                value,
+                timesUsed,
+                datetime(firstUsed/1000000,'unixepoch','localtime') AS "First Used",
+                datetime(lastUsed/1000000,'unixepoch','localtime') AS "Last Used",
+                guid
+                from moz_formhistory
+                order by fieldname desc
         BaseFileName: Firefox Form History
