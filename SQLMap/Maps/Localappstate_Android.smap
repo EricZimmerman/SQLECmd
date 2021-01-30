@@ -10,18 +10,18 @@ Queries:
         Name: Localappstate
         Query: | 
                 SELECT
-		package_name,
-		case
-		when auto_update = 1 then "AutoUpdate Set"
-		else "No AutoUpdate"
-		end AS "AutoUpdate Status",
-		delivery_data,
-		DateTime(delivery_data_timestamp_ms / 1000, 'UNIXEPOCH') As "Delivery Date",
-		DateTime(first_download_ms / 1000, 'UNIXEPOCH') As "First Download Date",
-		account,
-		title,
-		last_notified_version,
-		datetime(last_update_timestamp_ms/ 1000, 'UNIXEPOCH') As "Last Update",
-		datetime(install_request_timestamp_ms/ 1000, 'UNIXEPOCH') As "Install Request Date"
-		From appstate
+                package_name,
+                case
+                when auto_update = 1 then "AutoUpdate Set"
+                else "No AutoUpdate"
+                end AS "AutoUpdate Status",
+                delivery_data,
+                DateTime(delivery_data_timestamp_ms / 1000, 'UNIXEPOCH') As "Delivery Date",
+                DateTime(first_download_ms / 1000, 'UNIXEPOCH') As "First Download Date",
+                account,
+                title,
+                last_notified_version,
+                datetime(last_update_timestamp_ms/ 1000, 'UNIXEPOCH') As "Last Update",
+                datetime(install_request_timestamp_ms/ 1000, 'UNIXEPOCH') As "Install Request Date"
+                From appstate
         BaseFileName: LocalAppstate/App Tracker

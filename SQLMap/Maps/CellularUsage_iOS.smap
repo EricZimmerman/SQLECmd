@@ -10,9 +10,9 @@ Queries:
         Name: CellularUsage
         Query: | 
                 SELECT
-		ROWID,
-		subscriber_id AS "ICCID",
-		subscriber_mdn AS "Phone Number",
-		datetime(last_update_time+978307200,'UNIXEPOCH','localtime') AS "Last Updated"
-		FROM subscriber_info
+                ROWID,
+                subscriber_id AS "ICCID",
+                subscriber_mdn AS "Phone Number",
+                datetime(last_update_time+978307200,'UNIXEPOCH','localtime') AS "Last Updated"
+                FROM subscriber_info
         BaseFileName: CellularUsage/SIM Usage

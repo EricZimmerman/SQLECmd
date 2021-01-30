@@ -10,13 +10,13 @@ Queries:
         Name: Accounts
         Query: | 
                 SELECT
-		Z_PK,
-		ZACCOUNTTYPE AS "Account Type",
-		ZPARENTACCOUNT AS "Parent Account",
-		ZUSERNAME AS "Username",
-		DATETIME(ZDATE+978307200,'UNIXEPOCH') AS "TIMESTAMP",
-		ZACCOUNTDESCRIPTION AS "Account Description",
-		ZIDENTIFIER AS "Identifier",
-		ZOWNINGBUNDLEID AS "Bundle ID"
-		FROM ZACCOUNT
+                Z_PK,
+                ZACCOUNTTYPE AS "Account Type",
+                ZPARENTACCOUNT AS "Parent Account",
+                ZUSERNAME AS "Username",
+                DATETIME(ZDATE+978307200,'UNIXEPOCH') AS "TIMESTAMP",
+                ZACCOUNTDESCRIPTION AS "Account Description",
+                ZIDENTIFIER AS "Identifier",
+                ZOWNINGBUNDLEID AS "Bundle ID"
+                FROM ZACCOUNT
         BaseFileName: Accounts

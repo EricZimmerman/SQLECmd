@@ -10,16 +10,16 @@ Queries:
         Name: SMS
         Query: | 
              select
-		mmssms._id,
-		mmssms.msg_type,
-		case
-		when mmssms.type = 2 then "incoming"
-		when mmssms.type = 1 then "outgoing"
-		end AS "message status",
-		mmssms.address,
-		datetime(mmssms.date/1000,'UNIXEPOCH','localtime') AS "date",
-		mmssms.body AS "message",
-		mmssms_tag.tag AS "unread"
-		from mmssms
-l		eft join mmssms_tag on mmssms_tag._id=mmssms._id   
+                mmssms._id,
+                mmssms.msg_type,
+                case
+                when mmssms.type = 2 then "incoming"
+                when mmssms.type = 1 then "outgoing"
+                end AS "message status",
+                mmssms.address,
+                datetime(mmssms.date/1000,'UNIXEPOCH','localtime') AS "date",
+                mmssms.body AS "message",
+                mmssms_tag.tag AS "unread"
+                from mmssms
+                eft join mmssms_tag on mmssms_tag._id=mmssms._id   
         BaseFileName: SMS
