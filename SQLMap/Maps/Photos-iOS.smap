@@ -10,7 +10,7 @@ IdentifyValue: 5 # Both tables should exist. this is always treated as a string
 Queries:
     -
         Name: Moments
-        Query: | 
+        Query: |
                 Select
                 ZGENERICASSET.Z_PK,
                 CASE

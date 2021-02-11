@@ -4,7 +4,7 @@ Email: hmahalik@gmail.com
 Id: 83b99299-2d84-4844-af22-c227d2440b12
 Version: 0.2
 CSVPrefix: Addressbook
-FileName:Addressbook.sqlitedb
+FileName: Addressbook.sqlitedb
 Queries:
     -
         Name: Addressbook
@@ -24,4 +24,4 @@ Queries:
                 abperson.imagetype
                 from abperson
                 left join abmultivalue on abmultivalue.uid=abperson.ROWID
-   BaseFileName: Addressbook
+        BaseFileName: Addressbook

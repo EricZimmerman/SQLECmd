@@ -6,7 +6,7 @@ Version: 0.2
 CSVPrefix: Contacts
 FileName: Contacts.db # Used when in non-hunting mode. In hunting mode, sqlite files will be identified by their header. This mode will let you sweep for changes/unknown databases across a directory
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='Customers' OR name='Total');
-IdentifyValue: 2 #Both tables should exist. this is always treated as a string
+IdentifyValue: 2 # Both tables should exist. this is always treated as a string
 Queries:
     -
         Name: Customers table users
@@ -26,7 +26,7 @@ Queries:
         BaseFileName: AnotherExample
 
 
-#TODO, transforms
+# TODO, transforms
 #        Transforms:
 #            -
 #                Id: Hex

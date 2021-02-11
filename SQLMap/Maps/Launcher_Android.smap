@@ -14,4 +14,4 @@ Queries:
                 intent AS "Application",
                 datetime(modified/1000,'unixepoch') AS "Modified"
                 from favorites
-   BaseFileName: Launcher
+        BaseFileName: Launcher

@@ -20,4 +20,4 @@ Queries:
                 when deleted=1 then "Deleted"
                 end AS "State"
                 from bookmarks
-   BaseFileName: Browser
+        BaseFileName: Browser
