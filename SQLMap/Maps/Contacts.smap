@@ -11,7 +11,7 @@ Queries:
     -
         Name: Customers table users
         Query: SELECT FirstName,LastName from Customers
-        BaseFileName: Users #this will be used when naming csv files for export
+        BaseFileName: Users # This will be used when naming csv files for export
     -
         Name: Another Customers table query
         Query: SELECT Id,State as Wizzo from Customers

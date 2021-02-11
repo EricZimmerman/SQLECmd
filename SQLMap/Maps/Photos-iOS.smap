@@ -32,4 +32,4 @@ Queries:
                 datetime(ZMOMENT.ZENDDATE+978307200,'UNIXEPOCH') AS "Moment End Date"
                 From ZGENERICASSET
                 left join zmoment on zmoment.z_pk=zgenericasset.zmoment
-        BaseFileName: Moments #this will be used when naming csv files for export
+        BaseFileName: Moments # This will be used when naming csv files for export
