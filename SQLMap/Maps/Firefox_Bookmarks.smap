@@ -4,7 +4,7 @@ Email: hmahalik@gmail.com
 Id: 83b99299-2d84-4844-af22-c227d2440b12
 Version: 0.2
 CSVPrefix: Browser
-FileName:browser.db
+FileName: browser.db
 
 Queries:
     -
