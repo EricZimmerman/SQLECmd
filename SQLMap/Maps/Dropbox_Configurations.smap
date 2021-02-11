@@ -8,9 +8,9 @@ FileName: config.db
 Queries:
     -
         Name: Drobpox
-        Query: | 
+        Query: |
              SELECT
                 key,
                 VALUE
-                from config  
+                from config
         BaseFileName: Dropbox Configurations

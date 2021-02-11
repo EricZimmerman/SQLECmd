@@ -11,11 +11,11 @@ IdentifyValue: 1
 Queries:
     -
         Name: Google Drive Snapshot
-        Query: | 
+        Query: |
                SELECT
                 filename,
                 datetime(modified, 'unixepoch') as "Modified Time",
-                case 
+                case
                 when acl_role = 0 then "Google Drive Owner"
                 else "From Elsewhere"
                 end AS "ACL Role",

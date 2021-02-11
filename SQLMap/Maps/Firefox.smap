@@ -10,7 +10,7 @@ IdentifyValue: 1
 Queries:
     -
         Name: History
-        Query: | 
+        Query: |
                 SELECT
                 url,
                 title,
@@ -19,5 +19,5 @@ Queries:
                 when is_deleted = 1 then "deleted"
                 when is_deleted = 0 then "not deleted"
                 end AS "Deleted State"
-                from history        
+                from history
         BaseFileName: Firefox History

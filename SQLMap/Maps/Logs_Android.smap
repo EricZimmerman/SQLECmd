@@ -11,7 +11,7 @@ IdentifyValue: 1
 Queries:
     -
         Name: Log Snippets
-        Query: | 
+        Query: |
                 SELECT
                 _id,
                 number,

@@ -10,7 +10,7 @@ IdentifyValue: 6
 Queries:
     -
         Name: Device history
-        Query: | 
+        Query: |
                 SELECT
                 manufacturer,
                 hardware,

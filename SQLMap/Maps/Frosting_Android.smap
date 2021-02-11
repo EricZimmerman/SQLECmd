@@ -10,7 +10,7 @@ IdentifyValue: 1
 Queries:
     -
         Name: Frosting
-        Query: | 
+        Query: |
                 select
                 pk,
                 apk_path,

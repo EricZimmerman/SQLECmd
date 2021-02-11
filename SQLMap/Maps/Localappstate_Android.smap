@@ -11,7 +11,7 @@ IdentifyValue: 2
 Queries:
     -
         Name: Localappstate
-        Query: | 
+        Query: |
                 SELECT
                 package_name,
                 case

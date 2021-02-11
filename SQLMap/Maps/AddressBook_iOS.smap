@@ -9,7 +9,7 @@ FileName:Addressbook.sqlitedb
 Queries:
     -
         Name: Addressbook
-        Query: | 
+        Query: |
              SELECT
                 abperson.ROWID,
                 abperson.first,

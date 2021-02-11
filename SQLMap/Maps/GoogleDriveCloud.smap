@@ -10,7 +10,7 @@ IdentifyValue: 1
 Queries:
     -
         Name: Google Drive
-        Query: | 
+        Query: |
               SELECT
                 filename AS "Filename",
                 datetime(modified, 'unixepoch') as "Modified Time",
@@ -38,5 +38,5 @@ Queries:
                 when removed = 0 then "Not Removed"
                 when removed =1 then "Removed"
                 end as "Cloud Status"
-                from cloud_graph_entry   
+                from cloud_graph_entry
         BaseFileName: Google Drive Cloud

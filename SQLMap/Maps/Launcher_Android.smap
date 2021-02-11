@@ -9,7 +9,7 @@ FileName:launcher.db
 Queries:
     -
         Name: Launcher
-        Query: | 
+        Query: |
                SELECT
                 _id,
                 intent AS "Application",

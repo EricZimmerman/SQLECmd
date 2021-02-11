@@ -8,7 +8,7 @@ FileName: filecache.db
 Queries:
     -
         Name: Drobpox
-        Query: | 
+        Query: |
                 SELECT
                 id,
                 server_path,

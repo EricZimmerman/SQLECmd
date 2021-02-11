@@ -10,7 +10,7 @@ IdentifyValue: 1
 Queries:
     -
         Name: CellularUsage
-        Query: | 
+        Query: |
                 SELECT
                 ROWID,
                 subscriber_id AS "ICCID",

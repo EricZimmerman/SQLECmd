@@ -10,7 +10,7 @@ IdentifyValue: 1
 Queries:
     -
         Name: Calls
-        Query: | 
+        Query: |
                 select
                 z_pk AS "Call Sequence #",
                 zaddress AS "Phone Number",

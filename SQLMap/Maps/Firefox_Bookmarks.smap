@@ -9,7 +9,7 @@ FileName:browser.db
 Queries:
     -
         Name: Browser
-        Query: | 
+        Query: |
                SELECT
                 _id,
                 title,

@@ -10,7 +10,7 @@ IdentifyValue: 8
 Queries:
     -
         Name: SMS and iMessage
-        Query: | 
+        Query: |
                 SELECT message.rowid,
                 chat_message_join.chat_id,
                 message.handle_id,

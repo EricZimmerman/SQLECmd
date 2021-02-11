@@ -10,7 +10,7 @@ IdentifyValue: 1
 Queries:
     -
         Name: Accounts
-        Query: | 
+        Query: |
                 SELECT
                 Z_PK,
                 ZACCOUNTTYPE AS "Account Type",

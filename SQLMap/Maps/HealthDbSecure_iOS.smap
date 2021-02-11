@@ -14,7 +14,7 @@ Queries:
                 Select
                 datetime(samples.start_date+978307200,'unixepoch','localtime') as "Start Date",
                 datetime(samples.end_date+978307200,'unixepoch','localtime') as "End Date",
-                samples.data_id, 
+                samples.data_id,
                 case
                 when samples.data_type = 3 then "weight"
                 when samples.data_type = 7 then "steps"
