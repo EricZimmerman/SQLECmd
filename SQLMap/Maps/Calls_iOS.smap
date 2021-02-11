@@ -1,10 +1,12 @@
 Description: iOS 8+ Call History database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
-Id: 83b99299-2d84-4844-af22-c227d2440b12
+Id: 83b99299-2d84-4844-af22-c227d2440b13
 Version: 0.2
 CSVPrefix: Calls
-FileName:Callhistory.storedata
+FileName: callhistory.storedata
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='ZCALLRECORD');
+IdentifyValue: 1
 Queries:
     -
         Name: Calls

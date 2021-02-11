@@ -1,10 +1,12 @@
 Description: iOS SMS database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
-Id: 83b99299-2d84-4844-af22-c227d2440b12
+Id: 83b99299-2d84-4844-af22-c227d2440b35
 Version: 0.2
-CSVPrefix: Calls
-
+CSVPrefix: SMS
+FileName: sms.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='attachment' OR name='chat' OR name='deleted_messages' OR name='handle' OR name='sync_deleted_chats' OR name='sync_deleted_attachments' OR name='sync_deleted_messages' oR name='message');
+IdentifyValue: 8
 Queries:
     -
         Name: SMS and iMessage

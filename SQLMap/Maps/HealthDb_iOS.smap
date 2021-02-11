@@ -1,12 +1,12 @@
 Description: Health Db database
-Author: Heather Mahalik
+Author: Heather Mahalik and Sarah Edwards
 Email: hmahalik@gmail.com
-Id: 72b96792-3d42-4244-af22-c227d2440b12
+Id: 72b96792-3d42-4244-af22-c227d2440b28
 Version: 0.2
 CSVPrefix: HealthDb
 FileName: healthdb.sqlite
-IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='workout_sessions' OR name='alarm_events' OR name='workout_builders');
-IdentifyValue: 3
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='workout_sessions' OR name='alarm_events' OR name='workout_builders' OR name='sources' OR name='sync_stores' OR name='source_devices');
+IdentifyValue: 6
 Queries:
     -
         Name: Device history

@@ -1,10 +1,10 @@
-Description: iOS Accounts (3) database
+Description: iOS Accounts (4) database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
-Id: 83b99299-2d84-4844-af22-c227d2440b10
+Id: 83b99299-2d84-4844-af22-c227d2440b12
 Version: 0.2
 CSVPrefix: Accounts
-FileName: accounts3.db
+FileName: accounts4.db
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='ZACCOUNT');
 IdentifyValue: 1
 Queries:
