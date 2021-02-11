@@ -9,19 +9,20 @@ Queries:
     -
         Name: Addressbook
         Query: |
-             SELECT
-                abperson.ROWID,
-                abperson.first,
-                abperson.last,
-                abperson.middle,
-                abperson.organization,
-                abperson.department,
-                abperson.birthday,
-                datetime(creationdate + 978307200,'unixepoch') AS "Creation Date",
-                datetime(modificationdate +978307200,'unixepoch') AS "Modification Date",
-                abmultivalue.value AS "Number",
-                abperson.imageuri,
-                abperson.imagetype
-                from abperson
-                left join abmultivalue on abmultivalue.uid=abperson.ROWID
+               SELECT
+               abperson.ROWID,
+               abperson.first,
+               abperson.last,
+               abperson.middle,
+               abperson.organization,
+               abperson.department,
+               abperson.birthday,
+               datetime(creationdate + 978307200,'unixepoch') AS "Creation Date",
+               datetime(modificationdate +978307200,'unixepoch') AS "Modification Date",
+               abmultivalue.value AS "Number",
+               abperson.imageuri,
+               abperson.imagetype
+               from abperson
+               left join abmultivalue on abmultivalue.uid=abperson.ROWID
+               left join abmultivalue on abmultivalue.uid=abperson.ROWID
         BaseFileName: Addressbook
