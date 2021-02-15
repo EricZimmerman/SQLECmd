@@ -1,14 +1,16 @@
 Description: Android SMS database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
-Id: 83b99299-2d84-4844-af22-c227d2440b12
+Id: 83b99299-2d84-4844-af22-c227d2440b34
 Version: 0.2
 CSVPrefix: SMS
 FileName: mmssms.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='SMS' or name='part' or name='addr' OR name='mmssms');
+IdentifyValue: 4
 Queries:
     -
         Name: SMS
-        Query: | 
+        Query: |
              select
                 mmssms._id,
                 mmssms.msg_type,
@@ -21,5 +23,5 @@ Queries:
                 mmssms.body AS "message",
                 mmssms_tag.tag AS "unread"
                 from mmssms
-                eft join mmssms_tag on mmssms_tag._id=mmssms._id   
+                left join mmssms_tag on mmssms_tag._id=mmssms._id
         BaseFileName: SMS

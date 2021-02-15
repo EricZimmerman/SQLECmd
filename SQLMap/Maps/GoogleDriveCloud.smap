@@ -1,14 +1,16 @@
 Description: Google Drive Cloud database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
-Id: 83b99299-2d84-4844-af22-c227d2440b12
+Id: 83b99299-2d84-4844-af22-c227d2440b26
 Version: 0.2
 CSVPrefix: Google Drive Cloud Status
-FileName:
+FileName: cloud_graph.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='cloud_graph_entry');
+IdentifyValue: 1
 Queries:
     -
         Name: Google Drive
-        Query: | 
+        Query: |
               SELECT
                 filename AS "Filename",
                 datetime(modified, 'unixepoch') as "Modified Time",
@@ -36,5 +38,5 @@ Queries:
                 when removed = 0 then "Not Removed"
                 when removed =1 then "Removed"
                 end as "Cloud Status"
-                from cloud_graph_entry   
+                from cloud_graph_entry
         BaseFileName: Google Drive Cloud

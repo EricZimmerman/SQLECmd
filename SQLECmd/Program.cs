@@ -115,7 +115,7 @@ namespace SQLECmd
                 @"Examples: SQLECmd.exe -f ""C:\Temp\someFile.db"" --csv ""c:\temp\out"" " +
                 "\r\n\t " +
                 @" SQLECmd.exe -d ""C:\Temp\"" --csv ""c:\temp\out""" + "\r\n\t " +
-                @" EvtxECmd.exe -d ""C:\Temp\"" --hunt --csv ""c:\temp\out""" + "\r\n\t " +
+                @" SQLECmd.exe -d ""C:\Temp\"" --hunt --csv ""c:\temp\out""" + "\r\n\t " +
                 "\r\n\t" +
                 "  Short options (single letter) are prefixed with a single dash. Long commands are prefixed with two dashes\r\n";
 
@@ -451,7 +451,7 @@ namespace SQLECmd
                                  {
                                      csv.WriteRecords(results);
                                     
-                                    _logger.Debug($"Wrote {csv.Context.Row:N0} rows (including header)");
+                                    //_logger.Debug($"Wrote {csv.Context.Writer.Row:N0} rows (including header)");
 
                                      csv.Flush();
                                      writer.Flush();

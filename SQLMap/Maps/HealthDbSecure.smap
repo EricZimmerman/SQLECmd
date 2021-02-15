@@ -1,12 +1,12 @@
 Description: HealthDb Secure database
-Author: Eric Zimmerman
-Email: saericzimmerman@gmail.com
-Id: 72b96792-3d42-4246-af42-c457d1540b23
+Author: Heather Mahalik and Sarah Edwards
+Email: hmahalik@gmail.com
+Id: 72b96792-3d42-4246-af42-c457d1540b29
 Version: 0.2
 CSVPrefix: HealthDBSecure
 FileName: healthdb_secure.sqlite
-IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='workouts' OR name='workout_events' OR name='medical_records');
-IdentifyValue: 3
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='workouts' OR name='workout_events' OR name='medical_records' OR name='clinical accounts' OR name='data_provences' OR name='devices' OR name='fitness_friend_activity_snapshots' OR name='vaccination_record_samples' or name='samples');
+IdentifyValue: 7
 Queries:
     -
         Name: Samples
@@ -14,7 +14,7 @@ Queries:
                 Select
                 datetime(samples.start_date+978307200,'unixepoch','localtime') as "Start Date",
                 datetime(samples.end_date+978307200,'unixepoch','localtime') as "End Date",
-                samples.data_id, 
+                samples.data_id,
                 case
                 when samples.data_type = 3 then "weight"
                 when samples.data_type = 7 then "steps"

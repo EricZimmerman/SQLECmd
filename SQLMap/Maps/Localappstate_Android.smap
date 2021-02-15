@@ -1,14 +1,17 @@
 Description: Android Application Tracker database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
-Id: 83b99299-2d84-4844-af22-c227d2440b12
+Id: 83b99299-2d84-4844-af22-c227d2440b31
 Version: 0.2
 CSVPrefix: Application Tracker
+FileName: localappstae.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='appstate' OR name='android_metadata');
+IdentifyValue: 2
 
 Queries:
     -
         Name: Localappstate
-        Query: | 
+        Query: |
                 SELECT
                 package_name,
                 case
