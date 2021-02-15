@@ -1,14 +1,16 @@
 Description: Firefox database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
-Id: 83b99299-2d84-4844-af22-c227d2440b12
+Id: 83b99299-2d84-4844-af22-c227d2440b21
 Version: 0.2
 CSVPrefix: Firefox history
 FileName: history.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='history');
+IdentifyValue: 1
 Queries:
     -
         Name: History
-        Query: | 
+        Query: |
                 SELECT
                 url,
                 title,
@@ -17,5 +19,5 @@ Queries:
                 when is_deleted = 1 then "deleted"
                 when is_deleted = 0 then "not deleted"
                 end AS "Deleted State"
-                from history        
+                from history
         BaseFileName: Firefox History
