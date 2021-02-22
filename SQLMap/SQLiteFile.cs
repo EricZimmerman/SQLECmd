@@ -14,7 +14,9 @@ namespace SQLMaps
         {
             if (File.Exists(path) == false)
             {
-                throw new FileNotFoundException($"'{path}' not found");
+                var l = LogManager.GetLogger("FileVerify");
+
+                l.Warn($"'{path}' not found!");
             }
 
             try
