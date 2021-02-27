@@ -1,0 +1,36 @@
+Description: Windows Your Phone SMS Messages
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 6aefdb56-01ad-4a5d-8bd7-28f6c9f31625
+Version: 1.0
+CSVPrefix: WindowsYourPhone
+FileName: Phone.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='message' OR (name='mms') OR (name='rcs_chat') OR (name='sync'));
+IdentifyValue: 4
+Queries:
+    -
+        Name: Windows Your Phone Phone Database SMS Messages
+        Query: |
+                SELECT
+                	message.message_id AS MessageID,
+                	message.thread_id AS ThreadID,
+                	datetime( ( "timestamp" / 10000000 ) - 11644473600, 'unixepoch' ) AS Timestamp,
+                	message.from_address AS "From",
+                CASE
+                		
+                		WHEN message.type = 1 THEN
+                		'Received' 
+                		WHEN message.type = 2 THEN
+                		'Sent' ELSE 'Unknown' 
+                	END AS Type,
+                	message.body AS Body 
+                FROM
+                	message 
+                ORDER BY
+                	message.thread_id ASC,
+                	message.timestamp ASC                       
+        BaseFileName: YourPhoneDBSMSMessages
+
+# Documentation
+# https://github.com/kacos2000/Win10/blob/master/YourPhone/readme.md
+# Use SQLECmd in conjunction with the Windows Your Phone KAPE Target - https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsYourPhone.tkape
