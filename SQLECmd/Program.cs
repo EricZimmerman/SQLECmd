@@ -246,40 +246,55 @@ namespace SQLECmd
                 _logger.Info($"Looking for files in '{_fluentCommandLineParser.Object.Directory}'");
                 _logger.Info("");
 
-                var dirEnumOptions =
+
+                Privilege[] privs = {Privilege.EnableDelegation, Privilege.Impersonate, Privilege.Tcb};
+                using (new PrivilegeEnabler(Privilege.Backup, privs))
+                {
+                    var dirEnumOptions =
                     DirectoryEnumerationOptions.Files | DirectoryEnumerationOptions.Recursive |
                     DirectoryEnumerationOptions.SkipReparsePoints | DirectoryEnumerationOptions.ContinueOnException |
                     DirectoryEnumerationOptions.BasicSearch;
 
-                var f = new DirectoryEnumerationFilters
-                {
-                    RecursionFilter = entryInfo => !entryInfo.IsMountPoint && !entryInfo.IsSymbolicLink,
-                    ErrorFilter = (errorCode, errorMessage, pathProcessed) => true
-                };
-
-                var dbNames = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-
-                if (_fluentCommandLineParser.Object.Hunt)
-                {
-                    f.InclusionFilter = fsei => true;
-                }
-                else
-                {
-                    foreach (var mapFile in SQLMap.MapFiles)
+                    var f = new DirectoryEnumerationFilters
                     {
-                        dbNames.Add(mapFile.Value.FileName);
+                        RecursionFilter = entryInfo => !entryInfo.IsMountPoint && !entryInfo.IsSymbolicLink,
+                        ErrorFilter = (errorCode, errorMessage, pathProcessed) => true
+                    };
+
+                    var dbNames = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+
+                    if (_fluentCommandLineParser.Object.Hunt)
+                    {
+                        f.InclusionFilter = fsei => true;
+                    }
+                    else
+                    {
+                        foreach (var mapFile in SQLMap.MapFiles)
+                        {
+                            dbNames.Add(mapFile.Value.FileName);
+                        }
+
+                        f.InclusionFilter = fsei => dbNames.Contains(fsei.FileName);
                     }
 
-                    f.InclusionFilter = fsei => dbNames.Contains(fsei.FileName);
+                    var files2 =
+                        Directory.EnumerateFileSystemEntries(Path.GetFullPath(_fluentCommandLineParser.Object.Directory), dirEnumOptions, f);
+
+                    foreach (var file in files2)
+                    {
+                        try
+                        {
+                            ProcessFile(file);
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.Error($"Error processing '{file}': {e.Message}");
+                        }
+                    }
+
                 }
 
-                var files2 =
-                    Directory.EnumerateFileSystemEntries(Path.GetFullPath(_fluentCommandLineParser.Object.Directory), dirEnumOptions, f);
-
-                foreach (var file in files2)
-                {
-                    ProcessFile(file);
-                }
+              
             }
 
             sw.Stop();
@@ -350,8 +365,6 @@ namespace SQLECmd
          //       File.WriteAllBytes(sqllitefile, Resources.x86SQLite_Interop);
         }
 
-
-
         private static void ProcessFile(string fileName)
         {
             _logger.Debug($"Checking if '{fileName}' is a SQLite file");
@@ -359,11 +372,11 @@ namespace SQLECmd
             {
                 if (_fluentCommandLineParser.Object.Hunt == false)
                 {
-                    _logger.Error($"'{fileName}' is not a SQLite file! Skipping...");
+                    _logger.Error($"\t'{fileName}' is not a SQLite file! Skipping...");
                 }
                 else
                 {
-                    _logger.Debug($"'{fileName}' is not a SQLite file! Skipping...");
+                    _logger.Debug($"\t'{fileName}' is not a SQLite file! Skipping...");
                 }
                 
                 return;
@@ -411,6 +424,8 @@ namespace SQLECmd
             {
                 _logger.Debug($"Processing map '{map.Description}' with Id '{map.Id}'");
 
+             
+
                 var dbFactory = new OrmLiteConnectionFactory($"{fileName}",SqliteDialect.Provider);
 
                 var baseTime = DateTimeOffset.UtcNow;
@@ -418,11 +433,14 @@ namespace SQLECmd
                  using (var db = dbFactory.Open())
                  {
                      _logger.Debug($"\tVerifying database via '{map.IdentifyQuery}'");
+
+
+
                      var id = db.ExecuteScalar<string>(map.IdentifyQuery);
 
                      if (string.Equals(id,map.IdentifyValue,StringComparison.InvariantCultureIgnoreCase) == false)
                      {
-                         _logger.Error($"\tGot value '{id}' from IdentityQuery, but expected '{map.IdentifyValue}'. Queries will not be processed!");
+                         _logger.Error($"\tFor map w/ description '{map.Description}', got value '{id}' from IdentityQuery, but expected '{map.IdentifyValue}'. Queries will not be processed!");
                          continue;
                      }
 
@@ -516,7 +534,12 @@ namespace SQLECmd
 
             var newMapPath = Path.Combine(BaseDirectory, "SQLECmd-master","SQLMap", "Maps");
 
-            var orgMapMath = Path.Combine(BaseDirectory, "Maps");
+            var orgMapPath = Path.Combine(BaseDirectory, "Maps");
+
+            if (Directory.Exists(orgMapPath) == false)
+            {
+                Directory.CreateDirectory(orgMapPath);
+            }
 
             var newMaps = Directory.GetFiles(newMapPath);
 
@@ -527,7 +550,7 @@ namespace SQLECmd
             foreach (var newMap in newMaps)
             {
                 var mName = Path.GetFileName(newMap);
-                var dest = Path.Combine(orgMapMath, mName);
+                var dest = Path.Combine(orgMapPath, mName);
 
                 if (File.Exists(dest) == false)
                 {
@@ -549,8 +572,6 @@ namespace SQLECmd
 
                 File.Copy(newMap, dest, CopyOptions.None);
             }
-
-            
 
             if (newlocalMaps.Count > 0 || updatedlocalMaps.Count > 0)
             {
