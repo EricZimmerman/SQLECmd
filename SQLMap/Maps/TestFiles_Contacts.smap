@@ -36,3 +36,4 @@ Queries:
 #                BLOBS - images, gzip, binary plists, plists, etc.
 #                Base 64 for certain payloads
 #        Protobuff
+# Use this Map against this file: .\SQLMap.Test\TestFiles\Contacts.db
