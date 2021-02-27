@@ -1,0 +1,28 @@
+Description: Windows Your Phone Notifications DB
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 736e7cef-7d90-4d06-99f9-5a29e9ca431b
+Version: 1.0
+CSVPrefix: WindowsYourPhone
+FileName: Notifications.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='notifications');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Windows Your Phone Notifications Database
+        Query: |
+                SELECT
+                	notifications.id AS ID,
+                	datetime( ( "post_time" / 10000000 ) - 11644473600, 'unixepoch' ) AS "Post Time",
+                	notifications.notification_id AS "Notification ID",
+                	notifications.package_name AS "Package Name",
+                	notifications.json AS "JSON Payload" 
+                FROM
+                	notifications 
+                ORDER BY
+                	notifications.id ASC
+        BaseFileName: NotificationsDB
+
+# Documentation
+# https://github.com/kacos2000/Win10/blob/master/YourPhone/readme.md
+# Use SQLECmd in conjunction with the Windows Your Phone KAPE Target - https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsYourPhone.tkape
