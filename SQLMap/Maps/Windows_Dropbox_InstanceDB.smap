@@ -1,0 +1,24 @@
+Description: Dropbox Instance database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: 83b99299-2d84-4844-af22-c227d2440b20
+Version: 0.2
+CSVPrefix: Dropbox Instance Configurations
+FileName: instance.dbx
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='instance');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Drobpox
+        Query: |
+                SELECT
+                id,
+                active,
+                appdata_path,
+                default_dropbox_path,
+                default_dropbox_folder_name,
+                business_name,
+                uid,
+                host_id
+                from instance
+        BaseFileName: Dropbox Instance

@@ -1,0 +1,21 @@
+Description: Windows Notifications DB
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: cd952d69-7b3e-4d13-9810-8d987155bc58
+Version: 1.0
+CSVPrefix: WindowsNotifications
+FileName: wpndatabase.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='Notification' OR name='HandlerAssets' OR name='WNSPushChannel' OR name='TransientTable' OR name='NotificationData');
+IdentifyValue: 5
+Queries:
+    -
+        Name: Windows Notifications
+        Query: |
+                Select
+                Notification.ArrivalTime AS "Notification Arrival Time",
+                Notification.Payload,
+                CASE
+                when Notification.Type = "Toast",
+                end AS "Payload",
+                from Notification
+        BaseFileName: WindowsNotificationsDB
