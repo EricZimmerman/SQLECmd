@@ -18,10 +18,10 @@ Queries:
                 	settings.setting_value AS "Settings Value",
                 	settings.setting_type AS "Settings Type",
                 	settings.setting_key AS "Settings Key",
-                	settings.setting_group_id AS "Group ID" 
+                	settings.setting_group_id AS "Group ID"
                 FROM
                 	phone_apps
-                	LEFT JOIN settings ON settings.setting_key = phone_apps.package_name 
+                	LEFT JOIN settings ON settings.setting_key = phone_apps.package_name
                 ORDER BY
                 	phone_apps.app_name
         BaseFileName: SettingsDB
