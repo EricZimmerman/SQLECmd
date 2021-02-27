@@ -22,11 +22,11 @@ Queries:
                 	media.width AS Width,
                 	media.orientation AS Orientation,
                 	media.size AS "Size (Bytes)",
-                	media.uri AS URI 
+                	media.uri AS URI
                 FROM
-                	media 
+                	media
                 ORDER BY
-                	media.id ASC 
+                	media.id ASC
         BaseFileName: PhotosDB
 
 # Documentation

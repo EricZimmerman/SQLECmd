@@ -10,7 +10,7 @@ IdentifyValue: 1
 Queries:
     -
         Name: Drobpox
-        Query: | 
+        Query: |
                 SELECT
                 id,
                 active,
