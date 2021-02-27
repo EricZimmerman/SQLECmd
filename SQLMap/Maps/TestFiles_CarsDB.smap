@@ -24,3 +24,6 @@ Queries:
         Name: Make and model
         Query: select Trademark,Model from cars ORDER BY Trademark
         BaseFileName: MakeModel
+
+# Use this Map against this file: .\SQLMap.Test\TestFiles\CarsDB.db
+
