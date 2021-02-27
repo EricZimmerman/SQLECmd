@@ -17,18 +17,18 @@ Queries:
                 	datetime( ( "timestamp" / 10000000 ) - 11644473600, 'unixepoch' ) AS Timestamp,
                 	message.from_address AS "From",
                 CASE
-                		
+
                 		WHEN message.type = 1 THEN
-                		'Received' 
+                		'Received'
                 		WHEN message.type = 2 THEN
-                		'Sent' ELSE 'Unknown' 
+                		'Sent' ELSE 'Unknown'
                 	END AS Type,
-                	message.body AS Body 
+                	message.body AS Body
                 FROM
-                	message 
+                	message
                 ORDER BY
                 	message.thread_id ASC,
-                	message.timestamp ASC                       
+                	message.timestamp ASC
         BaseFileName: YourPhoneDBSMSMessages
 
 # Documentation

@@ -10,9 +10,9 @@ IdentifyValue: 1
 Queries:
     -
         Name: Drobpox
-        Query: | 
+        Query: |
              SELECT
                 key,
                 VALUE
-                from config  
+                from config
         BaseFileName: Dropbox Configurations

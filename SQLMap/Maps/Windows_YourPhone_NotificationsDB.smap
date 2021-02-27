@@ -16,9 +16,9 @@ Queries:
                 	datetime( ( "post_time" / 10000000 ) - 11644473600, 'unixepoch' ) AS "Post Time",
                 	notifications.notification_id AS "Notification ID",
                 	notifications.package_name AS "Package Name",
-                	notifications.json AS "JSON Payload" 
+                	notifications.json AS "JSON Payload"
                 FROM
-                	notifications 
+                	notifications
                 ORDER BY
                 	notifications.id ASC
         BaseFileName: NotificationsDB
