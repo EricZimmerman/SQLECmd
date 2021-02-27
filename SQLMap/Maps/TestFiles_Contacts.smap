@@ -25,6 +25,7 @@ Queries:
         Query: SELECT Id,State as Wizzo froM Customers
         BaseFileName: AnotherExample
 
+# Use this Map against this file: .\SQLMap.Test\TestFiles\Contacts.db
 
 # TODO, transforms
 #        Transforms:
