@@ -19,9 +19,9 @@ Queries:
                	timesUsed AS TimesUsed,
                	datetime( firstUsed / 1000000, 'unixepoch', 'localtime' ) AS "First Used",
                	datetime( lastUsed / 1000000, 'unixepoch', 'localtime' ) AS "Last Used",
-               	guid AS GUID 
+               	guid AS GUID
                FROM
-               	moz_formhistory 
+               	moz_formhistory
                ORDER BY
                	id ASC
         BaseFileName: FormHistory
