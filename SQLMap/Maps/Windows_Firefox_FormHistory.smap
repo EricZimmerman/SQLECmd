@@ -3,7 +3,7 @@ Author: Heather Mahalik
 Email: hmahalik@gmail.com
 Id: 83b99299-2d84-4844-af22-c227d2440b24
 Version: 0.2
-CSVPrefix: Firefox Form History
+CSVPrefix: Firefox
 FileName: formhistory.sqlite
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='moz_formhistory');
 IdentifyValue: 1
@@ -12,14 +12,16 @@ Queries:
     -
         Name: Firefox Form History
         Query: |
-               select
-                id,
-                fieldname,
-                value,
-                timesUsed,
-                datetime(firstUsed/1000000,'unixepoch','localtime') AS "First Used",
-                datetime(lastUsed/1000000,'unixepoch','localtime') AS "Last Used",
-                guid
-                from moz_formhistory
-                order by fieldname desc
-        BaseFileName: Firefox Form History
+               SELECT
+               	id AS ID,
+               	fieldname AS FieldName,
+               	value AS Value,
+               	timesUsed AS TimesUsed,
+               	datetime( firstUsed / 1000000, 'unixepoch', 'localtime' ) AS "First Used",
+               	datetime( lastUsed / 1000000, 'unixepoch', 'localtime' ) AS "Last Used",
+               	guid AS GUID
+               FROM
+               	moz_formhistory
+               ORDER BY
+               	id ASC
+        BaseFileName: FormHistory
