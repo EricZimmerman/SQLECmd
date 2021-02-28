@@ -20,9 +20,9 @@ Queries:
                	datetime( startTime / 1000000, 'unixepoch', 'localtime' ) AS StartTime,
                	datetime( endTime / 1000000, 'unixepoch', 'localtime' ) AS EndTime,
                	moz_downloads.currBytes AS CurrentBytes,
-               	moz_downloads.maxBytes AS MaxBytes 
+               	moz_downloads.maxBytes AS MaxBytes
                FROM
-               	moz_downloads 
+               	moz_downloads
                ORDER BY
                	moz_downloads.id ASC
         BaseFileName: Downloads
