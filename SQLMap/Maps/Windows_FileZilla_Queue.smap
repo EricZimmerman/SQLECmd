@@ -31,6 +31,6 @@ Queries:
                 FROM files f
                 INNER JOIN servers s ON f.server = s.id
                 INNER JOIN remote_paths r ON f.local_path = r.id
-                INNER JOIN local_paths l ON f.remote_path = l.id 
+                INNER JOIN local_paths l ON f.remote_path = l.id
 
         BaseFileName: ClientQueue
