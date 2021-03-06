@@ -1,7 +1,7 @@
 Description: Android 7+ Call History database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
-Id: 83b99299-2d84-4844-af22-c227d2440b11
+Id: 2ec6e0a6-76b7-4c5f-ade6-a8551eb47a97
 Version: 0.2
 CSVPrefix: Calls
 FileName: Calllog.db

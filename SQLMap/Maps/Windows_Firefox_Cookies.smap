@@ -1,7 +1,7 @@
 Description: Firefox Cookies database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
-Id: 83b99299-2d84-4844-af22-c227d2440b23
+Id: 7be83590-8260-4c8a-9b75-c5f82290ebc2
 Version: 0.2
 CSVPrefix: Firefox
 FileName: cookies.sqlite

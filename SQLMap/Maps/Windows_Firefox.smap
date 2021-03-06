@@ -1,7 +1,7 @@
 Description: Firefox database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
-Id: 83b99299-2d84-4844-af22-c227d2440b21
+Id: 69ab294d-9e50-46d9-ba8e-afddb94705e8
 Version: 0.2
 CSVPrefix: Firefox history
 FileName: history.db

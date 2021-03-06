@@ -1,7 +1,7 @@
 Description: Android SMS database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
-Id: 83b99299-2d84-4844-af22-c227d2440b34
+Id: c4904a4f-041a-4872-8763-4f55917c873a
 Version: 0.2
 CSVPrefix: SMS
 FileName: mmssms.db
