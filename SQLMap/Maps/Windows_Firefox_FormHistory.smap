@@ -1,7 +1,7 @@
 Description: Firefox Form History database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
-Id: 83b99299-2d84-4844-af22-c227d2440b24
+Id: 928acef8-7035-45f2-b2a0-06613781c158
 Version: 0.2
 CSVPrefix: Firefox
 FileName: formhistory.sqlite

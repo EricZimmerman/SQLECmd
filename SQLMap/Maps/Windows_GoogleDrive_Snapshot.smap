@@ -1,7 +1,7 @@
 Description: Google Drive Snapshot database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
-Id: 83b99299-2d84-4844-af22-c227d2440b27
+Id: c17e9884-49fb-468b-a623-6eac312cf9f4
 Version: 0.2
 CSVPrefix: Google Drive Snapshot
 FileName: snapshot.db

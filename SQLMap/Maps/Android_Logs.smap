@@ -1,7 +1,7 @@
 Description: Samsung Logs database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
-Id: 83b99299-2d84-4844-af22-c227d2440b32
+Id: d9bdc64c-a59a-426d-a489-2c1c35b2ea8b
 Version: 0.2
 CSVPrefix: Logs
 FileName: logs.db

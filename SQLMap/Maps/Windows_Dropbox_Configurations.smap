@@ -1,7 +1,7 @@
 Description: Dropbox database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
-Id: 83b99299-2d84-4844-af22-c227d2440b17
+Id: 4528e3da-e3ec-498e-8325-e104ee969d71
 Version: 0.2
 CSVPrefix: Dropbox Configurations
 FileName: config.db

@@ -1,7 +1,7 @@
 Description: Photos database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
-Id: 83b99299-2d84-4844-af22-c227d2440b33
+Id: e740e01a-c964-43aa-9b93-1147ee08b358
 Version: 0.2
 CSVPrefix: Photos
 FileName: Photos.sqlite # Used when in non-hunting mode. In hunting mode, sqlite files will be identified by their header. This mode will let you sweep for changes/unknown databases across a directory
