@@ -29,3 +29,8 @@ Queries:
 
 # Documentation
 # https://www.acquireforensics.com/services/tech/mozilla-firefox.html
+# https://forensicswiki.xyz/wiki/index.php?title=Mozilla_Firefox
+# https://kb.digital-detective.net/display/BF/Firefox+SQLite+Databases
+# https://davidkoepi.wordpress.com/2010/11/27/firefoxforensics/
+# https://www.sans.org/blog/firefox-3-x-forensics-using-f3e
+# Use SQLECmd in conjunction with the Firefox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Firefox.tkape
