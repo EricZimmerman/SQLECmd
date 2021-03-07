@@ -13,15 +13,23 @@ Queries:
         Name: Firefox Form History
         Query: |
                SELECT
-               	id AS ID,
-               	fieldname AS FieldName,
-               	value AS Value,
-               	timesUsed AS TimesUsed,
-               	datetime( firstUsed / 1000000, 'unixepoch', 'localtime' ) AS "First Used",
-               	datetime( lastUsed / 1000000, 'unixepoch', 'localtime' ) AS "Last Used",
-               	guid AS GUID
+                id AS ID,
+                fieldname AS FieldName,
+                value AS Value,
+                timesUsed AS TimesUsed,
+                datetime( firstUsed / 1000000, 'unixepoch', 'localtime' ) AS "First Used",
+                datetime( lastUsed / 1000000, 'unixepoch', 'localtime' ) AS "Last Used",
+                guid AS GUID
                FROM
-               	moz_formhistory
+                moz_formhistory
                ORDER BY
-               	id ASC
+                id ASC
         BaseFileName: FormHistory
+
+# Documentation
+# https://kb.digital-detective.net/display/BF/formhistory.sqlite
+# https://sqliteviewer.com/blog/database-of-sqlite-in-mozilla-firefox/
+# https://www.foxtonforensics.com/browser-history-examiner/firefox-history-location
+# https://pr1malbyt3s.com/Forensics/SQLite-Browser-Artifacts.html
+# https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
+# Use SQLECmd in conjunction with the Firefox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Firefox.tkape
