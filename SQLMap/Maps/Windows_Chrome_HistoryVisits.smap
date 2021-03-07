@@ -11,11 +11,12 @@ Queries:
     -
         Name: History
         Query: |
-                SELECT
+                SELECTSELECT
                 urls.id AS ID,
+                datetime( visits.visit_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS VisitTime,
                 datetime( urls.last_visit_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS LastVisitedTime,
-                urls.url AS URL,
                 urls.title AS URLTitle,
+                urls.url AS URL,
                 urls.visit_count AS VisitCount,
                 urls.typed_count AS TypedCount,
                 CASE
@@ -24,11 +25,15 @@ Queries:
                 'Yes'
                 WHEN urls.hidden = 0 THEN
                 'No'
-                END AS Hidden
+                END AS Hidden,
+                visits.id AS VisitID,
+                visits.from_visit AS FromVisitID,
+                CAST ( visits.visit_duration AS FLOAT ) / 1000000 AS VisitDurationInSeconds
                 FROM
                 urls
+                LEFT JOIN visits ON urls.id = visits.url
                 ORDER BY
-                urls.last_visit_time ASC;
+                visits.visit_time ASC;
         BaseFileName: Visits
 
 # Documentation
