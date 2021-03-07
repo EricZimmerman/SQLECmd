@@ -1,9 +1,9 @@
-Description: Google Drive Cloud database
+Description: Google Drive Cloud Graph database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
 Id: a8579549-8776-42ce-858a-7425f8f6c039
 Version: 0.2
-CSVPrefix: Google Drive Cloud Status
+CSVPrefix: GoogleDrive
 FileName: cloud_graph.db
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='cloud_graph_entry');
 IdentifyValue: 1
@@ -39,4 +39,9 @@ Queries:
                 when removed =1 then "Removed"
                 end as "Cloud Status"
                 from cloud_graph_entry
-        BaseFileName: Google Drive Cloud
+        BaseFileName: CloudGraphDB
+
+# Documentation
+# https://www.atropos4n6.com/cloud-forensics/artifacts-of-google-drive-usage-on-windows-10-part-1/
+# https://www.researchgate.net/publication/330319091_Cloud_Drives_Forensic_Artifacts_A_Google_Drive_Case
+# https://github.com/kacos2000/Queries/blob/master/GDrive_cloudgraph.sql

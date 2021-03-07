@@ -26,3 +26,8 @@ Queries:
                 datetime(zdate+978307200,'unixepoch','localtime') AS "Timestamp"
                 from zcallrecord
         BaseFileName: Calls
+
+# Documentation
+# https://www.oreilly.com/library/view/practical-mobile-forensics/9781788839198/c9f43416-9eea-4013-b7da-23421311aead.xhtml
+# https://smarterforensics.com/2019/09/
+# https://papers.put.as/papers/macosx/2014/Forensic-artifacts-for-Yosemite-call-history-and-sms-anlaysis-ENG.pdf

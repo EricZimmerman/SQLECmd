@@ -23,3 +23,10 @@ Queries:
                ORDER BY
                	moz_cookies.id ASC
         BaseFileName: Cookies
+
+# Documentation
+# https://www.acquireforensics.com/services/tech/mozilla-firefox.html
+# https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
+# https://pr1malbyt3s.com/Forensics/SQLite-Browser-Artifacts.html
+# https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
+# Use SQLECmd in conjunction with the Firefox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Firefox.tkape
