@@ -3,7 +3,7 @@ Author: Heather Mahalik
 Email: hmahalik@gmail.com
 Id: c17e9884-49fb-468b-a623-6eac312cf9f4
 Version: 0.2
-CSVPrefix: Google Drive Snapshot
+CSVPrefix: GoogleDrive
 FileName: snapshot.db
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='cloud_entry');
 IdentifyValue: 1
@@ -31,4 +31,12 @@ Queries:
                 when shared = 0 then "not shared"
                 end as "Shared Status"
                 from cloud_entry
-        BaseFileName: Google Drive Snapshot
+        BaseFileName: Snapshot
+
+# Documentation
+# https://forensicswiki.xyz/wiki/index.php?title=Google_Drive
+# https://www.forensicfocus.com/articles/what-are-gdocs-google-drive-data-part-2/
+# https://www.researchgate.net/publication/330319091_Cloud_Drives_Forensic_Artifacts_A_Google_Drive_Case
+# https://digital-forensics.sans.org/summit-archives/Prague_Summit/Cloud_Storage_Forensics_Mattia_Eppifani.pdf
+# https://www.atropos4n6.com/cloud-artifacts/google-drive-forensics/
+# https://amity.edu/UserFiles/aijem/36V02_I02_P011.pdf
