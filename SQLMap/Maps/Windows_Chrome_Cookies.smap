@@ -1,0 +1,65 @@
+Description: Google Chrome Cookies
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: e1849119-3265-4880-a45e-a6029757625d
+Version: 1.0
+CSVPrefix: GoogleChrome
+FileName: Cookies
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='cookies' OR name='meta');
+IdentifyValue: 2
+Queries:
+    -
+        Name: Chrome Cookies
+        Query: |
+                SELECT
+                datetime ( cookies.creation_utc / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS CreationUTC,
+                datetime ( cookies.expires_utc / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS ExpiresUTC,
+                datetime ( cookies.last_access_utc / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS LastAccessUTC,
+                cookies.host_key AS HostKey,
+                cookies.name AS Name,
+                cookies.path AS Path,
+                CASE
+
+                WHEN cookies.is_secure = 1 THEN
+                'Yes'
+                WHEN cookies.is_secure = 0 THEN
+                'No'
+                END AS IsSecure,
+                CASE
+
+                WHEN cookies.is_httponly = 1 THEN
+                'Yes'
+                WHEN cookies.is_httponly = 0 THEN
+                'No'
+                END AS IsHttpOnly,
+                CASE
+
+                WHEN cookies.has_expires = 1 THEN
+                'Yes'
+                WHEN cookies.has_expires = 0 THEN
+                'No'
+                END AS HasExpiration,
+                CASE
+
+                WHEN cookies.is_persistent = 1 THEN
+                'Yes'
+                WHEN cookies.is_persistent = 0 THEN
+                'No'
+                END AS IsPersistent,
+                cookies.priority AS Priority,
+                cookies.source_port AS SourcePort
+                FROM
+                cookies
+                ORDER BY
+                cookies.creation_utc ASC
+        BaseFileName: Cookies
+
+# Documentation
+# https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
+# https://www.sans.org/blog/google-chrome-forensics/
+# https://pr1malbyt3s.com/Forensics/SQLite-Browser-Artifacts.html
+# https://www.epochconverter.com/webkit
+# https://www.foxtonforensics.com/browser-history-examiner/chrome-history-location
+# https://forensicswiki.xyz/page/Google_Chrome
+# https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
+# Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape
