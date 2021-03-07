@@ -12,16 +12,16 @@ Queries:
         Name: Chrome Masked Credit Cards
         Query: |
                 SELECT
-                masked_credit_cards.id AS ID, 
-                masked_credit_cards.status AS Status, 
-                masked_credit_cards.name_on_card AS NameOnCard, 
-                masked_credit_cards.network AS CardNetwork, 
-                masked_credit_cards.last_four AS LastFour, 
-                masked_credit_cards.exp_month AS ExpMonth, 
-                masked_credit_cards.exp_year AS ExpYear, 
-                masked_credit_cards.bank_name AS BankName, 
-                masked_credit_cards.nickname AS CardNickname, 
-                masked_credit_cards.card_issuer AS CardIssuer, 
+                masked_credit_cards.id AS ID,
+                masked_credit_cards.status AS Status,
+                masked_credit_cards.name_on_card AS NameOnCard,
+                masked_credit_cards.network AS CardNetwork,
+                masked_credit_cards.last_four AS LastFour,
+                masked_credit_cards.exp_month AS ExpMonth,
+                masked_credit_cards.exp_year AS ExpYear,
+                masked_credit_cards.bank_name AS BankName,
+                masked_credit_cards.nickname AS CardNickname,
+                masked_credit_cards.card_issuer AS CardIssuer,
                 masked_credit_cards.instrument_id AS InstrumentID
                 FROM
                 masked_credit_cards
