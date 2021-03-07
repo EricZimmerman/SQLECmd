@@ -1,4 +1,4 @@
-Description: Microsoft Sticky Notes
+Description: Microsoft Sticky Notes Database
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: afa8cd82-e364-41e9-8d5b-8ec7ff466bce
@@ -40,4 +40,5 @@ Queries:
 # Documentation:
 # https://www.venea.net/web/net_ticks_datetime_converter#net_ticks_to_date_time_and_unix_timestamp_conversion
 # https://stackoverflow.com/questions/5855299/how-do-i-display-the-following-in-a-readable-datetime-format
-# Use this Map in conjunctionw with MicrosoftStickyNotes.tkape - https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/MicrosoftStickyNotes.tkape
+# Use this Map in conjunctionw with Microsoft Sticky Notes KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/MicrosoftStickyNotes.tkape
+
