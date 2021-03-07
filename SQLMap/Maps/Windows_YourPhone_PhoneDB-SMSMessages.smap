@@ -29,8 +29,8 @@ Queries:
                 ORDER BY
                 	message.thread_id ASC,
                 	message.timestamp ASC
-        BaseFileName: YourPhoneDBSMSMessages
+        BaseFileName: PhoneDB_SMSMessages
 
 # Documentation
 # https://github.com/kacos2000/Win10/blob/master/YourPhone/readme.md
-# Use SQLECmd in conjunction with the Windows Your Phone KAPE Target - https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsYourPhone.tkape
+# Use SQLECmd in conjunction with the Windows Your Phone KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsYourPhone.tkape
