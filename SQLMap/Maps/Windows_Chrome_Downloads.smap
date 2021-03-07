@@ -9,7 +9,7 @@ IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='
 IdentifyValue: 5
 Queries:
     -
-        Name: History
+        Name: Chrome Downloads
         Query: |
                 SELECT
                 downloads.id AS ID,
