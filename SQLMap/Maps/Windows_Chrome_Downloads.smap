@@ -1,4 +1,4 @@
-Description: Google Chrome History
+Description: Google Chrome Downloads
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: 0b575bcf-ade3-44e5-8162-eb52a96c2b06
@@ -128,7 +128,7 @@ Queries:
                 INNER JOIN downloads_url_chains AS DownloadURL ON downloads.id = DownloadURL.id
                 ORDER BY
                 downloads.id ASC
-        BaseFileName: History
+        BaseFileName: Downloads
 
 # Documentation
 # https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
