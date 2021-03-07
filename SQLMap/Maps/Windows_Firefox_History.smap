@@ -1,0 +1,29 @@
+Description: Firefox History database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: 69ab294d-9e50-46d9-ba8e-afddb94705e8
+Version: 0.2
+CSVPrefix: Firefox
+FileName: history.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='history');
+IdentifyValue: 1
+Queries:
+    -
+        Name: History
+        Query: |
+                SELECT
+                url,
+                title,
+                datetime(local_modified/1000,'unixepoch') AS date,
+                CASE
+                when is_deleted = 1 then "deleted"
+                when is_deleted = 0 then "not deleted"
+                end AS "Deleted State"
+                from history
+        BaseFileName: History
+
+# Documentation
+# https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
+# https://www.acquireforensics.com/blog/track-history-websites-visited-discussed-detail.html
+# http://2016.padjo.org/tutorials/sqlite-your-browser-history/
+# Use SQLECmd in conjunction with the Firefox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Firefox.tkape
