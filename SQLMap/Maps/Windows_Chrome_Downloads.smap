@@ -9,7 +9,7 @@ IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='
 IdentifyValue: 5
 Queries:
     -
-        Name: History
+        Name: Chrome Downloads
         Query: |
                 SELECT
                 downloads.id AS ID,
@@ -17,6 +17,7 @@ Queries:
                 downloads.current_path AS CurrentPath,
                 downloads.target_path AS TargetPath,
                 downloads.original_mime_type AS OriginalMIMEType,
+                downloads.received_bytes AS ReceivedBytes,
                 downloads.total_bytes AS TotalBytes,
                 datetime( downloads.start_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS StartTime,
                 datetime( downloads.end_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS EndTime,
