@@ -3,7 +3,7 @@ Author: Heather Mahalik and Sarah Edwards
 Email: hmahalik@gmail.com
 Id: 3206c59d-d3af-4424-a991-eb7c759a9f0b
 Version: 0.2
-CSVPrefix: HealthDBSecure
+CSVPrefix: iOS
 FileName: healthdb_secure.sqlite
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='workouts' OR name='workout_events' OR name='medical_records' OR name='clinical accounts' OR name='data_provences' OR name='devices' OR name='fitness_friend_activity_snapshots' OR name='vaccination_record_samples' or name='samples');
 IdentifyValue: 7
@@ -48,4 +48,13 @@ Queries:
                 left outer join metadata_values on metadata_values.object_id = samples.data_id
                 left outer join metadata_keys on metadata_keys.ROWID = metadata_values.key_id
                 order by "Start Date" desc
-        BaseFileName: Samples
+        BaseFileName: HealthDBSecureSamples
+
+# Documentation
+# https://blog.elcomsoft.com/2019/01/securing-and-extracting-health-data-apple-health-vs-google-fit/
+# https://objectivebythesea.com/v1/talks/OBTS_v1_Edwards.pdf
+# https://www.mac4n6.com/blog/tag/databases
+# http://fortegollc.com/wp-content/uploads/2020/11/F-Con-Lightning-Talk-Spooky-with-Apollo-Presentation-Deck-Compressed.pdf
+# https://conference.hitb.org/files/hitbsecconf2018pek/materials/D2T2%20-%20How%20Your%20Smartphone%20Tracks%20Your%20Entire%20Life%20-%20Vladimir%20Katalov.pdf
+# https://digital-forensics.sans.org/media/DFPS_FOR585_v3.1_0420_R8.pdf
+# https://www.sciencedirect.com/science/article/pii/S1742287619300313
