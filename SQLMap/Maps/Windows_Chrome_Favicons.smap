@@ -1,0 +1,39 @@
+Description: Google Chrome Favicons
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: d13f7b03-3fa3-497b-a3b7-3b7936b46ad4
+Version: 1.0
+CSVPrefix: GoogleChrome
+FileName: Favicons
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='icon_mapping' OR name='favicons' OR name='favicon_bitmaps');
+IdentifyValue: 3
+Queries:
+    -
+        Name: Chrome Favicons
+        Query: |
+                SELECT
+                favicons.id AS ID,
+                favicon_bitmaps.icon_id AS IconID,
+                datetime( favicon_bitmaps.last_updated / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS LastUpdated,
+                icon_mapping.page_url AS PageURL,
+                favicons.url AS FaviconURL
+                FROM
+                favicons
+                INNER JOIN
+                icon_mapping
+                INNER JOIN
+                favicon_bitmaps
+                ON icon_mapping.icon_id = favicon_bitmaps.icon_id
+                AND favicons.id = favicon_bitmaps.icon_id
+                ORDER BY
+                favicons.id ASC
+        BaseFileName: Favicons
+
+# Documentation
+# https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
+# https://www.sans.org/blog/google-chrome-forensics/
+# https://pr1malbyt3s.com/Forensics/SQLite-Browser-Artifacts.html
+# https://www.foxtonforensics.com/browser-history-examiner/chrome-history-location
+# https://forensicswiki.xyz/page/Google_Chrome
+# https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
+# Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape
