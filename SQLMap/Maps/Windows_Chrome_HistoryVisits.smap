@@ -34,7 +34,7 @@ Queries:
                 LEFT JOIN visits ON urls.id = visits.url
                 ORDER BY
                 visits.visit_time ASC;
-        BaseFileName: Visits
+        BaseFileName: HistoryVisits
 
 # Documentation
 # https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
