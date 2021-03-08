@@ -1,0 +1,49 @@
+Description: Google Chrome Media History Playback
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 4fa46af3-3dc5-4129-baf2-ec02bf09bf77
+Version: 1.0
+CSVPrefix: GoogleChrome
+FileName: Media History
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='origin' OR name='playback' OR name='playbackSession');
+IdentifyValue: 3
+Queries:
+    -
+        Name: Chrome Media History Playback
+        Query: |
+                SELECT
+                playback.id AS ID,
+                playback.url AS URL,
+                playback.watch_time_s AS WatchTimeSeconds,
+                CASE
+
+                WHEN playback.has_video = 1 THEN
+                'Yes'
+                WHEN playback.has_video = 0 THEN
+                'No'
+                END AS HasVideo,
+                CASE
+
+                WHEN playback.has_audio = 1 THEN
+                'Yes'
+                WHEN playback.has_audio = 0 THEN
+                'No'
+                END AS HasAudio,
+                datetime( playback.last_updated_time_s + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS LastUpdated,
+                playback.origin_id AS OriginID
+                FROM
+                playback
+                ORDER BY
+                playback.id ASC
+        BaseFileName: MediaHistoryPlayback
+
+# Documentation
+# https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
+# https://dfir.blog/media-history-database-added-to-chrome/
+# https://www.sans.org/blog/google-chrome-forensics/
+# https://pr1malbyt3s.com/Forensics/SQLite-Browser-Artifacts.html
+# https://www.epochconverter.com/webkit
+# https://www.foxtonforensics.com/browser-history-examiner/chrome-history-location
+# https://forensicswiki.xyz/page/Google_Chrome
+# https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
+# Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape

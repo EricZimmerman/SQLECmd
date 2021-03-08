@@ -1,0 +1,36 @@
+Description: Google Chrome Network Action Predictor
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: ecca7ec3-3c7d-4c79-a394-091e7d7f4f97
+Version: 1.0
+CSVPrefix: GoogleChrome
+FileName: Network Action Predictor
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='resource_prefetch_predictor_host_redirect' OR name='network_action_predictor' OR name='resource_prefetch_predictor_metadata');
+IdentifyValue: 3
+Queries:
+    -
+        Name: Chrome Network Action Predictor
+        Query: |
+                SELECT
+                network_action_predictor.id AS ID,
+                network_action_predictor.user_text AS UserText,
+                network_action_predictor.url AS URL,
+                network_action_predictor.number_of_hits AS NumberOfHits,
+                network_action_predictor.number_of_misses AS NumberOfMisses
+                FROM
+                network_action_predictor,
+                resource_prefetch_predictor_host_redirect
+                ORDER BY
+                network_action_predictor.id ASC
+        BaseFileName: NetworkActionPredictor
+
+# Documentation
+# https://dfir.blog/keystroke-flow-from-chrome-omnibox/
+# https://www.stark4n6.com/2021/02/chrome-network-action-predictor.html
+# https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
+# https://www.sans.org/blog/google-chrome-forensics/
+# https://pr1malbyt3s.com/Forensics/SQLite-Browser-Artifacts.html
+# https://www.foxtonforensics.com/browser-history-examiner/chrome-history-location
+# https://forensicswiki.xyz/page/Google_Chrome
+# https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
+# Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape

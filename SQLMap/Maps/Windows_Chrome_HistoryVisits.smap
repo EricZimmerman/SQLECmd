@@ -11,7 +11,7 @@ Queries:
     -
         Name: History
         Query: |
-                SELECTSELECT
+                SELECT
                 urls.id AS ID,
                 datetime( visits.visit_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS VisitTime,
                 datetime( urls.last_visit_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS LastVisitedTime,
@@ -34,7 +34,7 @@ Queries:
                 LEFT JOIN visits ON urls.id = visits.url
                 ORDER BY
                 visits.visit_time ASC;
-        BaseFileName: Visits
+        BaseFileName: HistoryVisits
 
 # Documentation
 # https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
