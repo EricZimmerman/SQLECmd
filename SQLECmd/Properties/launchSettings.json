@@ -2,7 +2,7 @@
   "profiles": {
     "SQLECmd": {
       "commandName": "Project",
-      "commandLineArgs": "--sync"
+      "commandLineArgs": "-d D:\\Code\\SQLECmd\\SQLMap.Test\\TestFiles --csv c:\\temp"
     }
   }
 }

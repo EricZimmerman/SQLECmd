@@ -60,20 +60,11 @@ namespace SQLECmd
                 .WithDescription(
                     "Directory to save CSV formatted results to."); // This, --json, or --xml required
 
-            // _fluentCommandLineParser.Setup(arg => arg.CsvName)
-            //     .As("csvf")
-            //     .WithDescription(
-            //         "File name to save CSV formatted results to. When present, overrides default name");
-
             _fluentCommandLineParser.Setup(arg => arg.JsonDirectory)
                 .As("json")
                 .WithDescription(
                     "Directory to save JSON formatted results to.\r\n"); // This, --csv, or --xml required
-            // _fluentCommandLineParser.Setup(arg => arg.JsonName)
-            //     .As("jsonf")
-            //     .WithDescription(
-            //         "File name to save JSON formatted results to. When present, overrides default name");
-
+          
             _fluentCommandLineParser.Setup(arg => arg.Dedupe)
                 .As("dedupe")
                 .WithDescription(
@@ -246,7 +237,6 @@ namespace SQLECmd
                 _logger.Info($"Looking for files in '{_fluentCommandLineParser.Object.Directory}'");
                 _logger.Info("");
 
-
                 Privilege[] privs = {Privilege.EnableDelegation, Privilege.Impersonate, Privilege.Tcb};
                 using (new PrivilegeEnabler(Privilege.Backup, privs))
                 {
@@ -293,18 +283,16 @@ namespace SQLECmd
                     }
 
                 }
-
-              
             }
 
             sw.Stop();
 
-            if (_unmatchedDbs.Any())
+            if (UnmatchedDbs.Any())
             {
                 Console.WriteLine();
                 _logger.Fatal($"At least one database was found with no corresponding map (Use --debug for more details about discovery process)");
 
-                foreach (var unmatchedDb in _unmatchedDbs)
+                foreach (var unmatchedDb in UnmatchedDbs)
                 {
                     DumpUnmatched(unmatchedDb);
                 }
@@ -312,25 +300,27 @@ namespace SQLECmd
             
             var extra = string.Empty;
 
-            if (_processedFiles.Count > 1)
+            if (ProcessedFiles.Count > 1)
             {
                 extra = "s";
             }
 
-            _logger.Info($"\r\nProcessed {_processedFiles.Count:N0} file{extra} in {sw.Elapsed.TotalSeconds:N4} seconds\r\n");
+            _logger.Info($"\r\nProcessed {ProcessedFiles.Count:N0} file{extra} in {sw.Elapsed.TotalSeconds:N4} seconds\r\n");
 
-            if (File.Exists("SQLite.Interop.dll"))
+            if (!File.Exists("SQLite.Interop.dll"))
             {
-                try
-                {
-                    File.Delete("SQLite.Interop.dll");
-                }
-                catch (Exception)
-                {
-                    _logger.Warn("Unable to delete 'SQLite.Interop.dll'. Delete manually if needed.\r\n");
-                }
+                return;
             }
-                
+
+            try
+            {
+                File.Delete("SQLite.Interop.dll");
+            }
+            catch (Exception)
+            {
+                _logger.Warn("Unable to delete 'SQLite.Interop.dll'. Delete manually if needed.\r\n");
+            }
+
         }
 
         private static void DumpUnmatched(string unmatchedDb)
@@ -353,16 +343,12 @@ namespace SQLECmd
             }
         }
 
-        private static readonly List<string> _processedFiles  = new List<string>();
+        private static readonly List<string> ProcessedFiles  = new List<string>();
 
         private static void DumpSqliteDll()
         {
             var sqllitefile = "SQLite.Interop.dll";
-
-           // if (Environment.Is64BitProcess)
-                File.WriteAllBytes(sqllitefile, Resources.SQLite_Interop);
-        //    else
-         //       File.WriteAllBytes(sqllitefile, Resources.x86SQLite_Interop);
+            File.WriteAllBytes(sqllitefile, Resources.SQLite_Interop);
         }
 
         private static void ProcessFile(string fileName)
@@ -388,7 +374,7 @@ namespace SQLECmd
             {
                 var sha = File.GetHash(fileName, HashType.SHA1);
 
-                if (_seenHashes.Contains(sha))
+                if (SeenHashes.Contains(sha))
                 {
                     _logger.Error($"Skipping '{fileName}' as a file with SHA-1 '{sha}' has already been processed");
                     Console.WriteLine();
@@ -396,12 +382,12 @@ namespace SQLECmd
                 }
 
                 _logger.Debug($"Adding '{fileName}' SHA-1 '{sha}' to seen hashes collection");
-                _seenHashes.Add(sha);
+                SeenHashes.Add(sha);
             }
 
             _logger.Warn($"Processing '{fileName}'...");
 
-            _processedFiles.Add(fileName);
+            ProcessedFiles.Add(fileName);
 
             var maps = new List<MapFile>();
 
@@ -424,8 +410,6 @@ namespace SQLECmd
             {
                 _logger.Debug($"Processing map '{map.Description}' with Id '{map.Id}'");
 
-             
-
                 var dbFactory = new OrmLiteConnectionFactory($"{fileName}",SqliteDialect.Provider);
 
                 var baseTime = DateTimeOffset.UtcNow;
@@ -433,8 +417,6 @@ namespace SQLECmd
                  using (var db = dbFactory.Open())
                  {
                      _logger.Debug($"\tVerifying database via '{map.IdentifyQuery}'");
-
-
 
                      var id = db.ExecuteScalar<string>(map.IdentifyQuery);
 
@@ -454,12 +436,18 @@ namespace SQLECmd
 
                          try
                          {
-                             var results = db.Query<dynamic>(queryInfo.Query);
-
+                             var results = db.Query<dynamic>(queryInfo.Query).ToList();
+                             
                              var outName =
                                  $"{baseTime:yyyyMMddHHmmssffffff}_{map.CSVPrefix}_{queryInfo.BaseFileName}_{map.Id}.csv";
 
                              var fullOutName = Path.Combine(_fluentCommandLineParser.Object.CsvDirectory, outName);
+
+                             if (results.Any() == false)
+                             {
+                                _logger.Warn($"\t '{queryInfo.Name}' did not return any results. CSV will not be saved.");
+                                continue;
+                             }
 
                              _logger.Info($"\tDumping '{queryInfo.Name}' to '{fullOutName}'");
 
@@ -467,10 +455,20 @@ namespace SQLECmd
                              {
                                  using (var csv = new CsvWriter(writer,CultureInfo.InvariantCulture))
                                  {
-                                     csv.WriteRecords(results);
                                     
-                                    //_logger.Debug($"Wrote {csv.Context.Writer.Row:N0} rows (including header)");
+                                  //   csv.WriteRecords(results);
 
+                                     foreach (var result in results)
+                                     {
+                                         result.SourceFile = fileName;
+                                         csv.WriteRecord(result);
+                                         csv.NextRecord();
+                                     }
+
+                                     // csv.WriteComment("");
+                                     // csv.NextRecord();
+                                     // csv.WriteComment($"SourceFile: {fileName}");
+                                     // csv.NextRecord();
                                      csv.Flush();
                                      writer.Flush();
                                  }
@@ -489,14 +487,14 @@ namespace SQLECmd
             if (foundMap == false)
             {
                 _logger.Info($"\tNo maps found for '{fileName}'. Adding to unmatched database list");
-                _unmatchedDbs.Add(fileName);
+                UnmatchedDbs.Add(fileName);
             }
 
             Console.WriteLine();
         }
 
-        private static readonly HashSet<string> _unmatchedDbs = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-        private static readonly HashSet<string> _seenHashes = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+        private static readonly HashSet<string> UnmatchedDbs = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+        private static readonly HashSet<string> SeenHashes = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
         private static void UpdateFromRepo()
         {
