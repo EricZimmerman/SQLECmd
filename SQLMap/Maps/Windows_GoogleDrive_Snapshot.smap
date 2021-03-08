@@ -1,0 +1,42 @@
+Description: Google Drive Snapshot database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: c17e9884-49fb-468b-a623-6eac312cf9f4
+Version: 0.2
+CSVPrefix: GoogleDrive
+FileName: snapshot.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='cloud_entry');
+IdentifyValue: 1
+
+Queries:
+    -
+        Name: Google Drive Snapshot
+        Query: |
+               SELECT
+                filename,
+                datetime(modified, 'unixepoch') as "Modified Time",
+                case
+                when acl_role = 0 then "Google Drive Owner"
+                else "From Elsewhere"
+                end AS "ACL Role",
+                CASE
+                when doc_type = 0 then "Folder"
+                when doc_type = 1 then "Regular File"
+                else "Google File/Object"
+                end as "Type",
+                size AS "Size in bytes",
+                checksum,
+                CASE
+                when shared = 1 then "shared"
+                when shared = 0 then "not shared"
+                end as "Shared Status"
+                from cloud_entry
+        BaseFileName: Snapshot
+
+# Documentation
+# https://forensicswiki.xyz/wiki/index.php?title=Google_Drive
+# https://www.forensicfocus.com/articles/what-are-gdocs-google-drive-data-part-2/
+# https://www.researchgate.net/publication/330319091_Cloud_Drives_Forensic_Artifacts_A_Google_Drive_Case
+# https://digital-forensics.sans.org/summit-archives/Prague_Summit/Cloud_Storage_Forensics_Mattia_Eppifani.pdf
+# https://www.atropos4n6.com/cloud-artifacts/google-drive-forensics/
+# https://amity.edu/UserFiles/aijem/36V02_I02_P011.pdf

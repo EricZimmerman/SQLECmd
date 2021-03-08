@@ -1,0 +1,30 @@
+Description: Dropbox Instance database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: 14d1c0fa-262d-4d50-9ea7-e7f07978e844
+Version: 0.2
+CSVPrefix: Dropbox
+FileName: instance.dbx
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='instance');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Drobpox
+        Query: |
+                SELECT
+                id,
+                active,
+                appdata_path,
+                default_dropbox_path,
+                default_dropbox_folder_name,
+                business_name,
+                uid,
+                host_id
+                from instance
+        BaseFileName: InstanceDB
+
+# Documentation
+# http://blog.digital-forensics.it/2017/04/brush-up-on-dropbox-dbx-decryption.html
+# http://blog.digital-forensics.it/2017/04/brush-up-on-dropbox-dbx-decryption.html
+# https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.736.6387&rep=rep1&type=pdf
+# Use SQLECmd in conjunction with the Dropbox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/Dropbox.tkape

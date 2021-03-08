@@ -1,0 +1,28 @@
+Description: Some rando cars database
+Author: Eric Zimmerman
+Email: saericzimmerman@gmail.com
+Id: af5bcf3f-b316-4e49-8d12-ce9e180b3914
+Version: 0.2
+CSVPrefix: Cars
+FileName: CarsDB.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='Cars' OR name='CarScheduling' OR name='Customers');
+IdentifyValue: 3
+Queries:
+    -
+        Name: Company names
+        Query: select Company from Customers;
+        BaseFileName: Companies
+    -
+        Name: Order payment type and amount, ordered
+        Query: select CustomerID,PaymentType,PaymentAmount from Orders ORDER BY PaymentAmount,PaymentType;
+        BaseFileName: PaymentTypeAndAmounts
+    -
+        Name: Distinct descriptions
+        Query: select distinct Description from CarScheduling
+        BaseFileName: DistinctDescription
+    -
+        Name: Make and model
+        Query: select Trademark,Model from cars ORDER BY Trademark
+        BaseFileName: MakeModel
+
+# Use this Map against this file: .\SQLMap.Test\TestFiles\CarsDB.db

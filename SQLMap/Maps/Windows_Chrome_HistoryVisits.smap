@@ -1,0 +1,45 @@
+Description: Google Chrome History Visits
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 1f37cc07-2b10-4c80-b845-84708e4f7429
+Version: 1.0
+CSVPrefix: GoogleChrome
+FileName: History
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='urls' OR name='visits' OR name='downloads' OR name='segments' OR name='typed_url_sync_metadata');
+IdentifyValue: 5
+Queries:
+    -
+        Name: History
+        Query: |
+                SELECT
+                urls.id AS ID,
+                datetime( visits.visit_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS VisitTime,
+                datetime( urls.last_visit_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS LastVisitedTime,
+                urls.title AS URLTitle,
+                urls.url AS URL,
+                urls.visit_count AS VisitCount,
+                urls.typed_count AS TypedCount,
+                CASE
+
+                WHEN urls.hidden = 1 THEN
+                'Yes'
+                WHEN urls.hidden = 0 THEN
+                'No'
+                END AS Hidden,
+                visits.id AS VisitID,
+                visits.from_visit AS FromVisitID,
+                CAST ( visits.visit_duration AS FLOAT ) / 1000000 AS VisitDurationInSeconds
+                FROM
+                urls
+                LEFT JOIN visits ON urls.id = visits.url
+                ORDER BY
+                visits.visit_time ASC;
+        BaseFileName: HistoryVisits
+
+# Documentation
+# https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
+# https://www.epochconverter.com/webkit
+# https://www.foxtonforensics.com/browser-history-examiner/chrome-history-location
+# https://forensicswiki.xyz/page/Google_Chrome
+# https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
+# Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape

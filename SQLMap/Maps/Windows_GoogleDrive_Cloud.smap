@@ -1,0 +1,47 @@
+Description: Google Drive Cloud Graph database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: a8579549-8776-42ce-858a-7425f8f6c039
+Version: 0.2
+CSVPrefix: GoogleDrive
+FileName: cloud_graph.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='cloud_graph_entry');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Google Drive
+        Query: |
+              SELECT
+                filename AS "Filename",
+                datetime(modified, 'unixepoch') as "Modified Time",
+                CASE
+                when acl_role = 0 then "Private/Google Drive Owner"
+                when acl_role = 1 then "Can Contribute"
+                When acl_role = 2 then "Can View"
+                else "From Elsewhere"
+                end AS "ACL Role",
+                CASE
+                when doc_type = 0 then "Folder"
+                when doc_type = 1 then "Regular File"
+                when doc_type = 4 then "Google Spreadsheet"
+                when doc_type = 6 then "Google Doc"
+                when doc_type = 12 then "Google Maps"
+                else "Google File/Object"
+                end as "Type",
+                size AS "Size in bytes",
+                checksum AS "MD5 Hash",
+                CASE
+                when shared = 1 then "Shared"
+                when shared = 0 then "Not Shared"
+                end as "Shared Status",
+                CASE
+                when removed = 0 then "Not Removed"
+                when removed =1 then "Removed"
+                end as "Cloud Status"
+                from cloud_graph_entry
+        BaseFileName: CloudGraphDB
+
+# Documentation
+# https://www.atropos4n6.com/cloud-forensics/artifacts-of-google-drive-usage-on-windows-10-part-1/
+# https://www.researchgate.net/publication/330319091_Cloud_Drives_Forensic_Artifacts_A_Google_Drive_Case
+# https://github.com/kacos2000/Queries/blob/master/GDrive_cloudgraph.sql

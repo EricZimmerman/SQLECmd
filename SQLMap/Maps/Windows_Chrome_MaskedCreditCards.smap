@@ -1,0 +1,39 @@
+Description: Google Chrome Masked Credit Cards
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: d8ae6c52-14c8-46af-823f-a406545c4614
+Version: 1.0
+CSVPrefix: GoogleChrome
+FileName: Web Data
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='autofill' OR name='credit_cards' OR name='offer_data' OR name='server_addresses' OR name='keywords');
+IdentifyValue: 5
+Queries:
+    -
+        Name: Chrome Masked Credit Cards
+        Query: |
+                SELECT
+                masked_credit_cards.id AS ID,
+                masked_credit_cards.status AS Status,
+                masked_credit_cards.name_on_card AS NameOnCard,
+                masked_credit_cards.network AS CardNetwork,
+                masked_credit_cards.last_four AS LastFour,
+                masked_credit_cards.exp_month AS ExpMonth,
+                masked_credit_cards.exp_year AS ExpYear,
+                masked_credit_cards.bank_name AS BankName,
+                masked_credit_cards.nickname AS CardNickname,
+                masked_credit_cards.card_issuer AS CardIssuer,
+                masked_credit_cards.instrument_id AS InstrumentID
+                FROM
+                masked_credit_cards
+                ORDER BY
+                masked_credit_cards.id ASC
+        BaseFileName: MaskedCreditCards
+
+# Documentation
+# https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
+# https://www.sans.org/blog/google-chrome-forensics/
+# https://pr1malbyt3s.com/Forensics/SQLite-Browser-Artifacts.html
+# https://www.foxtonforensics.com/browser-history-examiner/chrome-history-location
+# https://forensicswiki.xyz/page/Google_Chrome
+# https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
+# Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape

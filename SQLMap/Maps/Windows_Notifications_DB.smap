@@ -1,0 +1,29 @@
+Description: Windows Notifications DB
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: cd952d69-7b3e-4d13-9810-8d987155bc58
+Version: 1.0
+CSVPrefix: Windows
+FileName: wpndatabase.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='Notification' OR name='HandlerAssets' OR name='WNSPushChannel' OR name='TransientTable' OR name='NotificationData');
+IdentifyValue: 5
+Queries:
+    -
+        Name: Windows Notifications
+        Query: |
+                Select
+                Notification.ArrivalTime AS "Notification Arrival Time",
+                Notification.Payload,
+                CASE
+                when Notification.Type = "Toast",
+                end AS "Payload",
+                from Notification
+        BaseFileName: NotificationsDB
+
+# Documentation
+# http://www.swiftforensics.com/2016/06/prasing-windows-10-notification-database.html
+# https://tzworks.net/prototypes/wpn/wpn.users.guide.pdf
+# https://inc0x0.com/2018/10/windows-10-notification-database/
+# https://www.hecfblog.com/2018/08/daily-blog-440-windows-10-notifications.html
+# https://kacos2000.github.io/WindowsTimeline/WindowsTimeline.pdf
+# Use SQLECmd in conjunction with the WindowsNotificationDB KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsNotificationsDB.tkape

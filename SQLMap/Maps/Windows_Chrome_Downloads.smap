@@ -1,0 +1,141 @@
+Description: Google Chrome Downloads
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 0b575bcf-ade3-44e5-8162-eb52a96c2b06
+Version: 1.0
+CSVPrefix: GoogleChrome
+FileName: History
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='urls' OR name='visits' OR name='downloads' OR name='segments' OR name='typed_url_sync_metadata');
+IdentifyValue: 5
+Queries:
+    -
+        Name: Chrome Downloads
+        Query: |
+                SELECT
+                downloads.id AS ID,
+                downloads.guid AS GUID,
+                downloads.current_path AS CurrentPath,
+                downloads.target_path AS TargetPath,
+                downloads.original_mime_type AS OriginalMIMEType,
+                downloads.received_bytes AS ReceivedBytes,
+                downloads.total_bytes AS TotalBytes,
+                datetime( downloads.start_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS StartTime,
+                datetime( downloads.end_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS EndTime,
+                datetime( downloads.opened / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS Opened,
+                datetime( downloads.last_access_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS LastAccessTime,
+                downloads.last_modified AS LastModified,
+                CASE
+
+                WHEN downloads.state = 0 THEN
+                'In Progress'
+                WHEN downloads.state = 1 THEN
+                'Complete'
+                WHEN downloads.state = 2 THEN
+                'Cancelled'
+                WHEN downloads.state = 3 THEN
+                'Interrupted'
+                WHEN downloads.state = 4 THEN
+                'Interrupted'
+                END AS State,
+                CASE
+
+                WHEN downloads.danger_type = 0 THEN
+                'Not Dangerous'
+                WHEN downloads.danger_type = 1 THEN
+                'Dangerous'
+                WHEN downloads.danger_type = 2 THEN
+                'Dangerous URL'
+                WHEN downloads.danger_type = 3 THEN
+                'Dangerous Content'
+                WHEN downloads.danger_type = 4 THEN
+                'Content May Be Malicious'
+                WHEN downloads.danger_type = 5 THEN
+                'Uncommon Content'
+                WHEN downloads.danger_type = 6 THEN
+                'Dangerous But User Validated'
+                WHEN downloads.danger_type = 7 THEN
+                'Dangerous Host'
+                WHEN downloads.danger_type = 8 THEN
+                'Potentially Unwanted'
+                WHEN downloads.danger_type = 9 THEN
+                'Whitelisted by Policy'
+                END AS DangerType,
+                CASE
+
+                WHEN downloads.interrupt_reason = 0 THEN
+                'No Interrupt'
+                WHEN downloads.interrupt_reason = 1 THEN
+                'File Error'
+                WHEN downloads.interrupt_reason = 2 THEN
+                'Access Denied'
+                WHEN downloads.interrupt_reason = 3 THEN
+                'Disk Full'
+                WHEN downloads.interrupt_reason = 5 THEN
+                'Path Too Long'
+                WHEN downloads.interrupt_reason = 6 THEN
+                'File Too Large'
+                WHEN downloads.interrupt_reason = 7 THEN
+                'Virus'
+                WHEN downloads.interrupt_reason = 10 THEN
+                'Temporary Problem'
+                WHEN downloads.interrupt_reason = 11 THEN
+                'Blocked'
+                WHEN downloads.interrupt_reason = 12 THEN
+                'Security Check Failed'
+                WHEN downloads.interrupt_reason = 13 THEN
+                'Resume Error'
+                WHEN downloads.interrupt_reason = 20 THEN
+                'Network Error'
+                WHEN downloads.interrupt_reason = 21 THEN
+                'Operation Timed Out'
+                WHEN downloads.interrupt_reason = 22 THEN
+                'Connection Lost'
+                WHEN downloads.interrupt_reason = 23 THEN
+                'Server Down'
+                WHEN downloads.interrupt_reason = 30 THEN
+                'Server Error'
+                WHEN downloads.interrupt_reason = 31 THEN
+                'Range Request Error'
+                WHEN downloads.interrupt_reason = 32 THEN
+                'Server Precondition Error'
+                WHEN downloads.interrupt_reason = 33 THEN
+                'Unable to get file'
+                WHEN downloads.interrupt_reason = 34 THEN
+                'Server Unauthorized'
+                WHEN downloads.interrupt_reason = 35 THEN
+                'Server Certificate Problem'
+                WHEN downloads.interrupt_reason = 36 THEN
+                'Server Access Forbidden'
+                WHEN downloads.interrupt_reason = 37 THEN
+                'Server Unreachable'
+                WHEN downloads.interrupt_reason = 38 THEN
+                'Content Length Mismatch'
+                WHEN downloads.interrupt_reason = 39 THEN
+                'Cross Origin Redirect'
+                WHEN downloads.interrupt_reason = 40 THEN
+                'Cancelled'
+                WHEN downloads.interrupt_reason = 41 THEN
+                'Browser Shutdown'
+                WHEN downloads.interrupt_reason = 50 THEN
+                'Browser Crashed'
+                END AS InterruptReason,
+                downloads.referrer AS ReferrerURL,
+                downloads.site_url AS SiteURL,
+                downloads.tab_url AS TabURL,
+                downloads.tab_referrer_url AS TabReferrerURL,
+                DownloadURL.url AS DownloadURL
+                FROM
+                downloads
+                INNER JOIN downloads_url_chains AS DownloadURL ON downloads.id = DownloadURL.id
+                ORDER BY
+                downloads.id ASC
+        BaseFileName: Downloads
+
+# Documentation
+# https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
+# https://www.epochconverter.com/webkit
+# https://www.foxtonforensics.com/browser-history-examiner/chrome-history-location
+# https://dfir.blog/chrome-values-lookup-tables/
+# https://forensicswiki.xyz/page/Google_Chrome
+# https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
+# Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape

@@ -1,0 +1,44 @@
+Description: Google Chrome Autofill Profiles
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: f9d9d731-f6d3-43a6-907d-fe10ddc9e334
+Version: 1.0
+CSVPrefix: GoogleChrome
+FileName: Web Data
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='autofill' OR name='credit_cards' OR name='offer_data' OR name='server_addresses' OR name='keywords');
+IdentifyValue: 5
+Queries:
+    -
+        Name: Chrome Autofill Entries
+        Query: |
+                SELECT
+                autofill_profiles.guid AS GUID,
+                datetime( "date_modified", 'unixepoch' ) AS DateModified,
+                datetime( "use_date", 'unixepoch' ) AS UseDate,
+                autofill_profile_names.first_name AS FirstName,
+                autofill_profile_names.middle_name AS MiddleName,
+                autofill_profile_names.last_name AS LastName,
+                autofill_profile_phones.number AS PhoneNumber,
+                autofill_profiles.company_name AS CompanyName,
+                autofill_profiles.street_address AS StreetAddress,
+                autofill_profiles.city AS City,
+                autofill_profiles.state AS State,
+                autofill_profiles.zipcode AS ZipCode,
+                autofill_profiles.use_count AS UseCount
+                FROM
+                autofill_profiles
+                INNER JOIN autofill_profile_phones ON autofill_profiles.guid = autofill_profile_phones.guid
+                INNER JOIN autofill_profile_names ON autofill_profile_phones.guid = autofill_profile_names.guid
+                ORDER BY
+                autofill_profiles.guid ASC
+        BaseFileName: AutofillProfiles
+
+# Documentation
+# https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
+# https://www.sans.org/blog/google-chrome-forensics/
+# https://pr1malbyt3s.com/Forensics/SQLite-Browser-Artifacts.html
+# https://www.epochconverter.com/webkit
+# https://www.foxtonforensics.com/browser-history-examiner/chrome-history-location
+# https://forensicswiki.xyz/page/Google_Chrome
+# https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
+# Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape

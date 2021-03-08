@@ -1,0 +1,25 @@
+Description: Android Frosting Application Tracker database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: 10909a28-943e-4363-bbdc-617feac432c0
+Version: 0.2
+CSVPrefix: Android
+FileName: frosting.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='frosting');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Frosting
+        Query: |
+                select
+                pk,
+                apk_path,
+                datetime(last_updated/1000,'UNIXEPOCH','localtime') AS "Last Updated",
+                data
+                from frosting
+        BaseFileName: FrostingDB
+
+# Documentation
+# https://digital-forensics.sans.org/media/DFPS_FOR585_v3.1_0420_R8.pdf
+# https://www.carpeindicium.com/blog/gone_10-seconds/
+# https://docplayer.net/185501588-Analysis-of-application-installation-logs-on-android-systems.html

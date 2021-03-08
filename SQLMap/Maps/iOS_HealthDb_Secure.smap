@@ -1,0 +1,60 @@
+Description: HealthDb Secure database
+Author: Heather Mahalik and Sarah Edwards
+Email: hmahalik@gmail.com
+Id: 3206c59d-d3af-4424-a991-eb7c759a9f0b
+Version: 0.2
+CSVPrefix: iOS
+FileName: healthdb_secure.sqlite
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='workouts' OR name='workout_events' OR name='medical_records' OR name='clinical accounts' OR name='data_provences' OR name='devices' OR name='fitness_friend_activity_snapshots' OR name='vaccination_record_samples' or name='samples');
+IdentifyValue: 7
+Queries:
+    -
+        Name: Samples
+        Query: |
+                Select
+                datetime(samples.start_date+978307200,'unixepoch','localtime') as "Start Date",
+                datetime(samples.end_date+978307200,'unixepoch','localtime') as "End Date",
+                samples.data_id,
+                case
+                when samples.data_type = 3 then "weight"
+                when samples.data_type = 7 then "steps"
+                when samples.data_type = 8 then "dist in m"
+                when samples.data_type = 9 then "resting energy"
+                when samples.data_type = 10 then "active energy"
+                when samples.data_type = 12 then "flights climbed"
+                when samples.data_type = 67 then "weekly calorie goal"
+                when samples.data_type = 70 then "watch on"
+                when samples.data_type = 75 then "stand"
+                when samples.data_type = 76 then "activity"
+                when samples.data_type = 79 then "workout"
+                when samples.data_type = 83 then "some workouts"
+                end as "activity type",
+                quantity,
+                original_quantity,
+                unit_strings.unit_string,
+                original_unit,
+                correlations.correlation,
+                correlations.object,
+                correlations.provenance
+                string_value,
+                metadata_values.data_value,
+                metadata_values.numerical_value,
+                metadata_values.value_type,
+                metadata_keys.key
+                from samples
+                left outer join quantity_samples on samples.data_id = quantity_samples.data_id
+                left outer join unit_strings on quantity_samples.original_unit = unit_strings.RowID
+                left outer join correlations on samples.data_id = correlations.object
+                left outer join metadata_values on metadata_values.object_id = samples.data_id
+                left outer join metadata_keys on metadata_keys.ROWID = metadata_values.key_id
+                order by "Start Date" desc
+        BaseFileName: HealthDBSecureSamples
+
+# Documentation
+# https://blog.elcomsoft.com/2019/01/securing-and-extracting-health-data-apple-health-vs-google-fit/
+# https://objectivebythesea.com/v1/talks/OBTS_v1_Edwards.pdf
+# https://www.mac4n6.com/blog/tag/databases
+# http://fortegollc.com/wp-content/uploads/2020/11/F-Con-Lightning-Talk-Spooky-with-Apollo-Presentation-Deck-Compressed.pdf
+# https://conference.hitb.org/files/hitbsecconf2018pek/materials/D2T2%20-%20How%20Your%20Smartphone%20Tracks%20Your%20Entire%20Life%20-%20Vladimir%20Katalov.pdf
+# https://digital-forensics.sans.org/media/DFPS_FOR585_v3.1_0420_R8.pdf
+# https://www.sciencedirect.com/science/article/pii/S1742287619300313

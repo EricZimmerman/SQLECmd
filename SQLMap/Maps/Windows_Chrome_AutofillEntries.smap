@@ -1,0 +1,35 @@
+Description: Google Chrome Autofill Entries
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 7cf6de25-2953-46aa-b555-7a5c7bf35b07
+Version: 1.0
+CSVPrefix: GoogleChrome
+FileName: Web Data
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='autofill' OR name='credit_cards' OR name='offer_data' OR name='server_addresses' OR name='keywords');
+IdentifyValue: 5
+Queries:
+    -
+        Name: Chrome Autofill Entries
+        Query: |
+                SELECT
+                autofill.name AS Name,
+                autofill.value AS Value,
+                autofill.value_lower AS ValueLowercase,
+                datetime( "date_created", 'unixepoch' ) AS DateCreated,
+                datetime( "date_last_used", 'unixepoch' ) AS LastUsed,
+                autofill.count AS Count
+                FROM
+                autofill
+                ORDER BY
+                autofill.name ASC
+        BaseFileName: AutofillEntries
+
+# Documentation
+# https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
+# https://www.sans.org/blog/google-chrome-forensics/
+# https://pr1malbyt3s.com/Forensics/SQLite-Browser-Artifacts.html
+# https://www.epochconverter.com/webkit
+# https://www.foxtonforensics.com/browser-history-examiner/chrome-history-location
+# https://forensicswiki.xyz/page/Google_Chrome
+# https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
+# Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape

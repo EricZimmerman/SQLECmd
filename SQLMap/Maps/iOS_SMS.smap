@@ -1,0 +1,63 @@
+Description: iOS SMS database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: 79863e25-3cd2-4122-92af-50284edc9663
+Version: 0.2
+CSVPrefix: iOS
+FileName: sms.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='attachment' OR name='chat' OR name='deleted_messages' OR name='handle' OR name='sync_deleted_chats' OR name='sync_deleted_attachments' OR name='sync_deleted_messages' oR name='message');
+IdentifyValue: 8
+Queries:
+    -
+        Name: SMS and iMessage
+        Query: |
+                SELECT message.rowid,
+                chat_message_join.chat_id,
+                message.handle_id,
+                message.text,
+                message.service,
+                message.account,
+                chat.account_login,
+                chat.chat_identifier,
+                case when LENGTH(chat_message_join.message_date)=18 then
+                datetime(chat_message_join.message_date/1000000000 + 978307200,'unixepoch','localtime')
+                when LENGTH(chat_message_join.message_date)=9 then
+                datetime(chat_message_join.message_date + 978307200,'unixepoch','localtime')
+                else 'NA'
+                END as "Message Date",
+                case when LENGTH(message.date_read)=18 then
+                datetime(message.date_read/1000000000 + 978307200,'unixepoch','localtime')
+                when LENGTH(message.date_read)=9 then
+                datetime(message.date_read+978307200,'unixepoch','localtime')
+                else 'NA'
+                END as "Date Read",
+                case when message.is_read=1
+                then 'Incoming'
+                when message.is_read=0
+                then 'Outgoing'
+                end as "Message Direction",
+                case when LENGTH(chat.last_read_message_timestamp)=18 then
+                datetime(chat.last_read_message_timestamp/1000000000+978307200,'unixepoch','localtime')
+                when LENGTH(chat.last_read_message_timestamp)=9 then
+                datetime(chat.last_read_message_timestamp + 978307200,'unixepoch','localtime')
+                else 'NA'
+                END as "Last Read",
+                attachment.filename,
+                datetime(attachment.created_date+978307200,'unixepoch','localtime') AS "Attachment Date",
+                attachment.mime_type,
+                attachment.total_bytes
+                FROM message
+                left join chat_message_join on chat_message_join.message_id=message.ROWID
+                left join chat on chat.ROWID=chat_message_join.chat_id
+                left join attachment on attachment.ROWID=chat_message_join.chat_id
+                order by message.date_read desc;
+        BaseFileName: SMSDB
+
+# Documentation
+# https://reincubate.com/blog/ios-data-recovery-sqlite-benchmark/
+# https://blog.elcomsoft.com/2020/10/the-forensic-view-of-imessage-security/
+# http://cyberforensicator.com/2017/09/30/forensicating-messanging-in-ios-11/
+# https://www.forensicfocus.com/forums/mobile-forensics/analyzing-sms-db-question/
+# https://salt4n6.com/category/mobile-forensics/
+# https://blog.d204n6.com/2020/09/ios-14-first-thoughts-and-analysis.html
+# https://blog.d204n6.com/2020/09/ios-14-first-thoughts-and-analysis.html

@@ -1,0 +1,27 @@
+Description: CellularUsage database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: 3d56413c-2057-462f-88a2-6ccd02d35985
+Version: 0.2
+CSVPrefix: iOS
+FileName: CellularUsage.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='subscriber_info');
+IdentifyValue: 1
+Queries:
+    -
+        Name: CellularUsage
+        Query: |
+                SELECT
+                ROWID,
+                subscriber_id AS "ICCID",
+                subscriber_mdn AS "Phone Number",
+                datetime(last_update_time+978307200,'UNIXEPOCH','localtime') AS "Last Updated"
+                FROM subscriber_info
+        BaseFileName: Cellular_SimUsage
+
+# Documentation
+# https://blog.digital-forensics.it/2019/12/checkra1n-era-ep-4-analyzing.html
+# https://digital-forensics.sans.org/media/DFPS_FOR585_v3.1_0420_R8.pdf
+# https://salt4n6.com/category/mobile-forensics/
+# https://salt4n6.com/2018/05/15/a-few-interesting-ios-forensic-artefacts/
+# https://blog.elcomsoft.com/2019/11/ios-device-acquisition-with-checkra1n-jailbreak/

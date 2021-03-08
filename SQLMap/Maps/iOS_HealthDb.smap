@@ -1,0 +1,29 @@
+Description: Health Db database
+Author: Heather Mahalik and Sarah Edwards
+Email: hmahalik@gmail.com
+Id: 1d8a9b0e-cd36-4045-939b-54e4fdc90861
+Version: 0.2
+CSVPrefix: iOS
+FileName: healthdb.sqlite
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='workout_sessions' OR name='alarm_events' OR name='workout_builders' OR name='sources' OR name='sync_stores' OR name='source_devices');
+IdentifyValue: 6
+Queries:
+    -
+        Name: Device history
+        Query: |
+                SELECT
+                manufacturer,
+                hardware,
+                software,
+                datetime(source_devices.creation_date+978307200,'unixepoch') AS "iOS_Install_or_Upgrade_Date"
+                FROM
+                source_devices
+        BaseFileName: HealthDBDeviceHistory
+
+# Documentation
+# https://blog.elcomsoft.com/2019/01/securing-and-extracting-health-data-apple-health-vs-google-fit/
+# https://www.forensicfocus.com/forums/mobile-forensics/is-apple-ios-health-data-encrypted/
+# https://conference.hitb.org/files/hitbsecconf2018pek/materials/D2T2%20-%20How%20Your%20Smartphone%20Tracks%20Your%20Entire%20Life%20-%20Vladimir%20Katalov.pdf
+# https://objectivebythesea.com/v1/talks/OBTS_v1_Edwards.pdf
+# https://smarterforensics.com/2019/09/wont-you-back-that-thing-up-a-glimpse-of-ios-13-artifacts/
+# https://forums.macrumors.com/threads/health-data-to-new-iphone-from-backup.2007787/

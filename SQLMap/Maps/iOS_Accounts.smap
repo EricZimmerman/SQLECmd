@@ -1,0 +1,32 @@
+Description: iOS Accounts (3) database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: db337b07-2e96-4052-91df-f230dfbd232e
+Version: 0.2
+CSVPrefix: iOS
+FileName: accounts3.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='ZACCOUNT');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Accounts
+        Query: |
+                SELECT
+                Z_PK,
+                ZACCOUNTTYPE AS "Account Type",
+                ZPARENTACCOUNT AS "Parent Account",
+                ZUSERNAME AS "Username",
+                DATETIME(ZDATE+978307200,'UNIXEPOCH') AS "TIMESTAMP",
+                ZACCOUNTDESCRIPTION AS "Account Description",
+                ZIDENTIFIER AS "Identifier",
+                ZOWNINGBUNDLEID AS "Bundle ID"
+                FROM ZACCOUNT
+        BaseFileName: AccountsDB
+
+# Documentation
+# https://www.sans.org/security-resources/posters/dfir-advanced-smartphone-forensics/30/download
+# https://blog.elcomsoft.com/2019/11/ios-device-acquisition-with-checkra1n-jailbreak/
+# https://www.jamf.com/jamf-nation/discussions/22884/removing-accounts-from-internet-accounts
+# https://www.andreafortuna.org/2020/01/10/ios-forensics-bfu-before-first-unlock-acquisition-using-checkra1n/
+# https://blog.digital-forensics.it/2019/12/checkra1n-era-ep-4-analyzing.html
+# https://www.duffy.app/blog/fde-sep-amp-passcodes-my-idevice-data-is-safe-right

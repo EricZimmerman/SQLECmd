@@ -1,0 +1,39 @@
+Description: Google Chrome Omnibox Shortcuts
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 0e137968-371b-4078-9440-a94b3dcf0d2f
+Version: 1.0
+CSVPrefix: GoogleChrome
+FileName: Shortcuts
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='meta' OR name='omni_box_shortcuts');
+IdentifyValue: 2
+Queries:
+    -
+        Name: Chrome Shortcuts
+        Query: |
+                SELECT
+                datetime( omni_box_shortcuts.last_access_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS LastAccessTime,
+                omni_box_shortcuts.text AS TextTyped,
+                omni_box_shortcuts.fill_into_edit AS FillIntoEdit,
+                omni_box_shortcuts.url AS URL,
+                omni_box_shortcuts.contents AS Contents,
+                omni_box_shortcuts.description AS Description,
+                omni_box_shortcuts.type AS Type,
+                omni_box_shortcuts.keyword AS Keyword,
+                omni_box_shortcuts.number_of_hits AS TimesSelectedByUser,
+                omni_box_shortcuts.id AS ID
+                FROM
+                omni_box_shortcuts
+                ORDER BY
+                omni_box_shortcuts.last_access_time ASC
+        BaseFileName: OmniboxShortcuts
+
+# Documentation
+# https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
+# https://www.sans.org/blog/google-chrome-forensics/
+# https://pr1malbyt3s.com/Forensics/SQLite-Browser-Artifacts.html
+# https://www.epochconverter.com/webkit
+# https://www.foxtonforensics.com/browser-history-examiner/chrome-history-location
+# https://forensicswiki.xyz/page/Google_Chrome
+# https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
+# Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape

@@ -1,0 +1,33 @@
+Description: Google Chrome Top Sites
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 3b2fc9c8-23ea-4694-82a2-266aa819db3b
+Version: 1.0
+CSVPrefix: GoogleChrome
+FileName: Top Sites
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='meta' OR name='top_sites');
+IdentifyValue: 2
+Queries:
+    -
+        Name: Chrome Autofill Entries
+        Query: |
+                SELECT
+                top_sites.url_rank AS URLRank,
+                top_sites.url AS URL,
+                top_sites.title AS Title,
+                top_sites.redirects AS Redirects
+                FROM
+                top_sites
+                ORDER BY
+                top_sites.url_rank ASC
+        BaseFileName: TopSites
+
+# Documentation
+# https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
+# https://www.sans.org/blog/google-chrome-forensics/
+# https://pr1malbyt3s.com/Forensics/SQLite-Browser-Artifacts.html
+# https://www.epochconverter.com/webkit
+# https://www.foxtonforensics.com/browser-history-examiner/chrome-history-location
+# https://forensicswiki.xyz/page/Google_Chrome
+# https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
+# Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape
