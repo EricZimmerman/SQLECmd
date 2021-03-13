@@ -1,0 +1,34 @@
+Description: Firefox Downloads - Places.sqlite
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: f5d66594-1b5a-45f7-8cdf-57d76d646649
+Version: 1.0
+CSVPrefix: Firefox
+FileName: places.sqlite
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='moz_historyvisits' OR name='moz_bookmarks' OR name='moz_places' OR name='moz_inputhistory');
+IdentifyValue: 4
+Queries:
+    -
+        Name: Firefox Downloads
+        Query: |
+               SELECT
+               	moz_annos.place_id AS PlaceID,
+               	moz_annos.content AS Content,
+               	datetime( dateAdded / 1000000, 'unixepoch', 'localtime' ) AS DateAdded,
+               	datetime( lastModified / 1000000, 'unixepoch', 'localtime' ) AS LastModified
+               FROM
+               	moz_annos
+               WHERE
+               	anno_attribute_id IN (1,2)
+               ORDER BY
+               	moz_annos.dateAdded ASC
+        BaseFileName: Downloads-PlacesDB
+
+# Documentation
+# https://www.acquireforensics.com/services/tech/mozilla-firefox.html
+# https://forensicswiki.xyz/wiki/index.php?title=Mozilla_Firefox
+# https://kb.digital-detective.net/display/BF/Firefox+SQLite+Databases
+# https://davidkoepi.wordpress.com/2010/11/27/firefoxforensics/
+# https://www.sans.org/blog/firefox-3-x-forensics-using-f3e
+# https://webcache.googleusercontent.com/search?q=cache:Zet3XwbInDsJ:forums.mozillazine.org/viewtopic.php%3Ff%3D7%26t%3D2688995+&cd=4&hl=en&ct=clnk&gl=us&client=firefox-b-1-d
+# Use SQLECmd in conjunction with the Firefox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Firefox.tkape

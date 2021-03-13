@@ -1,0 +1,33 @@
+Description: Firefox Favicons
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 3242e11b-0575-4501-862f-265e2f3fccdf
+Version: 1.0
+CSVPrefix: Firefox
+FileName: favicons.sqlite
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='moz_icons' OR name='moz_icons_to_pages' OR name='moz_pages_w_icons');
+IdentifyValue: 3
+Queries:
+    -
+        Name: Firefox Favicons
+        Query: |
+               SELECT
+               moz_icons.id AS ID,
+               moz_pages_w_icons.page_url AS PageURL,
+               moz_icons.icon_url AS FaviconURL,
+               datetime( moz_icons.expire_ms / 1000, 'unixepoch', 'localtime' ) AS Expiration
+               FROM
+               moz_icons
+               INNER JOIN moz_icons_to_pages ON moz_icons.id = moz_icons_to_pages.icon_id
+               INNER JOIN moz_pages_w_icons ON moz_icons_to_pages.page_id = moz_pages_w_icons.id
+               ORDER BY
+               moz_icons.expire_ms ASC
+        BaseFileName: Favicons
+
+# Documentation
+# https://www.acquireforensics.com/services/tech/mozilla-firefox.html
+# https://forensicswiki.xyz/wiki/index.php?title=Mozilla_Firefox
+# https://kb.digital-detective.net/display/BF/Firefox+SQLite+Databases
+# https://davidkoepi.wordpress.com/2010/11/27/firefoxforensics/
+# https://www.sans.org/blog/firefox-3-x-forensics-using-f3e
+# Use SQLECmd in conjunction with the Firefox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Firefox.tkape

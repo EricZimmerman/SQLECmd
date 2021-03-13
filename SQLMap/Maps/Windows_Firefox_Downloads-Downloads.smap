@@ -1,8 +1,8 @@
-Description: Firefox Downloads
+Description: Firefox Downloads - downloads.sqlite
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: 163ac574-ab35-4509-b925-f8a14a470d4a
-Version: 0.2
+Version: 1.0
 CSVPrefix: Firefox
 FileName: downloads.sqlite
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='moz_downloads');
@@ -12,20 +12,20 @@ Queries:
         Name: Firefox Downloads
         Query: |
                SELECT
-               	moz_downloads.id AS ID,
-               	moz_downloads.name AS Name,
-               	moz_downloads.mimeType AS MIMEType,
-               	moz_downloads.source AS Source,
-               	moz_downloads.target AS Target,
-               	datetime( startTime / 1000000, 'unixepoch', 'localtime' ) AS StartTime,
-               	datetime( endTime / 1000000, 'unixepoch', 'localtime' ) AS EndTime,
-               	moz_downloads.currBytes AS CurrentBytes,
-               	moz_downloads.maxBytes AS MaxBytes
+               moz_downloads.id AS ID,
+               moz_downloads.name AS Name,
+               moz_downloads.mimeType AS MIMEType,
+               moz_downloads.source AS Source,
+               moz_downloads.target AS Target,
+               datetime( startTime / 1000000, 'unixepoch', 'localtime' ) AS StartTime,
+               datetime( endTime / 1000000, 'unixepoch', 'localtime' ) AS EndTime,
+               moz_downloads.currBytes AS CurrentBytes,
+               moz_downloads.maxBytes AS MaxBytes
                FROM
-               	moz_downloads
+               moz_downloads
                ORDER BY
-               	moz_downloads.id ASC
-        BaseFileName: Downloads
+               moz_downloads.id ASC
+        BaseFileName: Downloads-DownloadsDB
 
 # Documentation
 # https://www.acquireforensics.com/services/tech/mozilla-firefox.html
