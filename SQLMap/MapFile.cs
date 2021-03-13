@@ -22,7 +22,6 @@ namespace SQLMaps
         /// The database's 'normal' filename to look
         /// </summary>
         public string FileName { get; set; }
-        
 
         /// <summary>
         /// The SQL statement used to identify this database

@@ -111,7 +111,7 @@ namespace SQLMaps
                         errorMaps.Add(Path.GetFileName(mapFile));
                     }
                 }
-                catch (YamlDotNet.Core.SyntaxErrorException se)
+                catch (SyntaxErrorException se)
                 {
                     errorMaps.Add(Path.GetFileName(mapFile));
 
