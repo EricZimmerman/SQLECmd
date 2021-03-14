@@ -12,26 +12,26 @@ Queries:
         Name: Dropbox Non-Local Resources
         Query: |
                SELECT
-               datetime( nonlocal_resources.server_fetch_timestamp / 1000 + ( strftime( '%ms', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS timestamp, 
-               nonlocal_resources.account_id AS AccountID, 
-               nonlocal_resources.name AS Name, 
-               nonlocal_resources.url AS URL, 
-               nonlocal_resources.server_path AS ServerPath, 
+               datetime( nonlocal_resources.server_fetch_timestamp / 1000 + ( strftime( '%ms', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS timestamp,
+               nonlocal_resources.account_id AS AccountID,
+               nonlocal_resources.name AS Name,
+               nonlocal_resources.url AS URL,
+               nonlocal_resources.server_path AS ServerPath,
                CASE
-               
+
                WHEN nonlocal_resources.is_dir = 0 THEN
-               'No' 
+               'No'
                WHEN nonlocal_resources.is_dir = 1 THEN
-               'Yes' 
-               END AS IsDirectory, 
+               'Yes'
+               END AS IsDirectory,
                CASE
-               
+
                WHEN nonlocal_resources.is_share = 0 THEN
-               'No' 
+               'No'
                WHEN nonlocal_resources.is_share = 1 THEN
-               'Yes' 
-               END AS IsShare, 
-               nonlocal_resources.resource_type AS ResourceType, 
+               'Yes'
+               END AS IsShare,
+               nonlocal_resources.resource_type AS ResourceType,
                nonlocal_resources.resource_id AS ResourceID
                FROM
                nonlocal_resources
