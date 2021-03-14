@@ -1,4 +1,4 @@
-Description: Windows WPNDatabase - WNSPushChannel 
+Description: Windows WPNDatabase - WNSPushChannel
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: a91038dd-baa5-42a3-a92e-e1105171c6fa
@@ -17,10 +17,10 @@ Queries:
                 WNSPushChannel.HandlerId AS HandlerID,
                 WNSPushChannel.Uri AS URI,
                 datetime( ( WNSPushChannel.CreatedTime - 116444736000000000 ) / 10000000, 'unixepoch' ) AS CreatedTime,
-                datetime( ( WNSPushChannel.ExpiryTime - 116444736000000000 ) / 10000000, 'unixepoch' ) AS ExpirationTime 
+                datetime( ( WNSPushChannel.ExpiryTime - 116444736000000000 ) / 10000000, 'unixepoch' ) AS ExpirationTime
                 FROM
                 WNSPushChannel
-                JOIN NotificationHandler ON NotificationHandler.RecordId = WNSPushChannel.HandlerId 
+                JOIN NotificationHandler ON NotificationHandler.RecordId = WNSPushChannel.HandlerId
                 ORDER BY
                 CreatedTime ASC
         BaseFileName: NotificationsDBN-WNSPushChannel
