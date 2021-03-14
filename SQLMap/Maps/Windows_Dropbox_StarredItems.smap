@@ -1,0 +1,42 @@
+Description: Dropbox Starred Items
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 4092c211-3032-41b1-abc3-a2a6b82f0ac3
+Version: 1.0
+CSVPrefix: Dropbox
+FileName: home.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='activity_feed' OR name='recents' OR name='starred_items' OR name='calendar_items' OR name='sfj_resources');
+IdentifyValue: 5
+Queries:
+    -
+        Name: Dropbox Starred Items
+        Query: |
+               SELECT
+               datetime( timestamp / 1000 + ( strftime( '%ms', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS timestamp,
+               starred_items.account_id AS AccountID,
+               starred_items.server_path AS ServerPath,
+               CASE
+
+               WHEN starred_items.is_starred = 0 THEN
+               'No'
+               WHEN starred_items.is_starred = 1 THEN
+               'Yes'
+               END AS IsStarred,
+               starred_items.keywords AS Keywords,
+               starred_items.paper_path AS PaperPath,
+               starred_items.persist_state AS PersistState,
+               starred_items.resource_type AS ResourceType,
+               starred_items.resource_id AS ResourceID
+               FROM
+               starred_items
+               ORDER BY
+               starred_items.timestamp ASC
+        BaseFileName: StarredItems
+
+# Documentation
+# https://www.forensicfocus.com/news/new-free-tool-decrypting-the-dropbox-filecache-dbx-file/
+# https://digital-forensics.sans.org/summit-archives/Prague_Summit/Cloud_Storage_Forensics_Mattia_Eppifani.pdf
+# https://www.forensicfocus.com/articles/dropbox-forensics/
+# https://arxiv.org/pdf/1709.10395
+# https://www.researchgate.net/publication/342991973_Forensic_Analysis_of_Dropbox_Data_Remnants_on_Windows_10
+# Use SQLECmd in conjunction with the Dropbox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/Dropbox.tkape
