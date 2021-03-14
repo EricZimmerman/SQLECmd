@@ -17,9 +17,9 @@ Queries:
                 Notification.HandlerId AS HandlerId,
                 NotificationHandler.PrimaryId AS Application,
                 CASE
-                
+
                 WHEN NotificationHandler.ParentId THEN
-                NotificationHandler.ParentId ELSE '' 
+                NotificationHandler.ParentId ELSE ''
                 END AS Parent,
                 NotificationHandler.HandlerType AS HandlerType,
                 Notification.Type AS Type,
@@ -31,51 +31,51 @@ Queries:
                 CASE
 
                 WHEN Notification.ExpiryTime = 0 THEN
-                'Expired' ELSE datetime( ( Notification.ExpiryTime - 116444736000000000 ) / 10000000, 'unixepoch' ) 
+                'Expired' ELSE datetime( ( Notification.ExpiryTime - 116444736000000000 ) / 10000000, 'unixepoch' )
                 END AS ExpirationTime,
                 NotificationHandler.CreatedTime AS HandlerCreated,
                 NotificationHandler.ModifiedTime AS HandlerModified,
                 CASE
 
                 WHEN NotificationHandler.WNSId NOTNULL THEN
-                NotificationHandler.WNSId ELSE '' 
+                NotificationHandler.WNSId ELSE ''
                 END AS WNSId,
                 CASE
 
                 WHEN NotificationHandler.WNFEventName NOTNULL THEN
-                NotificationHandler.WNFEventName ELSE '' 
+                NotificationHandler.WNFEventName ELSE ''
                 END AS WNFEventName,
                 CASE
 
                 WHEN WNSPushChannel.ChannelId NOTNULL THEN
-                WNSPushChannel.ChannelId ELSE '' 
+                WNSPushChannel.ChannelId ELSE ''
                 END AS ChannelID,
                 CASE
 
                 WHEN WNSPushChannel.Uri NOTNULL THEN
-                WNSPushChannel.Uri ELSE '' 
+                WNSPushChannel.Uri ELSE ''
                 END AS URI,
                 CASE
 
                 WHEN WNSPushChannel.CreatedTime NOTNULL THEN
-                datetime( ( WNSPushChannel.CreatedTime - 116444736000000000 ) / 10000000, 'unixepoch' ) ELSE '' 
+                datetime( ( WNSPushChannel.CreatedTime - 116444736000000000 ) / 10000000, 'unixepoch' ) ELSE ''
                 END AS WNSCreatedTime,
                 CASE
 
                 WHEN WNSPushChannel.ExpiryTime NOTNULL THEN
-                datetime( ( WNSPushChannel.ExpiryTime - 116444736000000000 ) / 10000000, 'unixepoch' ) ELSE '' 
+                datetime( ( WNSPushChannel.ExpiryTime - 116444736000000000 ) / 10000000, 'unixepoch' ) ELSE ''
                 END AS WNSExpirationTime,
                 CASE
 
                 WHEN hex( Notification.ActivityId ) = '00000000000000000000000000000000' THEN
-                '' ELSE hex( Notification.ActivityId ) 
-                END AS ActivityId 
+                '' ELSE hex( Notification.ActivityId )
+                END AS ActivityId
                 FROM
                 Notification
                 JOIN NotificationHandler ON NotificationHandler.RecordId = Notification.HandlerId
-                LEFT JOIN WNSPushChannel ON WNSPushChannel.HandlerId = NotificationHandler.RecordId 
+                LEFT JOIN WNSPushChannel ON WNSPushChannel.HandlerId = NotificationHandler.RecordId
                 ORDER BY
-                Id DESC                                                                                              
+                Id DESC
         BaseFileName: NotificationsDB-Notifications
 
 # Documentation
