@@ -1,0 +1,46 @@
+Description: Dropbox Non-Local Resources
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 255c6d03-a065-49dd-b1bd-4cf7c635554a
+Version: 1.0
+CSVPrefix: Dropbox
+FileName: home.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='activity_feed' OR name='recents' OR name='starred_items' OR name='calendar_items' OR name='sfj_resources');
+IdentifyValue: 5
+Queries:
+    -
+        Name: Dropbox Non-Local Resources
+        Query: |
+               SELECT
+               datetime( nonlocal_resources.server_fetch_timestamp / 1000 + ( strftime( '%ms', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS timestamp,
+               nonlocal_resources.account_id AS AccountID,
+               nonlocal_resources.name AS Name,
+               nonlocal_resources.url AS URL,
+               nonlocal_resources.server_path AS ServerPath,
+               CASE
+
+               WHEN nonlocal_resources.is_dir = 0 THEN
+               'No'
+               WHEN nonlocal_resources.is_dir = 1 THEN
+               'Yes'
+               END AS IsDirectory,
+               CASE
+
+               WHEN nonlocal_resources.is_share = 0 THEN
+               'No'
+               WHEN nonlocal_resources.is_share = 1 THEN
+               'Yes'
+               END AS IsShare,
+               nonlocal_resources.resource_type AS ResourceType,
+               nonlocal_resources.resource_id AS ResourceID
+               FROM
+               nonlocal_resources
+        BaseFileName: NonLocalResources
+
+# Documentation
+# https://www.forensicfocus.com/news/new-free-tool-decrypting-the-dropbox-filecache-dbx-file/
+# https://digital-forensics.sans.org/summit-archives/Prague_Summit/Cloud_Storage_Forensics_Mattia_Eppifani.pdf
+# https://www.forensicfocus.com/articles/dropbox-forensics/
+# https://arxiv.org/pdf/1709.10395
+# https://www.researchgate.net/publication/342991973_Forensic_Analysis_of_Dropbox_Data_Remnants_on_Windows_10
+# Use SQLECmd in conjunction with the Dropbox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/Dropbox.tkape
