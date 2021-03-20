@@ -14,6 +14,8 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net462|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,7 +24,7 @@
 
   <ItemGroup>
     <PackageReference Include="AlphaFS" Version="2.2.6" />
-    <PackageReference Include="Costura.Fody" Version="5.0.2">
+    <PackageReference Include="Costura.Fody" Version="5.1.0">
       <PrivateAssets>all</PrivateAssets>
       
     </PackageReference>
