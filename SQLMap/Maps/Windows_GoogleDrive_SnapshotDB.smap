@@ -39,7 +39,7 @@ Queries:
                WHEN doc_type = 6 THEN
                'Google Docs'
                WHEN doc_type = 12 THEN
-              ''Google Maps' ELSE 'Google File/Object'
+               'Google Maps' ELSE 'Google File/Object'
                END AS Type,
                size AS 'SizeInBytes',
                checksum AS Checksum,
