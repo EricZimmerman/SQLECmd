@@ -13,7 +13,6 @@ Queries:
         Query: |
                SELECT
                moz_cookies.id AS ID,
-               moz_cookies.baseDomain AS BaseDomain,
                moz_cookies.host AS Host,
                moz_cookies.name AS Name,
                moz_cookies.value AS Value,
