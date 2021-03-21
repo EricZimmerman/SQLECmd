@@ -9,7 +9,7 @@ IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='
 IdentifyValue: 1
 Queries:
     -
-        Name: Google Drive
+        Name: Google Drive CloudGraphDB
         Query: |
               SELECT
               filename AS 'Filename',
@@ -66,3 +66,4 @@ Queries:
 # https://www.atropos4n6.com/cloud-forensics/artifacts-of-google-drive-usage-on-windows-10-part-1/
 # https://www.researchgate.net/publication/330319091_Cloud_Drives_Forensic_Artifacts_A_Google_Drive_Case
 # https://github.com/kacos2000/Queries/blob/master/GDrive_cloudgraph.sql
+# Use SQLECmd in conjunction with the Google Drive KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/GoogleDrive.tkape
