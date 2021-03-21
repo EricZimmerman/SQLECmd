@@ -1,0 +1,26 @@
+Description: Google Drive Sync Config database
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: ebd2e7bf-11ae-4b61-8126-1958ee46d570
+Version: 1.0
+CSVPrefix: GoogleDrive
+FileName: sync_config.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='data');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Google Drive Sync Config Database
+        Query: |
+              SELECT
+              data.entry_key AS EntryKey,
+              data.data_key AS DataKey,
+              data.data_value AS DataValue
+              FROM
+              data
+        BaseFileName: SyncConfigDB
+
+# Documentation
+# https://www.atropos4n6.com/cloud-forensics/artifacts-of-google-drive-usage-on-windows-10-part-1/
+# https://www.researchgate.net/publication/330319091_Cloud_Drives_Forensic_Artifacts_A_Google_Drive_Case
+# https://github.com/kacos2000/Queries/blob/master/GDrive_cloudgraph.sql
+# Use SQLECmd in conjunction with the Google Drive KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/GoogleDrive.tkape
