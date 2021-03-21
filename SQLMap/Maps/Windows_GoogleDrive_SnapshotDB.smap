@@ -1,0 +1,120 @@
+Description: Google Drive Snapshot database
+Author: Heather Mahalik and Andrew Rathbun
+Email: hmahalik@gmail.com
+Id: c17e9884-49fb-468b-a623-6eac312cf9f4
+Version: 0.3
+CSVPrefix: GoogleDrive
+FileName: snapshot.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='cloud_entry' OR name='volume_info' OR name='cloud_relations' OR name='local_entry' OR name='local_relations');
+IdentifyValue: 5
+
+Queries:
+    -
+        Name: Google Drive SnapshotDB - Cloud Files
+        Query: |
+               SELECT
+               cloud_entry.doc_id AS ID,
+               ( SELECT cloud_entry.filename FROM cloud_entry WHERE cloud_relations.parent_doc_id = cloud_entry.doc_id ) AS ParentFolder,
+               filename AS Filename,
+               datetime( modified, 'unixepoch' ) AS ModifiedTime,
+               CASE
+
+               WHEN acl_role = 0 THEN
+               'Google Drive Owner' ELSE 'From Elsewhere'
+               END AS ACLRole,
+               CASE
+
+               WHEN doc_type = 0 THEN
+               'Folder'
+               WHEN doc_type = 1 THEN
+               'Regular File'
+               WHEN doc_type = 2 THEN
+               'Google Slides'
+               WHEN doc_type = 3 THEN
+               'Google Forms'
+               WHEN doc_type = 4 THEN
+               'Google Sheets'
+               WHEN doc_type = 5 THEN
+               'Google Draw'
+               WHEN doc_type = 6 THEN
+               'Google Docs'
+               WHEN doc_type = 12 THEN
+               'Google Maps' ELSE 'Google File/Object'
+               END AS Type,
+               size AS 'SizeInBytes',
+               checksum AS Checksum,
+               CASE
+
+               WHEN shared = 1 THEN
+               'Shared'
+               WHEN shared = 0 THEN
+               'Not Shared'
+               END AS SharedStatus,
+               CASE
+
+               WHEN removed = 1 THEN
+               'Yes'
+               WHEN removed = 0 THEN
+               'No'
+               END AS RemovedStatus
+               FROM
+               cloud_entry
+               LEFT JOIN cloud_relations ON cloud_relations.child_doc_id = cloud_entry.doc_id
+               ORDER BY
+               cloud_entry.modified ASC
+        BaseFileName: SnapshotCloudFiles
+
+    -
+        Name: Google Drive SnapshotDB - Local Files
+        Query: |
+               SELECT
+               local_entry.inode AS FileID,
+               local_entry.volume AS Volume,
+               ( SELECT local_entry.filename FROM local_entry WHERE local_relations.parent_inode = local_entry.inode ) AS ParentFolder,
+               local_entry.filename AS Filename,
+               datetime( modified, 'unixepoch' ) AS "ModifiedTime",
+               local_entry.checksum AS Checksum,
+               local_entry.size AS SizeInBytes,
+               CASE
+
+               WHEN is_folder = 0 THEN
+               'No'
+               WHEN is_folder = 1 THEN
+               'Yes'
+               END AS IsFolder
+               FROM
+               local_entry AS local_entry
+               LEFT JOIN local_relations ON local_relations.child_inode = local_entry.inode
+               ORDER BY
+               local_entry.inode ASC
+        BaseFileName: SnapshotLocalFiles
+
+    -
+        Name: Google Drive SnapshotDB - Volume Info
+        Query: |
+               SELECT
+               main.volume_info.volume AS Volume,
+               main.volume_info.full_path AS FullPath,
+               main.volume_info.uuid AS UUID,
+               main.volume_info.label AS DriveLabel,
+               main.volume_info.size AS SizeInBytes,
+               main.volume_info.filesystem AS DriveFormat,
+               main.volume_info.model AS DriveModel,
+               main.volume_info.device_type AS DeviceType,
+               main.volume_info.device_file AS DeviceFile,
+               main.volume_info.device_number AS DeviceSerialNumber
+               FROM
+               main.volume_info
+               ORDER BY
+               main.volume_info.full_path ASC
+        BaseFileName: SnapshotVolumeInfo
+
+# Documentation
+# https://forensicswiki.xyz/wiki/index.php?title=Google_Drive
+# https://www.forensicfocus.com/articles/what-are-gdocs-google-drive-data-part-2/
+# https://www.researchgate.net/publication/330319091_Cloud_Drives_Forensic_Artifacts_A_Google_Drive_Case
+# https://digital-forensics.sans.org/summit-archives/Prague_Summit/Cloud_Storage_Forensics_Mattia_Eppifani.pdf
+# https://www.atropos4n6.com/cloud-artifacts/google-drive-forensics/
+# https://bitforensics.blogspot.com/2012/12/google-drive-artifacts-explained.html
+# https://amity.edu/UserFiles/aijem/36V02_I02_P011.pdf
+# Use SQLECmd in conjunction with the Google Drive KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/GoogleDrive.tkape

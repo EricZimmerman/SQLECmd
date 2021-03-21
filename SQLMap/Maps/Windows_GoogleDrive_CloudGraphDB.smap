@@ -1,0 +1,69 @@
+Description: Google Drive Cloud Graph database
+Author: Heather Mahalik and Andrew Rathbun
+Email: hmahalik@gmail.com
+Id: a8579549-8776-42ce-858a-7425f8f6c039
+Version: 0.3
+CSVPrefix: GoogleDrive
+FileName: cloud_graph.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='cloud_graph_entry');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Google Drive CloudGraphDB
+        Query: |
+              SELECT
+              filename AS 'Filename',
+              datetime( modified, 'unixepoch' ) AS 'ModifiedTime',
+              CASE
+
+              WHEN acl_role = 0 THEN
+              'Private/Google Drive Owner'
+              WHEN acl_role = 1 THEN
+              'Can Contribute'
+              WHEN acl_role = 2 THEN
+              'Can View' ELSE 'From Elsewhere'
+              END AS 'ACL Role',
+              CASE
+
+              WHEN doc_type = 0 THEN
+              'Folder'
+              WHEN doc_type = 1 THEN
+              'Regular File'
+              WHEN doc_type = 2 THEN
+              'Google Slides'
+              WHEN doc_type = 3 THEN
+              'Google Forms'
+              WHEN doc_type = 4 THEN
+              'Google Sheets'
+              WHEN doc_type = 5 THEN
+              'Google Draw'
+              WHEN doc_type = 6 THEN
+              'Google Docs'
+              WHEN doc_type = 12 THEN
+              'Google Maps' ELSE 'Google File/Object'
+              END AS Type,
+              size AS 'Size in bytes',
+              checksum AS 'MD5 Hash',
+              CASE
+
+              WHEN shared = 1 THEN
+              'Shared'
+              WHEN shared = 0 THEN
+              'Not Shared'
+              END AS 'Shared Status',
+              CASE
+
+              WHEN removed = 0 THEN
+              'Not Removed'
+              WHEN removed = 1 THEN
+              'Removed'
+              END AS 'Cloud Status'
+              FROM
+              cloud_graph_entry
+        BaseFileName: CloudGraphDB
+
+# Documentation
+# https://www.atropos4n6.com/cloud-forensics/artifacts-of-google-drive-usage-on-windows-10-part-1/
+# https://www.researchgate.net/publication/330319091_Cloud_Drives_Forensic_Artifacts_A_Google_Drive_Case
+# https://github.com/kacos2000/Queries/blob/master/GDrive_cloudgraph.sql
+# Use SQLECmd in conjunction with the Google Drive KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/GoogleDrive.tkape
