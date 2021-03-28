@@ -1,0 +1,83 @@
+Description: Google Drive - Changes
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 690cd1e6-def2-42d4-8cc8-64858cd9d4e4
+Version: 1.0
+FileName: random.db # run --hunt mode on the directory to make use of this map
+CSVPrefix: GoogleDrive
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='change_buffer_entries' OR name='fschanges');
+IdentifyValue: 2
+
+Queries:
+    -
+        Name: Google Drive FS Changes
+        Query: |
+               SELECT
+               sqlite_sequence.seq AS Sequence,
+               fschanges.identifier AS Identifier,
+               fschanges.direction AS Direction,
+               fschanges."action" AS "Action",
+               fschanges.inode AS Inode,
+               fschanges.parent_inode AS ParentInode,
+               fschanges.volume AS Volume,
+               fschanges.parent_volume AS ParentVolume,
+               fschanges.path AS Path,
+               fschanges.name AS Name,
+               CASE
+
+               WHEN fschanges.is_folder = 0 THEN
+               'No'
+               WHEN fschanges.is_folder = 1 THEN
+               'Yes'
+               END AS IsFolder,
+               CASE
+
+               WHEN fschanges.affects_gdoc = 0 THEN
+               'No'
+               WHEN fschanges.affects_gdoc = 1 THEN
+               'Yes'
+               END AS AffectsGDocs,
+               datetime( modified, 'unixepoch' ) AS ModifiedTime,
+               fschanges.size AS SizeInBytes,
+               CASE
+
+               WHEN fschanges.shared = 0 THEN
+               'No'
+               WHEN fschanges.shared = 1 THEN
+               'Yes'
+               END AS Shared,
+               CASE
+
+               WHEN doc_type = 0 THEN
+               'Folder'
+               WHEN doc_type = 1 THEN
+               'Regular File'
+               WHEN doc_type = 2 THEN
+               'Google Slides'
+               WHEN doc_type = 3 THEN
+               'Google Forms'
+               WHEN doc_type = 4 THEN
+               'Google Sheets'
+               WHEN doc_type = 5 THEN
+               'Google Draw'
+               WHEN doc_type = 6 THEN
+               'Google Docs'
+               WHEN doc_type = 12 THEN
+               'Google Maps' ELSE 'Google File/Object'
+               END AS DocType,
+               fschanges.full_path AS FullPath,
+               fschanges.hash AS Hash,
+               change_buffer_entries.failure_count AS FailureCount,
+               change_buffer_entries.time AS Time,
+               change_buffer_entries.state AS State
+               FROM
+               fschanges
+               LEFT JOIN change_buffer_entries ON fschanges.identifier = change_buffer_entries.identifier,
+               sqlite_sequence
+               ORDER BY
+               fschanges.identifier ASC
+        BaseFileName: FSChanges
+
+# Documentation
+# N/A
+# Use SQLECmd in conjunction with the Google Drive KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/GoogleDrive.tkape
