@@ -13,7 +13,7 @@ Queries:
         Query: |
                 SELECT
                 Notification.Id AS ID,
-                Notification."Order" AS "Order",
+                Notification.'Order' AS 'Order',
                 Notification.HandlerId AS HandlerId,
                 NotificationHandler.PrimaryId AS Application,
                 CASE
