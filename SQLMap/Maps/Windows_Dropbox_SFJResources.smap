@@ -34,7 +34,7 @@ Queries:
         BaseFileName: SFJResources
 
 # Documentation
-# I have no idea what SFJ Resources means and I couldn’t find any documentation on it. If anyone knows, please do a PR and add documentation. It looks like good data resides here, I just don’t know exactly what it’s representing at this time.
+# I have no idea what SFJ Resources means and I couldn't find any documentation on it. If anyone knows, please do a PR and add documentation. It looks like good data resides here, I just don't know exactly what it's representing at this time.
 # https://www.forensicfocus.com/news/new-free-tool-decrypting-the-dropbox-filecache-dbx-file/
 # https://digital-forensics.sans.org/summit-archives/Prague_Summit/Cloud_Storage_Forensics_Mattia_Eppifani.pdf
 # https://www.forensicfocus.com/articles/dropbox-forensics/
