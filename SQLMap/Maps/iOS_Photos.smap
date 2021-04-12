@@ -1,0 +1,41 @@
+Description: iOS Photos database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: e740e01a-c964-43aa-9b93-1147ee08b358
+Version: 0.2
+CSVPrefix: iOS
+FileName: Photos.sqlite # Used when in non-hunting mode. In hunting mode, sqlite files will be identified by their header. This mode will let you sweep for changes/unknown databases across a directory
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='ZALBUMLIST' OR name='ZMOMENT' OR name='Z_PRIMARYKEY' OR name='ZCODEC' OR name='ZGENERICASSET');
+IdentifyValue: 5 # Both tables should exist. this is always treated as a string
+Queries:
+    -
+        Name: Moments
+        Query: |
+                Select
+                ZGENERICASSET.Z_PK,
+                CASE
+                when ZGENERICASSET.ZTRASHEDSTATE = 1 then "Deleted"
+                when ZGENERICASSET.ZTRASHEDSTATE = 0 then "Not Deleted"
+                end AS "State" ,
+                datetime(ZGENERICASSET.ZADDEDDATE+978307200,'UNIXEPOCH') AS "Added",
+                datetime(ZGENERICASSET.ZLASTSHAREDDATE+978307200,'UNIXEPOCH') AS "Last Shared",
+                ZGENERICASSET.ZLATITUDE AS "Latitude",
+                ZGENERICASSET.ZLONGITUDE AS "Longitude",
+                datetime(ZGENERICASSET.ZMODIFICATIONDATE+978307200,'UNIXEPOCH') AS "Modified",
+                datetime(ZGENERICASSET.ZTRASHEDDATE+978307200,'UNIXEPOCH') AS "Deleted Date",
+                ZGENERICASSET.ZDIRECTORY AS "Directory",
+                ZGENERICASSET.ZFILENAME AS "Filename",
+                ZGENERICASSET.ZLOCATIONDATA AS "Blob Location",
+                ZMOMENT.ZAPPROXIMATELATITUDE AS "Approximate Latitude",
+                ZMOMENT.ZAPPROXIMATELONGITUDE AS "Approximate Longitude",
+                datetime(ZMOMENT.ZSTARTDATE+978307200,'UNIXEPOCH') AS "Moment Start Date",
+                datetime(ZMOMENT.ZENDDATE+978307200,'UNIXEPOCH') AS "Moment End Date"
+                From ZGENERICASSET
+                left join zmoment on zmoment.z_pk=zgenericasset.zmoment
+        BaseFileName: PhotosDB_Moments # This will be used when naming csv files for export
+
+# Documentation
+# https://www.forensicmike1.com/2019/05/02/ios-photos-sqlite-forensics/
+# https://smarterforensics.com/2020/08/does-photos-sqlite-have-relations-with-cameramessagesapp-by-scott-koenig/
+# https://www.cellebrite.com/en/identifying-file-to-album-correlation-using-ios-photos-sqlite/
+# https://digital-forensics.sans.org/media/DFPS_FOR585_v3.1_0420_R8.pdf

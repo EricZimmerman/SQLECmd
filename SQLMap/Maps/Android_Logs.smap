@@ -1,0 +1,29 @@
+Description: Samsung Logs database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: d9bdc64c-a59a-426d-a489-2c1c35b2ea8b
+Version: 0.2
+CSVPrefix: Android
+FileName: logs.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='logs');
+IdentifyValue: 1
+
+Queries:
+    -
+        Name: Log Snippets
+        Query: |
+                SELECT
+                _id,
+                number,
+                DateTime(date / 1000, 'UNIXEPOCH') AS "Date",
+                name,
+                account_name,
+                m_content
+                FROM logs
+        BaseFileName: LogsDB
+
+# Documentation
+# https://digital-forensics.sans.org/media/DFPS_FOR585_v3.1_0420_R8.pdf
+# https://github.com/kacos2000/queries/blob/master/logs_db.sql
+# https://az4n6.blogspot.com/2013/02/
+# https://www.forensicfocus.com/articles/extracting-data-from-dump-of-mobile-devices-running-android-operating-system/

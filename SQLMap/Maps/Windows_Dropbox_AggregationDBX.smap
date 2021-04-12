@@ -1,0 +1,29 @@
+Description: Dropbox Aggregation database
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 69ace2ef-a789-4ec7-9408-b264467e3801
+Version: 1.0
+CSVPrefix: Dropbox
+FileName: aggregation.dbx
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='snapshot');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Dropbox Aggregation database
+        Query: |
+               SELECT
+               snapshot."key" AS "Key",
+               snapshot.value AS "Value(ConvertToJSON)"
+               FROM
+               snapshot
+               ORDER BY
+               snapshot."key" ASC
+        BaseFileName: AggregationDBX
+
+# Documentation
+# https://www.forensicfocus.com/news/new-free-tool-decrypting-the-dropbox-filecache-dbx-file/
+# https://digital-forensics.sans.org/summit-archives/Prague_Summit/Cloud_Storage_Forensics_Mattia_Eppifani.pdf
+# https://www.forensicfocus.com/articles/dropbox-forensics/
+# https://arxiv.org/pdf/1709.10395
+# https://www.researchgate.net/publication/342991973_Forensic_Analysis_of_Dropbox_Data_Remnants_on_Windows_10
+# Use SQLECmd in conjunction with the Dropbox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/Dropbox.tkape

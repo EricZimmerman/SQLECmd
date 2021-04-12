@@ -1,0 +1,39 @@
+Description: Some rando contacts database example
+Author: Eric Zimmerman
+Email: saericzimmerman@gmail.com
+Id: 83b99299-2d84-4844-af25-c727d3440b19
+Version: 0.2
+CSVPrefix: Contacts
+FileName: Contacts.db # Used when in non-hunting mode. In hunting mode, sqlite files will be identified by their header. This mode will let you sweep for changes/unknown databases across a directory
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='Customers' OR name='Total');
+IdentifyValue: 2 # Both tables should exist. this is always treated as a string
+Queries:
+    -
+        Name: Customers table users
+        Query: SELECT FirstName,LastName from Customers
+        BaseFileName: Users # This will be used when naming csv files for export
+    -
+        Name: Another Customers table query
+        Query: SELECT Id,State as Wizzo from Customers
+        BaseFileName: StateIdInfo
+    -
+        Name: JoinExample
+        Query: SELECT Total.ID, Customers.FirstName || ' ' || Customers.LastName AS CustomerName, Total.Year, Total.January, Total.February, Total.March, Total.April, Total.May, Total.June, Total.July, Total.August, Total.September, Total.October, Total.November, Total.December FROM         Customers INNER JOIN Total ON Customers.ID = Total.CustomerID
+        BaseFileName: JoinExample
+    -
+        Name: SomeThingElse
+        Query: SELECT Id,State as Wizzo froM Customers
+        BaseFileName: AnotherExample
+
+# Use this Map against this file: .\SQLMap.Test\TestFiles\Contacts.db
+
+# TODO, transforms
+#        Transforms:
+#            -
+#                Id: Hex
+#                Timestamp: Epoch
+#                SomeOther: EpochMillisecond
+#                Chrome timestamps and Mac (9 and 18 digit) timestamps
+#                BLOBS - images, gzip, binary plists, plists, etc.
+#                Base 64 for certain payloads
+#        Protobuff

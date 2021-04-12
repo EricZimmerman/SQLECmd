@@ -1,0 +1,33 @@
+Description: iOS 8+ Call History database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: 3b782af4-0073-4b08-b955-eb8a3af7bf99
+Version: 0.2
+CSVPrefix: Calls
+FileName: callhistory.storedata
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='ZCALLRECORD');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Calls
+        Query: |
+                select
+                z_pk AS "Call Sequence #",
+                zaddress AS "Phone Number",
+                zduration AS "Call in Seconds",
+                case
+                when zoriginated = 0 then "Incoming"
+                when zoriginated = 1 then "Outgoing"
+                end AS "Call Direction",
+                case
+                when zanswered = 0 then "Call Missed"
+                when zanswered = 1 then "Call Answered"
+                end as "Call Status",
+                datetime(zdate+978307200,'unixepoch','localtime') AS "Timestamp"
+                from zcallrecord
+        BaseFileName: Calls
+
+# Documentation
+# https://www.oreilly.com/library/view/practical-mobile-forensics/9781788839198/c9f43416-9eea-4013-b7da-23421311aead.xhtml
+# https://smarterforensics.com/2019/09/
+# https://papers.put.as/papers/macosx/2014/Forensic-artifacts-for-Yosemite-call-history-and-sms-anlaysis-ENG.pdf

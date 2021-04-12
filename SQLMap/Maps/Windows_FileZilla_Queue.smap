@@ -1,0 +1,41 @@
+Description: FileZilla Client Queue
+Author: Aaron Read
+Email: aaron.j.read@kroll.com
+Id: dce0e3b5-afd0-41ca-b422-9e30e17abb4b
+Version: 1.0
+FileName: queue.sqlite3
+CSVPrefix: FileZilla
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='files');
+IdentifyValue: 1
+
+Queries:
+    -
+        Name: FileZilla Client Queue
+        Query: |
+               SELECT
+                source_file,
+                download,
+                size,
+                error_count,
+                priority,
+                l.path AS Local_Path,
+                r.path AS Remote_Path,
+                s.host as Remote_Server_IP,
+                s.port as Remote_Server_Port,
+                s.user as Remote_Server_User,
+                s.password as Remote_Server_Password,
+                s.account as Remote_Server_Account,
+                s.name as Remote_Server_Name,
+                s.parameters as Remote_Server_Parameters,
+                s.site_path as Remote_Server_Site_Path
+                FROM files f
+                INNER JOIN servers s ON f.server = s.id
+                INNER JOIN remote_paths r ON f.local_path = r.id
+                INNER JOIN local_paths l ON f.remote_path = l.id
+
+        BaseFileName: ClientQueue
+
+# Documentation
+# https://www.hecfblog.com/2013/09/daily-blog-93-filezilla-artifacts.html
+# https://krknsec.com/2020/04/18/miscellaneous-windows-10-forensic-artifacts/
+# Use SQLECmd in conjunction with the FileZilla KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/FileZilla.tkape

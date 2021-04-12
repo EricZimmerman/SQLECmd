@@ -1,0 +1,34 @@
+Description: Google Chrome Keyword Searches
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: d968ece4-d24a-4baf-8f07-78da07727712
+Version: 1.0
+CSVPrefix: GoogleChrome
+FileName: History
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='urls' OR name='visits' OR name='downloads' OR name='segments' OR name='typed_url_sync_metadata');
+IdentifyValue: 5
+Queries:
+    -
+        Name: Chrome Keyword Searches
+        Query: |
+                SELECT
+                keyword_search_terms.keyword_id AS KeywordID,
+                keyword_search_terms.url_id AS URLID,
+                datetime( urls.last_visit_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS LastVisitTime,
+                keyword_search_terms.term AS KeywordSearchTerm,
+                urls.title AS Title,
+                urls.url AS URL
+                FROM
+                keyword_search_terms
+                INNER JOIN urls ON keyword_search_terms.url_id = urls.id
+                ORDER BY
+                keyword_search_terms.keyword_id ASC
+        BaseFileName: KeywordSearches
+
+# Documentation
+# https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
+# https://www.epochconverter.com/webkit
+# https://www.foxtonforensics.com/browser-history-examiner/chrome-history-location
+# https://forensicswiki.xyz/page/Google_Chrome
+# https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
+# Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape

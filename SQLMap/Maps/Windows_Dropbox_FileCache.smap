@@ -1,0 +1,46 @@
+Description: Dropbox Filecache Database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: f2b91cc9-d5af-47c7-9bfc-c14ca38d2bc6
+Version: 0.2
+CSVPrefix: Dropbox
+FileName: filecache.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='file_journal');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Drobpox
+        Query: |
+                SELECT
+                id,
+                server_path,
+                parent_path,
+                local_host_id,
+                local_filename,
+                local_infinite_details,
+                local_size,
+                datetime(local_mtime,'unixepoch') AS "Local Modified Time",
+                datetime(local_ctime,'unixepoch') AS "Local Created Time",
+                local_attrs,
+                datetime(local_timestamp,'unixepoch') AS "Local Timestamp",
+                local_user_id,
+                Local_sync_type,
+                updated_filename,
+                updated_host_id,
+                updated_size,
+                datetime(updated_mtime) AS "Updated Modified Time",
+                datetime(updated_timestamp) AS "Updated Timestamp",
+                updated_dir,
+                updated_user_id,
+                updated_sync_type
+                from file_journal
+                order by "local created time" desc
+        BaseFileName: FileCacheDB
+
+# Docmentation
+# https://www.forensicfocus.com/news/new-free-tool-decrypting-the-dropbox-filecache-dbx-file/
+# https://digital-forensics.sans.org/summit-archives/Prague_Summit/Cloud_Storage_Forensics_Mattia_Eppifani.pdf
+# https://www.forensicfocus.com/articles/dropbox-forensics/
+# https://arxiv.org/pdf/1709.10395
+# https://www.researchgate.net/publication/342991973_Forensic_Analysis_of_Dropbox_Data_Remnants_on_Windows_10
+# Use SQLECmd in conjunction with the Dropbox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/Dropbox.tkape

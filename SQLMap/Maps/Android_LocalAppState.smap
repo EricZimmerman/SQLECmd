@@ -1,0 +1,35 @@
+Description: Android Application Tracker database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: cec6722d-ec1a-452b-9c02-920cd3477f8f
+Version: 0.2
+CSVPrefix: Android
+FileName: localappstate.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='appstate' OR name='android_metadata');
+IdentifyValue: 2
+
+Queries:
+    -
+        Name: Localappstate
+        Query: |
+                SELECT
+                package_name,
+                case
+                when auto_update = 1 then "AutoUpdate Set"
+                else "No AutoUpdate"
+                end AS "AutoUpdate Status",
+                delivery_data,
+                DateTime(delivery_data_timestamp_ms / 1000, 'UNIXEPOCH') As "Delivery Date",
+                DateTime(first_download_ms / 1000, 'UNIXEPOCH') As "First Download Date",
+                account,
+                title,
+                last_notified_version,
+                datetime(last_update_timestamp_ms/ 1000, 'UNIXEPOCH') As "Last Update",
+                datetime(install_request_timestamp_ms/ 1000, 'UNIXEPOCH') As "Install Request Date"
+                From appstate
+        BaseFileName: LocalAppstateDB
+
+# Documentation
+# https://digital-forensics.sans.org/media/DFPS_FOR585_v2.8_4-19.pdf
+# https://digital-forensics.sans.org/media/DFPS_FOR585_v3.1_0420_R8.pdf
+# https://digital-forensics.sans.org/media/DFIR_FOR585_Digital_Poster.pdf

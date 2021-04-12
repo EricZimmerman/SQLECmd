@@ -1,0 +1,25 @@
+Description: Dropbox config database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: 4528e3da-e3ec-498e-8325-e104ee969d71
+Version: 0.2
+CSVPrefix: Dropbox
+FileName: config.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='config');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Drobpox
+        Query: |
+             SELECT
+                key,
+                VALUE
+                from config
+        BaseFileName: ConfigurationsDB
+
+# Documentation
+# https://dereknewton.com/2011/04/forensic-artifacts-dropbox/
+# https://arxiv.org/pdf/1709.10395
+# https://www.researchgate.net/publication/342991973_Forensic_Analysis_of_Dropbox_Data_Remnants_on_Windows_10
+# https://forensicswiki.xyz/wiki/index.php?title=Dropbox
+# Use SQLECmd in conjunction with the Dropbox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/Dropbox.tkape

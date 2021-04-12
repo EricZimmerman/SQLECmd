@@ -1,0 +1,33 @@
+Description: Android SMS database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: c4904a4f-041a-4872-8763-4f55917c873a
+Version: 0.2
+CSVPrefix: Android
+FileName: mmssms.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='SMS' or name='part' or name='addr' OR name='mmssms');
+IdentifyValue: 4
+Queries:
+    -
+        Name: SMS
+        Query: |
+             select
+                mmssms._id,
+                mmssms.msg_type,
+                case
+                when mmssms.type = 2 then "incoming"
+                when mmssms.type = 1 then "outgoing"
+                end AS "message status",
+                mmssms.address,
+                datetime(mmssms.date/1000,'UNIXEPOCH','localtime') AS "date",
+                mmssms.body AS "message",
+                mmssms_tag.tag AS "unread"
+                from mmssms
+                left join mmssms_tag on mmssms_tag._id=mmssms._id
+        BaseFileName: SMSDB
+
+# Documentation
+# https://digital-forensics.sans.org/media/DFPS_FOR585_v3.1_0420_R8.pdf
+# https://az4n6.blogspot.com/2013/02/
+# https://www.magnetforensics.com/blog/android-messaging-forensics-sms-mms-and-beyond/
+# https://cheeky4n6monkey.blogspot.com/2013/02/

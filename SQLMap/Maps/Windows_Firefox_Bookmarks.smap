@@ -1,0 +1,48 @@
+Description: Firefox Bookmarks
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: eda1fb9b-8275-4fb5-9ff2-ac557dc0d399
+Version: 1.0
+CSVPrefix: Firefox
+FileName: places.sqlite
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='moz_historyvisits' OR name='moz_bookmarks' OR name='moz_places' OR name='moz_inputhistory');
+IdentifyValue: 4
+Queries:
+    -
+        Name: Bookmarks
+        Query: |
+                SELECT
+                Bookmarks.id AS ID,
+                Bookmarks.parent AS ParentID,
+                CASE
+
+                WHEN Bookmarks.type = 1 THEN
+                'URL'
+                WHEN Bookmarks.type = 2 THEN
+                'Folder'
+                WHEN Bookmarks.type = 1 THEN
+                'Separator'
+                END AS Type,
+                datetime( Bookmarks.dateAdded / 1000000, 'unixepoch', 'localtime' ) AS DatedAdded,
+                datetime( Bookmarks.lastModified / 1000000, 'unixepoch', 'localtime' ) AS LastModified,
+                Bookmarks.position AS Position,
+                Bookmarks.title AS Title,
+                moz_places.url AS URL,
+                Bookmarks.fk AS ForeignKey
+                FROM
+                moz_bookmarks AS Bookmarks
+                LEFT JOIN moz_places ON Bookmarks.fk = moz_places.id
+                ORDER BY
+                Bookmarks.id ASC
+        BaseFileName: Bookmarks
+
+# Documentation
+# https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
+# https://www.acquireforensics.com/blog/track-history-websites-visited-discussed-detail.html
+# http://2016.padjo.org/tutorials/sqlite-your-browser-history/
+# https://developer.mozilla.org/en-US/docs/Mozilla/Tech/Places/Database
+# https://stackoverflow.com/questions/464516/firefox-bookmarks-sqlite-structure
+# https://www.foxtonforensics.com/browser-history-examiner/firefox-history-location
+# https://pr1malbyt3s.com/Forensics/SQLite-Browser-Artifacts.html
+# https://stackoverflow.com/questions/52343272/sql-query-on-tags-in-places-sqlite-of-firefox
+# Use SQLECmd in conjunction with the Firefox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Firefox.tkape

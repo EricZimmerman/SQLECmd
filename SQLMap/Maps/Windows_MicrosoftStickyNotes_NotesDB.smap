@@ -1,0 +1,43 @@
+Description: Microsoft Sticky Notes Database
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: afa8cd82-e364-41e9-8d5b-8ec7ff466bce
+Version: 1.0
+CSVPrefix: MicrosoftStickyNotes
+FileName: plum.sqlite
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='Note' OR name='Media' OR name='Insight' OR name='User' OR name='Stroke');
+IdentifyValue: 5
+Queries:
+    -
+        Name: Microsoft Sticky Notes
+        Query: |
+                SELECT
+                datetime( ( "CreatedAt" / 10000000 ) - 62135596800, 'unixepoch' ) AS CreatedAt,
+                datetime( ( "UpdatedAt" / 10000000 ) - 62135596800, 'unixepoch' ) AS UpdatedAt,
+                datetime( ( "DeletedAt" / 10000000 ) - 62135596800, 'unixepoch' ) AS DeletedAt,
+                Note.WindowPosition AS WindowPosition,
+                CASE
+                WHEN Note.IsOpen = 0 THEN 'No'
+                WHEN Note.IsOpen = 1 THEN 'Yes'
+                ELSE 'Unknown'
+                END AS IsOpen,
+                CASE
+                WHEN Note.IsAlwaysOnTop = 0 THEN 'No'
+                WHEN Note.IsAlwaysOnTop = 1 THEN 'Yes'
+                ELSE 'Unknown'
+                END AS IsAlwaysOnTop,
+                Note.Theme AS Theme,
+                Note.Id AS NoteID,
+                Note.ParentId AS ParentID,
+                Note.Text AS Text,
+                Note.LastServerVersion AS LastServerVersion
+                FROM
+                Note
+                ORDER BY
+                Note.CreatedAt ASC
+        BaseFileName: NotesDB
+
+# Documentation:
+# https://www.venea.net/web/net_ticks_datetime_converter#net_ticks_to_date_time_and_unix_timestamp_conversion
+# https://stackoverflow.com/questions/5855299/how-do-i-display-the-following-in-a-readable-datetime-format
+# Use this Map in conjunctionw with Microsoft Sticky Notes KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/MicrosoftStickyNotes.tkape

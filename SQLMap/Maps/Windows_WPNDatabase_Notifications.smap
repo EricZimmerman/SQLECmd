@@ -1,0 +1,89 @@
+Description: Windows WPNDatabase - Notifications
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: cd952d69-7b3e-4d13-9810-8d987155bc58
+Version: 1.0
+CSVPrefix: Windows
+FileName: wpndatabase.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='Notification' OR name='HandlerAssets' OR name='WNSPushChannel' OR name='TransientTable' OR name='NotificationData');
+IdentifyValue: 5
+Queries:
+    -
+        Name: Windows Notifications
+        Query: |
+                SELECT
+                Notification.Id AS ID,
+                Notification.'Order' AS 'Order',
+                Notification.HandlerId AS HandlerId,
+                NotificationHandler.PrimaryId AS Application,
+                CASE
+
+                WHEN NotificationHandler.ParentId THEN
+                NotificationHandler.ParentId ELSE ''
+                END AS Parent,
+                NotificationHandler.HandlerType AS HandlerType,
+                Notification.Type AS Type,
+                Notification.Payload AS Payload,
+                Notification.PayloadType AS PayloadType,
+                Notification.Tag AS Tag,
+                Notification."Group" AS "Group",
+                datetime( ( Notification.ArrivalTime - 116444736000000000 ) / 10000000, 'unixepoch' ) AS ArrivalTime,
+                CASE
+
+                WHEN Notification.ExpiryTime = 0 THEN
+                'Expired' ELSE datetime( ( Notification.ExpiryTime - 116444736000000000 ) / 10000000, 'unixepoch' )
+                END AS ExpirationTime,
+                NotificationHandler.CreatedTime AS HandlerCreated,
+                NotificationHandler.ModifiedTime AS HandlerModified,
+                CASE
+
+                WHEN NotificationHandler.WNSId NOTNULL THEN
+                NotificationHandler.WNSId ELSE ''
+                END AS WNSId,
+                CASE
+
+                WHEN NotificationHandler.WNFEventName NOTNULL THEN
+                NotificationHandler.WNFEventName ELSE ''
+                END AS WNFEventName,
+                CASE
+
+                WHEN WNSPushChannel.ChannelId NOTNULL THEN
+                WNSPushChannel.ChannelId ELSE ''
+                END AS ChannelID,
+                CASE
+
+                WHEN WNSPushChannel.Uri NOTNULL THEN
+                WNSPushChannel.Uri ELSE ''
+                END AS URI,
+                CASE
+
+                WHEN WNSPushChannel.CreatedTime NOTNULL THEN
+                datetime( ( WNSPushChannel.CreatedTime - 116444736000000000 ) / 10000000, 'unixepoch' ) ELSE ''
+                END AS WNSCreatedTime,
+                CASE
+
+                WHEN WNSPushChannel.ExpiryTime NOTNULL THEN
+                datetime( ( WNSPushChannel.ExpiryTime - 116444736000000000 ) / 10000000, 'unixepoch' ) ELSE ''
+                END AS WNSExpirationTime,
+                CASE
+
+                WHEN hex( Notification.ActivityId ) = '00000000000000000000000000000000' THEN
+                '' ELSE hex( Notification.ActivityId )
+                END AS ActivityId
+                FROM
+                Notification
+                JOIN NotificationHandler ON NotificationHandler.RecordId = Notification.HandlerId
+                LEFT JOIN WNSPushChannel ON WNSPushChannel.HandlerId = NotificationHandler.RecordId
+                ORDER BY
+                Id DESC
+        BaseFileName: NotificationsDB-Notifications
+
+# Documentation
+# Lots of credit to kacos2000 on GitHub for their work on this SQL Query
+# http://www.swiftforensics.com/2016/06/prasing-windows-10-notification-database.html
+# https://tzworks.net/prototypes/wpn/wpn.users.guide.pdf
+# https://inc0x0.com/2018/10/windows-10-notification-database/
+# https://www.hecfblog.com/2018/08/daily-blog-440-windows-10-notifications.html
+# https://kacos2000.github.io/WindowsTimeline/WindowsTimeline.pdf
+# https://github.com/kacos2000/Win10
+# Use SQLECmd in conjunction with the WindowsNotificationDB KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsNotificationsDB.tkape

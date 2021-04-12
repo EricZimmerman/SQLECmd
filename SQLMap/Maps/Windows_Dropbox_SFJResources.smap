@@ -1,0 +1,43 @@
+Description: Dropbox SFJ Resources
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 34366884-7119-4c0f-b252-11457cc8490a
+Version: 1.0
+CSVPrefix: Dropbox
+FileName: home.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='activity_feed' OR name='recents' OR name='starred_items' OR name='calendar_items' OR name='sfj_resources');
+IdentifyValue: 5
+Queries:
+    -
+        Name: Dropbox SFJ Resources
+        Query: |
+               SELECT
+               datetime( timestamp / 1000 + ( strftime( '%ms', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS timestamp,
+               starred_items.account_id AS AccountID,
+               starred_items.server_path AS ServerPath,
+               CASE
+
+               WHEN starred_items.is_starred = 0 THEN
+               'No'
+               WHEN starred_items.is_starred = 1 THEN
+               'Yes'
+               END AS IsStarred,
+               starred_items.keywords AS Keywords,
+               starred_items.paper_path AS PaperPath,
+               starred_items.persist_state AS PersistState,
+               starred_items.resource_type AS ResourceType,
+               starred_items.resource_id AS ResourceID
+               FROM
+               starred_items
+               ORDER BY
+               starred_items.timestamp ASC
+        BaseFileName: SFJResources
+
+# Documentation
+# I have no idea what SFJ Resources means and I couldn't find any documentation on it. If anyone knows, please do a PR and add documentation. It looks like good data resides here, I just don't know exactly what it's representing at this time.
+# https://www.forensicfocus.com/news/new-free-tool-decrypting-the-dropbox-filecache-dbx-file/
+# https://digital-forensics.sans.org/summit-archives/Prague_Summit/Cloud_Storage_Forensics_Mattia_Eppifani.pdf
+# https://www.forensicfocus.com/articles/dropbox-forensics/
+# https://arxiv.org/pdf/1709.10395
+# https://www.researchgate.net/publication/342991973_Forensic_Analysis_of_Dropbox_Data_Remnants_on_Windows_10
+# Use SQLECmd in conjunction with the Dropbox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/Dropbox.tkape

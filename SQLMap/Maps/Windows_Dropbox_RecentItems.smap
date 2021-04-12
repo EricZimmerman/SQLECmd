@@ -1,0 +1,43 @@
+Description: Dropbox Recent Items
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 97a2f126-f939-4516-9c61-8b74a8cf482b
+Version: 1.0
+CSVPrefix: Dropbox
+FileName: home.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='activity_feed' OR name='recents' OR name='starred_items' OR name='calendar_items' OR name='sfj_resources');
+IdentifyValue: 5
+Queries:
+    -
+        Name: Dropbox Recent Items
+        Query: |
+               SELECT
+               datetime( timestamp / 1000 + ( strftime( '%ms', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS Timestamp,
+               recents.account_id AS AccountID,
+               recents.server_path AS ServerPath,
+               datetime( server_fetch_timestamp / 1000 + ( strftime( '%ms', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS ServerFetchTimestamp,
+               recents.batch_key AS BatchKey,
+               recents.event_type AS EventType,
+               CASE
+
+               WHEN recents.is_local = 0 THEN
+               'No'
+               WHEN recents.is_local = 1 THEN
+               'Yes'
+               END AS IsLocal,
+               recents.keywords AS Keywords,
+               recents.resource_id AS ResourceID,
+               recents.resource_type AS ResourceType
+               FROM
+               recents
+               ORDER BY
+               recents.timestamp ASC
+        BaseFileName: RecentItems
+
+# Documentation
+# https://www.forensicfocus.com/news/new-free-tool-decrypting-the-dropbox-filecache-dbx-file/
+# https://digital-forensics.sans.org/summit-archives/Prague_Summit/Cloud_Storage_Forensics_Mattia_Eppifani.pdf
+# https://www.forensicfocus.com/articles/dropbox-forensics/
+# https://arxiv.org/pdf/1709.10395
+# https://www.researchgate.net/publication/342991973_Forensic_Analysis_of_Dropbox_Data_Remnants_on_Windows_10
+# Use SQLECmd in conjunction with the Dropbox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/Dropbox.tkape

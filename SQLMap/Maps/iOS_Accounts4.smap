@@ -1,0 +1,24 @@
+Description: iOS Accounts (4) database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: 08155974-3246-40c0-aaba-a5bc89bacf8e
+Version: 0.2
+CSVPrefix: Accounts
+FileName: accounts4.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='ZACCOUNT');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Accounts
+        Query: |
+                SELECT
+                Z_PK,
+                ZACCOUNTTYPE AS "Account Type",
+                ZPARENTACCOUNT AS "Parent Account",
+                ZUSERNAME AS "Username",
+                DATETIME(ZDATE+978307200,'UNIXEPOCH') AS "TIMESTAMP",
+                ZACCOUNTDESCRIPTION AS "Account Description",
+                ZIDENTIFIER AS "Identifier",
+                ZOWNINGBUNDLEID AS "Bundle ID"
+                FROM ZACCOUNT
+        BaseFileName: Accounts

@@ -1,0 +1,76 @@
+Description: Firefox History
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 2f34be88-08d0-43c1-a2fd-60fe0b71f32b
+Version: 1.0
+CSVPrefix: Firefox
+FileName: places.sqlite
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='moz_historyvisits' OR name='moz_bookmarks' OR name='moz_places' OR name='moz_inputhistory');
+IdentifyValue: 4
+Queries:
+    -
+        Name: History
+        Query: |
+                SELECT
+                moz_historyvisits.id AS VisitID,
+                moz_historyvisits.from_visit AS FromVisitID,
+                datetime( moz_places.last_visit_date / 1000000, 'unixepoch', 'localtime' ) AS LastVisitDate,
+                moz_places.visit_count AS VisitCount,
+                moz_places.url AS URL,
+                moz_places.title AS Title,
+                moz_places.description AS Description,
+                CASE
+
+                WHEN moz_historyvisits.visit_type = 1 THEN
+                'TRANSITION_LINK'
+                WHEN moz_historyvisits.visit_type = 2 THEN
+                'TRANSITION_TYPED'
+                WHEN moz_historyvisits.visit_type = 3 THEN
+                'TRANSITION_BOOKMARK'
+                WHEN moz_historyvisits.visit_type = 4 THEN
+                'TRANSITION_EMBED'
+                WHEN moz_historyvisits.visit_type = 5 THEN
+                'TRANSITION_REDIRECT_PERMANENT'
+                WHEN moz_historyvisits.visit_type = 6 THEN
+                'TRANSITION_REDIRECT_TEMPORARY'
+                WHEN moz_historyvisits.visit_type = 7 THEN
+                'TRANSITION_DOWNLOAD'
+                WHEN moz_historyvisits.visit_type = 8 THEN
+                'TRANSITION_FRAMED_LINK'
+                WHEN moz_historyvisits.visit_type = 9 THEN
+                'TRANSITION_RELOAD'
+                END AS VisitType,
+                CASE
+
+                WHEN moz_places.hidden = 0 THEN
+                'No'
+                WHEN moz_places.hidden = 1 THEN
+                'Yes'
+                END AS Hidden,
+                CASE
+
+                WHEN moz_places.typed = 0 THEN
+                'No'
+                WHEN moz_places.typed = 1 THEN
+                'Yes'
+                END AS Typed,
+                moz_places.frecency AS Frecency,
+                moz_places.preview_image_url AS PreviewImageURL
+                FROM
+                moz_places
+                INNER JOIN moz_historyvisits ON moz_places.origin_id = moz_historyvisits.id
+                ORDER BY
+                moz_places.last_visit_date ASC
+        BaseFileName: History
+
+# Documentation
+# https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
+# https://www.acquireforensics.com/blog/track-history-websites-visited-discussed-detail.html
+# http://2016.padjo.org/tutorials/sqlite-your-browser-history/
+# https://dxr.mozilla.org/mozilla-esr60/source/toolkit/components/places/nsINavHistoryService.idl#1185
+# https://developer.mozilla.org/en-US/docs/Mozilla/Tech/Places/Database
+# https://kb.digital-detective.net/display/BF/Frecency
+# https://www.foxtonforensics.com/browser-history-examiner/firefox-history-location
+# https://pr1malbyt3s.com/Forensics/SQLite-Browser-Artifacts.html
+# https://stackoverflow.com/questions/52343272/sql-query-on-tags-in-places-sqlite-of-firefox
+# Use SQLECmd in conjunction with the Firefox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Firefox.tkape

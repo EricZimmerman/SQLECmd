@@ -1,0 +1,31 @@
+Description: Windows Your Phone Settings DB
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: c3bb2711-f8e8-425e-89e8-900ea4897283
+Version: 1.0
+CSVPrefix: WindowsYourPhone
+FileName: settings.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='settings');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Windows Your Phone Settings Database
+        Query: |
+                SELECT
+                	phone_apps.app_name AS "Application Name",
+                	phone_apps.package_name AS "Package Name",
+                	phone_apps.version AS Version,
+                	settings.setting_value AS "Settings Value",
+                	settings.setting_type AS "Settings Type",
+                	settings.setting_key AS "Settings Key",
+                	settings.setting_group_id AS "Group ID"
+                FROM
+                	phone_apps
+                	LEFT JOIN settings ON settings.setting_key = phone_apps.package_name
+                ORDER BY
+                	phone_apps.app_name
+        BaseFileName: SettingsDB
+
+# Documentation
+# https://github.com/kacos2000/Win10/blob/master/YourPhone/readme.md
+# Use SQLECmd in conjunction with the Windows Your Phone KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/WindowsYourPhone.tkape

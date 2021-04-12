@@ -1,0 +1,43 @@
+Description: Android 7+ Call History database
+Author: Heather Mahalik
+Email: hmahalik@gmail.com
+Id: 2ec6e0a6-76b7-4c5f-ade6-a8551eb47a97
+Version: 0.2
+CSVPrefix: Android7plus
+FileName: Calllog.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='calls');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Calls
+        Query: |
+                select
+                _id,
+                number,
+                name,
+                datetime(date/1000,'UNIXEPOCH','localtime') AS "date",
+                duration,
+                case
+                when type = 2 then "outgoing"
+                when type = 1 then "incoming"
+                when type = 4 then "voicemail"
+                end AS "Call Type",
+                subscription_id,
+                phone_account_address,
+                geocoded_location,
+                formatted_number,
+                datetime(last_modified/1000,'UNIXEPOCH','localtime') AS "modified date",
+                case
+                when deleted = 1 then "deleted"
+                else "N/A"
+                end AS "Deleted",
+                case
+                when dirty = 1 then "Dirty"
+                else "N/A"
+                end AS "Valid Entry" --most voicemail calls will get a status of dirty with a type of "4"
+                from calls
+        BaseFileName: CallHistory
+
+# Documentation
+# https://digital-forensics.sans.org/media/DFPS_FOR585_v3.1_0420_R8.pdf
+# https://forensenellanebbia.blogspot.com/2018/10/calllogdb-and-sms-data-on-android-70.html

@@ -1,0 +1,47 @@
+Description: Firefox Cookies
+Author: Heather Mahalik and Andrew Rathbun
+Email: hmahalik@gmail.com, andrew.rathbun@kroll.com
+Id: 7be83590-8260-4c8a-9b75-c5f82290ebc2
+Version: 0.3
+CSVPrefix: Firefox
+FileName: cookies.sqlite
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='moz_cookies');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Firefox Cookies
+        Query: |
+               SELECT
+               moz_cookies.id AS ID,
+               moz_cookies.host AS Host,
+               moz_cookies.name AS Name,
+               moz_cookies.value AS Value,
+               datetime( moz_cookies.creationTime / 1000000, 'UNIXEPOCH', 'localtime' ) AS "Creation Time",
+               datetime( moz_cookies.lastAccessed / 1000000, 'UNIXEPOCH', 'localtime' ) AS "Last Accessed Time",
+               datetime( moz_cookies.expiry, 'UNIXEPOCH', 'localtime' ) AS Expiration,
+               CASE
+
+               WHEN moz_cookies.isSecure = 0 THEN
+               'No'
+               WHEN moz_cookies.isSecure = 1 THEN
+               'Yes'
+               END AS IsSecure,
+               CASE
+
+               WHEN moz_cookies.isHttpOnly = 0 THEN
+               'No'
+               WHEN moz_cookies.isHttpOnly = 1 THEN
+               'Yes'
+               END AS IsHTTPOnly
+               FROM
+               moz_cookies
+               ORDER BY
+               moz_cookies.id ASC
+        BaseFileName: Cookies
+
+# Documentation
+# https://www.acquireforensics.com/services/tech/mozilla-firefox.html
+# https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
+# https://pr1malbyt3s.com/Forensics/SQLite-Browser-Artifacts.html
+# https://www.digitalforensics.com/blog/an-overview-of-web-browser-forensics/
+# Use SQLECmd in conjunction with the Firefox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Firefox.tkape
