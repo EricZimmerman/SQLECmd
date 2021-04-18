@@ -16,29 +16,29 @@ Queries:
                	Source,
                	size AS "Size (Bytes)",
                CASE
-               		                                             
+
                		WHEN IsFolder = 0 THEN
-               		'No' 
+               		'No'
                		WHEN IsFolder = 1 THEN
-               		'Yes' 
+               		'Yes'
                	END AS IsFolder,
                CASE
-               		
+
                		WHEN Marked = 0 THEN
-               		'No' 
+               		'No'
                		WHEN Marked = 1 THEN
-               		'Yes' 
+               		'Yes'
                	END AS Marked,
                CASE
-               		
+
                		WHEN Hidden = 0 THEN
-               		'No' 
+               		'No'
                		WHEN Hidden = 1 THEN
-               		'Yes' 
+               		'Yes'
                	END AS Hidden,
                	datetime( julianday( Creation ) ) AS Creation,
                	datetime( julianday( Access ) ) AS Access,
-               	datetime( julianday( Write ) ) AS Write 
+               	datetime( julianday( Write ) ) AS Write
                FROM
                	Files
         BaseFileName: History
