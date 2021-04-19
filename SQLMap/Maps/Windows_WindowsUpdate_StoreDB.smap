@@ -1,0 +1,32 @@
+Description: Windows Update History Database
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: a226e8a0-fc99-499d-8797-ba80179f349f
+Version: 1.0
+CSVPrefix: Windows
+FileName: Store.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='ACTIONRECORDS' OR name='COMPLETEDUPDATES' OR name='UPDATES' OR name='VARIABLES');
+IdentifyValue: 4
+
+Queries:
+    -
+        Name: Windows Update Store.db
+        Query: |
+               SELECT
+               datetime( Time / 1000, 'unixepoch', 'localtime' ) AS Time,
+               COMPLETEDUPDATES.PROVIDERID AS ProviderID,
+               COMPLETEDUPDATES.UPDATEID AS UpdateID,
+               COMPLETEDUPDATES.TITLE AS Title,
+               COMPLETEDUPDATES.DESCRIPTION AS Description,
+               COMPLETEDUPDATES.MOREINFOURL AS MoreInfoURL,
+               COMPLETEDUPDATES.HISTORYCATEGORY AS HistoryCategory,
+               COMPLETEDUPDATES.UNINSTALL AS Uninstall
+               FROM
+               COMPLETEDUPDATES
+               ORDER BY
+               COMPLETEDUPDATES.TIME ASC
+        BaseFileName: WindowsUpdateStoreDB
+
+# Documentation
+# N/A
+# Use SQLECmd in conjunction with the Windows OS Upgrade Artifacts KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsOSUpgradeArtifacts.tkape
