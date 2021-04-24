@@ -2,7 +2,7 @@ Description: Windows Your Phone Notifications DB
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: 736e7cef-7d90-4d06-99f9-5a29e9ca431b
-Version: 1.0
+Version: 1.1
 CSVPrefix: WindowsYourPhone
 FileName: Notifications.db
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='notifications');
@@ -12,17 +12,46 @@ Queries:
         Name: Windows Your Phone Notifications Database
         Query: |
                 SELECT
-                	notifications.id AS ID,
-                	datetime( ( "post_time" / 10000000 ) - 11644473600, 'unixepoch' ) AS "Post Time",
-                	notifications.notification_id AS "Notification ID",
-                	notifications.package_name AS "Package Name",
-                	notifications.json AS "JSON Payload"
+                notifications.id AS 'ID',
+                json_extract ( json, '$.appName' ) AS 'Application',
+                datetime( json_extract ( json, '$.postTime' ) / 1000, 'unixepoch', 'localtime' ) AS 'PostTime',
+                datetime( json_extract ( json, '$.timestamp' ) / 1000, 'unixepoch', 'localtime' ) AS 'Timestamp',
+                json_extract ( json, '$.tickerText' ) AS 'TickerText',
+                json_extract ( json, '$.title' ) AS 'Title',
+                json_extract ( json, '$.bigText' ) AS 'BigText',
+                json_extract ( json, '$.text' ) AS 'Text',
+                json_extract ( json, '$.subText' ) AS 'SubText',
+                CASE
+
+                WHEN json_extract ( json, '$.isClearable' ) = 0 THEN
+                'No'
+                WHEN json_extract ( json, '$.isClearable' ) = 1 THEN
+                'Yes'
+                END AS 'IsClearable',
+                CASE
+
+                WHEN json_extract ( json, '$.isGroup' ) = 0 THEN
+                'No'
+                WHEN json_extract ( json, '$.isGroup' ) = 1 THEN
+                'Yes'
+                END AS 'IsGroup',
+                CASE
+
+                WHEN json_extract ( json, '$.isOngoing' ) = 0 THEN
+                'No'
+                WHEN json_extract ( json, '$.isOngoing' ) = 1 THEN
+                'Yes'
+                END AS 'IsOngoing',
+                json_extract ( json, '$.category' ) AS 'Category',
+                notifications.package_name AS 'Package Name',
+                notifications.json AS 'Payload'
                 FROM
-                	notifications
+                notifications
                 ORDER BY
-                	notifications.id ASC
+                notifications.id ASC
         BaseFileName: NotificationsDB
 
 # Documentation
+# Huge thank you to kacos2000 for their work on GitHub to help make this query better - https://github.com/kacos2000/Win10/blob/master/YourPhone/phone_notifications.sql
 # https://github.com/kacos2000/Win10/blob/master/YourPhone/readme.md
 # Use SQLECmd in conjunction with the Windows Your Phone KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsYourPhone.tkape
