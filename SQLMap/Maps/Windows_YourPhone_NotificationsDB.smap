@@ -52,6 +52,6 @@ Queries:
         BaseFileName: NotificationsDB
 
 # Documentation
-# Huge thank you to kacos2000 for their work on GitHub to help make this query better - https://github.com/kacos2000/Win10/blob/master/YourPhone/phone_notifications.sql
+# Huge thank you to kacos2000 for their work on GitHub to help make this query better: https://github.com/kacos2000/Win10/blob/master/YourPhone/phone_notifications.sql
 # https://github.com/kacos2000/Win10/blob/master/YourPhone/readme.md
 # Use SQLECmd in conjunction with the Windows Your Phone KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Windows/WindowsYourPhone.tkape
