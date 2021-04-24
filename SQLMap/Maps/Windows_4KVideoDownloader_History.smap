@@ -1,0 +1,50 @@
+Description: 4K Video Downloader
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: ff0293ee-f646-4507-ade7-dc058d3e998e
+Version: 1.0
+CSVPrefix: 4KVideoDownloader
+FileName: random.sqlite # run --hunt mode on the directory to make use of this Map
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='media_item_description' OR name='url_description' OR name='media_info' OR name='audio_info' OR name='video_info' OR name='url_description');
+IdentifyValue: 6
+Queries:
+    -
+        Name: 4K Video Downloader
+        Query: |
+                SELECT
+                audio_info.id AS ID,
+                url_description.service_name AS ServiceName,
+                media_item_description.title AS Title,
+                url_description.url AS URL,
+                download_item.filename AS Filename,
+                media_item_description.duration / 1000 / 60 AS 'Duration (Minutes)',
+                audio_info.bitrate / 1000 AS 'Bitrate (kbps)',
+                CASE
+
+                WHEN video_info.video_360 = 0 THEN
+                'No'
+                WHEN video_info.video_360 = 1 THEN
+                'Yes'
+                END AS Video360,
+                CASE
+
+                WHEN video_info.hdr = 0 THEN
+                'No'
+                WHEN video_info.hdr = 1 THEN
+                'Yes'
+                END AS VideoHDR
+                FROM
+                download_item
+                LEFT JOIN media_item_description ON download_item.id = media_item_description.id
+                LEFT JOIN url_description ON media_item_description.id = url_description.id
+                NATURAL LEFT JOIN media_info
+                LEFT JOIN audio_info ON download_item.id = audio_info.id
+                LEFT JOIN video_info ON media_info.id = video_info.id
+                AND url_description.id = video_info.id
+                ORDER BY
+                ID ASC
+        BaseFileName: History
+
+# Documentation
+# N/A
+# Use SQLECmd in conjunction with the 4K Video Downloader KAPE Target: 4KVideoDownloader.tkape
