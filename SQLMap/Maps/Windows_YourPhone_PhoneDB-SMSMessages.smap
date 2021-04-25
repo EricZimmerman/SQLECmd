@@ -2,11 +2,11 @@ Description: Windows Your Phone SMS Messages
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: 6aefdb56-01ad-4a5d-8bd7-28f6c9f31625
-Version: 1.0
+Version: 1.1
 CSVPrefix: WindowsYourPhone
 FileName: Phone.db
-IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='message' OR (name='mms') OR (name='rcs_chat') OR (name='sync'));
-IdentifyValue: 4
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='message' OR name='mms' OR name='rcs_chat' OR name='sync' OR name='subscription');
+IdentifyValue: 5
 Queries:
     -
         Name: Windows Your Phone Phone Database SMS Messages
@@ -30,6 +30,105 @@ Queries:
                 	message.thread_id ASC,
                 	message.timestamp ASC
         BaseFileName: PhoneDB_SMSMessages
+    -
+        Name: Windows Your Phone Subscription Info
+        Query: |
+                SELECT
+                subscription.subscription_id AS SubscriptionID,
+                subscription.sim_slot_index AS SimSlotIndex,
+                subscription.country_iso AS CountryISO,
+                subscription.name AS WirelessProviderName,
+                CASE
+
+                WHEN subscription.is_roaming = 0 THEN
+                'No'
+                WHEN subscription.is_roaming = 1 THEN
+                'Yes' ELSE 'Unknown'
+                END AS IsRoaming,
+                subscription.number AS PhoneNumber,
+                CASE
+
+                WHEN subscription.is_mms_enabled = 0 THEN
+                'No'
+                WHEN subscription.is_mms_enabled = 1 THEN
+                'Yes' ELSE 'Unknown'
+                END AS IsMMSEnabled,
+                CASE
+
+                WHEN subscription.is_audio_attachment_allowed = 0 THEN
+                'No'
+                WHEN subscription.is_audio_attachment_allowed = 1 THEN
+                'Yes' ELSE 'Unknown'
+                END AS IsAudioAttachmentAllowed,
+                CASE
+
+                WHEN subscription.is_multipart_sms_enabled = 0 THEN
+                'No'
+                WHEN subscription.is_multipart_sms_enabled = 1 THEN
+                'Yes' ELSE 'Unknown'
+                END AS IsMultiPartSMSEnabled,
+                CASE
+
+                WHEN subscription.is_group_mms_enabled = 0 THEN
+                'No'
+                WHEN subscription.is_group_mms_enabled = 1 THEN
+                'Yes' ELSE 'Unknown'
+                END AS IsGroupMMSEnabled,
+                CASE
+
+                WHEN subscription.should_send_multipart_sms_as_separate_messages = 0 THEN
+                'No'
+                WHEN subscription.should_send_multipart_sms_as_separate_messages = 1 THEN
+                'Yes' ELSE 'Unknown'
+                END AS ShouldSendMultiPartSMSAsSeparateMessages,
+                subscription.max_message_size AS "MaxMessageSize (Bytes)",
+                subscription.recipient_limit AS RecipientLimit,
+                subscription.max_image_height AS MaxImageHeight,
+                subscription.max_image_width AS MaxImageWidth,
+                subscription.sms_multipart_to_mms_text_threshold AS SMSMultiParttoMMSTextThreshold,
+                subscription.sms_to_mms_text_length_threshold AS SMStoMMSTextLengthThreshold,
+                subscription.max_message_text_length AS MaxMessageTextLength,
+                subscription.max_subject_length AS MaxSubjectLength,
+                CASE
+
+                WHEN subscription.is_default_data_subscription = 0 THEN
+                'No'
+                WHEN subscription.is_default_data_subscription = 1 THEN
+                'Yes' ELSE 'Unknown'
+                END AS IsDefaultDataSubscription,
+                CASE
+
+                WHEN subscription.is_default_sms_subscription = 0 THEN
+                'No'
+                WHEN subscription.is_default_sms_subscription = 1 THEN
+                'Yes' ELSE 'Unknown'
+                END AS IsDefaultSMSSubscription,
+                CASE
+
+                WHEN subscription.is_default_subscription = 0 THEN
+                'No'
+                WHEN subscription.is_default_subscription = 1 THEN
+                'Yes' ELSE 'Unknown'
+                END AS IsDefaultSubscription,
+                CASE
+
+                WHEN subscription.is_default_voice_subscription = 0 THEN
+                'No'
+                WHEN subscription.is_default_voice_subscription = 1 THEN
+                'Yes' ELSE 'Unknown'
+                END AS IsDefaultVoiceSubscription,
+                CASE
+
+                WHEN subscription.is_rcs_supported = 0 THEN
+                'No'
+                WHEN subscription.is_rcs_supported = 1 THEN
+                'Yes' ELSE 'Unknown'
+                END AS IsRCSSupported,
+                subscription.max_rcs_message_size AS "MaxRCSMessageSize (Bytes)",
+                subscription.max_rcs_file_size AS "MaxRCSFileSize (Bytes)"
+                FROM
+                subscription
+        BaseFileName: PhoneDB_SubscriptionInfo
 
 # Documentation
 # https://github.com/kacos2000/Win10/blob/master/YourPhone/readme.md
