@@ -1,0 +1,115 @@
+Description: Windows Your Phone Contacts DB
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 5865567d-06d2-4831-87ec-0aaf11f840a2
+Version: 1.0
+CSVPrefix: WindowsYourPhone
+FileName: contacts.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='contact' OR name='contactdate' OR name='contacturl' OR name='emailaddress' OR name='phonenumber' OR name='postaladdress');
+IdentifyValue: 6
+Queries:
+    -
+        Name: Windows Your Phone Contacts Database
+        Query: |
+                SELECT DISTINCT
+                contact.display_name AS DisplayName,
+                contact.nickname AS Nickname,
+                datetime( ( last_updated_time / 10000000 ) - 11644473600, 'unixepoch' ) AS LastUpdatedTimeUTC,
+                contact.company AS Company,
+                contact.job_title AS Title,
+                contact.notes AS Notes,
+                contact.name_prefix AS Prefix,
+                contact.given_name AS GivenName,
+                contact.middle_name AS MiddleName,
+                contact.family_name AS FamilyName,
+                contact.name_suffix AS Suffix,
+                CASE
+
+                WHEN contactdate.date_type = 1 THEN
+                'Birthday'
+                WHEN contactdate.date_type = 2 THEN
+                'Anniversary'
+                WHEN contactdate.date_type = 3 THEN
+                'UserDefined' ELSE contactdate.date_type
+                END AS DateType,
+                contactdate.label AS DateLabel,
+                contactdate.display_date AS DisplayDate,
+                CASE
+
+                WHEN contacturl.type = 1 THEN
+                'HomePage'
+                WHEN contacturl.type = 3 THEN
+                'Work'
+                WHEN contacturl.type = 5 THEN
+                'Other'
+                WHEN contacturl.type = 6 THEN
+                'Blog/Profile/UserDefined' ELSE contacturl.type
+                END AS URLType,
+                contacturl.label AS URLLabel,
+                contacturl.url_address AS URLAddress,
+                CASE
+
+                WHEN emailaddress.type = 1 THEN
+                'Home'
+                WHEN emailaddress.type = 2 THEN
+                'Work'
+                WHEN emailaddress.type = 4 THEN
+                'Other'
+                WHEN emailaddress.type = 5 THEN
+                'UserDefined' ELSE emailaddress.type
+                END AS EmailType,
+                emailaddress.label AS EmailLabel,
+                emailaddress.address AS EmailAddress,
+                phonenumber.phone_number AS PhoneNumber,
+                phonenumber.display_phone_number AS DisplayPhoneNumber,
+                CASE
+
+                WHEN phonenumber.phone_number_type = 1 THEN
+                'Home'
+                WHEN phonenumber.phone_number_type = 2 THEN
+                'Mobile'
+                WHEN phonenumber.phone_number_type = 3 THEN
+                'Work'
+                WHEN phonenumber.phone_number_type = 4 THEN
+                'WorkMobile'
+                WHEN phonenumber.phone_number_type = 5 THEN
+                'Main'
+                WHEN phonenumber.phone_number_type = 6 THEN
+                'Other/HomeFax/WorkFax/Pager'
+                WHEN phonenumber.phone_number_type = 8 THEN
+                'UserDefined' ELSE phonenumber.phone_number_type
+                END AS PhoneNumberType,
+                phonenumber.label AS PhoneNumberLabel,
+                CASE
+
+                WHEN postaladdress.type = 1 THEN
+                'Home'
+                WHEN postaladdress.type = 2 THEN
+                'Work'
+                WHEN postaladdress.type = 4 THEN
+                'Other'
+                WHEN postaladdress.type = 5 THEN
+                'UserDefined' ELSE postaladdress.type
+                END AS PostalAddressType,
+                postaladdress.label AS PostalAddressLabel,
+                postaladdress.street AS PostalAddressStreet,
+                postaladdress.city AS PostalAddressCity,
+                postaladdress.region AS PostalAddressRegion,
+                postaladdress.postal_code AS PostalAddressPostalCode,
+                postaladdress.country_code AS PostalAddressCountryCode,
+                postaladdress.display_address AS PostalAddressDisplayAddress
+                FROM
+                contact
+                LEFT JOIN contactdate ON contact.contact_id = contactdate.contact_id
+                LEFT JOIN contacturl ON contact.contact_id = contacturl.contact_id
+                LEFT JOIN emailaddress ON contact.contact_id = emailaddress.contact_id
+                LEFT JOIN phonenumber ON contact.contact_id = phonenumber.contact_id
+                LEFT JOIN postaladdress ON contact.contact_id = postaladdress.contact_id
+                ORDER BY
+                contact.display_name ASC
+        BaseFileName: ContactsDB
+
+# Documentation
+# Huge thank you to kacos2000 for their work on GitHub to help make this query better: https://github.com/kacos2000/Win10/blob/master/YourPhone/yourphone_contacts.sql
+# https://github.com/kacos2000/Win10/blob/master/YourPhone/readme.md
+# Use SQLECmd in conjunction with the Windows Your Phone KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/WindowsYourPhone.tkape
