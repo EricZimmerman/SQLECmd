@@ -1,0 +1,25 @@
+Description: Bitdefender Sqlite Databases
+Author: Ahmed Elshaer
+Email: anelshaer@gmail.com
+Id: c3a9343a-cd65-484e-a8d2-b4e69b9924a1
+Version: 1.0
+CSVPrefix: Bitdefender
+FileName: Antiphishing.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='aph_cache');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Bitdefender Antiphishing DB
+        Query: |
+                SELECT          
+                url AS URL,
+                result AS Result,
+                datetime( expire / 1000, 'unixepoch', 'localtime' ) AS ExpireTime
+                FROM
+                aph_cache
+                ORDER BY
+                ExpireTime ASC;
+        BaseFileName: Antiphishing
+
+# Documentation
+# Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Antivirus/Bitdefender.tkape
