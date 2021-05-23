@@ -29,4 +29,4 @@ Queries:
         BaseFileName: RansomwareRecover
 
 # Documentation
-# Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Antivirus/Bitdefender.tkape
+# Use SQLECmd in conjunction with the Bitdefender KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Antivirus/Bitdefender.tkape
