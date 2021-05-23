@@ -1,15 +1,15 @@
-Description: Bitdefender Sqlite RansomewareRecover Database
+Description: Bitdefender Sqlite RansomwareRecover Database
 Author: Ahmed Elshaer
 Email: anelshaer@gmail.com
 Id: e5b7cddd-edd9-4717-b51e-10a1b07bca61
 Version: 1.0
 CSVPrefix: Bitdefender
-FileName: RansomewareRecover.db
+FileName: RansomwareRecover.db
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='files' OR name='packs');
 IdentifyValue: 2
 Queries:
     -
-        Name: Bitdefender RansomewareRecover DB Files
+        Name: Bitdefender RansomwareRecover DB Files
         Query: |
                 SELECT
                 files.packid AS PackID,
@@ -26,7 +26,7 @@ Queries:
                 files INNER JOIN packs ON files.packid = packs.uuid
                 ORDER BY
                 LastOperationTime ASC;
-        BaseFileName: RansomewareRecover
+        BaseFileName: RansomwareRecover
 
 # Documentation
 # Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Antivirus/Bitdefender.tkape
