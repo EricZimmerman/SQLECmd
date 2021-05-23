@@ -11,7 +11,7 @@ Queries:
     -
         Name: Bitdefender es DB
         Query: |
-                SELECT          
+                SELECT
                 url AS URL,
                 md5 AS MD5,
                 content_size AS ContentSizeBytes,

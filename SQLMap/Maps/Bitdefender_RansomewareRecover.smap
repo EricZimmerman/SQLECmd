@@ -11,7 +11,7 @@ Queries:
     -
         Name: Bitdefender RansomewareRecover DB Files
         Query: |
-                SELECT          
+                SELECT
                 files.packid AS PackID,
                 files.path AS Path,
                 files.restored AS Restored,
