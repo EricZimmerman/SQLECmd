@@ -2,7 +2,7 @@ Description: Google Chrome Autofill Profiles
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: f9d9d731-f6d3-43a6-907d-fe10ddc9e334
-Version: 1.0
+Version: 1.01
 CSVPrefix: GoogleChrome
 FileName: Web Data
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='autofill' OR name='credit_cards' OR name='offer_data' OR name='server_addresses' OR name='keywords');
