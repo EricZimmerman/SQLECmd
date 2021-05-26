@@ -18,7 +18,7 @@ Queries:
                 autofill_profile_names.first_name AS FirstName,
                 autofill_profile_names.middle_name AS MiddleName,
                 autofill_profile_names.last_name AS LastName,
-                autofill_profile_emails.email as Email,
+                autofill_profile_emails.email as EmailAddress,
                 autofill_profile_phones.number AS PhoneNumber,
                 autofill_profiles.company_name AS CompanyName,
                 autofill_profiles.street_address AS StreetAddress,
