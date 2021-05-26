@@ -18,6 +18,7 @@ Queries:
                 autofill_profile_names.first_name AS FirstName,
                 autofill_profile_names.middle_name AS MiddleName,
                 autofill_profile_names.last_name AS LastName,
+                autofill_profile_emails.email as Email,
                 autofill_profile_phones.number AS PhoneNumber,
                 autofill_profiles.company_name AS CompanyName,
                 autofill_profiles.street_address AS StreetAddress,
@@ -27,6 +28,7 @@ Queries:
                 autofill_profiles.use_count AS UseCount
                 FROM
                 autofill_profiles
+                INNER JOIN autofill_profile_emails ON autofill_profile_emails.guid = autofill_profiles.guid
                 INNER JOIN autofill_profile_phones ON autofill_profiles.guid = autofill_profile_phones.guid
                 INNER JOIN autofill_profile_names ON autofill_profile_phones.guid = autofill_profile_names.guid
                 ORDER BY
