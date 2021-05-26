@@ -2,7 +2,7 @@ Description: TeraCopy - history
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: d05d5a1f-7479-4ade-8b6b-92c59a90d45d
-Version: 1.0
+Version: 1.1
 FileName: random.db # run --hunt mode on the directory to make use of this map
 CSVPrefix: TeraCopy
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='Files');
@@ -12,15 +12,47 @@ Queries:
     -
         Name: TeraCopy History
         Query: |
-               select
-                Source,
-                size AS "Size (Bytes)",
-                IsFolder,
-                datetime(julianday(Creation)) as Creation,
-                datetime(julianday(Access)) as Access,
-                datetime(julianday(Write)) as Write
-                from Files
+               SELECT
+               	Source,
+               	size AS "Size (Bytes)",
+               CASE
+
+               		WHEN IsFolder = 0 THEN
+               		'No'
+               		WHEN IsFolder = 1 THEN
+               		'Yes'
+               	END AS IsFolder,
+               CASE
+
+               		WHEN Marked = 0 THEN
+               		'No'
+               		WHEN Marked = 1 THEN
+               		'Yes'
+               	END AS Marked,
+               CASE
+
+               		WHEN Hidden = 0 THEN
+               		'No'
+               		WHEN Hidden = 1 THEN
+               		'Yes'
+               	END AS Hidden,
+               	datetime( julianday( Creation ) ) AS Creation,
+               	datetime( julianday( Access ) ) AS Access,
+               	datetime( julianday( Write ) ) AS Write
+               FROM
+               	Files
         BaseFileName: History
+    -
+        Name: TeraCopy History Log
+        Query: |
+               SELECT
+               	Log.Timestamp AS Timestamp,
+               	Log.Message AS Message
+               FROM
+               	Log
+               ORDER BY
+               	Timestamp
+        BaseFileName: HistoryLog
 
 # Documentation
 # https://www.kraftkennedy.com/teracopy-forensics-finding-elusive-copy-log/

@@ -1,0 +1,26 @@
+Description: Bitdefender Sqlite ES Database
+Author: Ahmed Elshaer
+Email: anelshaer@gmail.com
+Id: b5341baa-9fa9-4761-9a86-4fca69aca6e8
+Version: 1.0
+CSVPrefix: Bitdefender
+FileName: es.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='es_cache');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Bitdefender es DB
+        Query: |
+                SELECT
+                url AS URL,
+                md5 AS MD5,
+                content_size AS ContentSizeBytes,
+                datetime( expire / 1000, 'unixepoch', 'localtime' ) AS ExpireTime
+                FROM
+                es_cache
+                ORDER BY
+                ExpireTime ASC;
+        BaseFileName: es
+
+# Documentation
+# Use SQLECmd in conjunction with the Bitdefender KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Antivirus/Bitdefender.tkape

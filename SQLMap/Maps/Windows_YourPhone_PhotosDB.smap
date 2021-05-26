@@ -2,7 +2,7 @@ Description: Windows Your Phone Photos DB
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: 560f493c-bdf8-4e23-ac17-3f757c5a048a
-Version: 1.0
+Version: 1.1
 CSVPrefix: WindowsYourPhone
 FileName: photos.db
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='media' OR name='photo');
@@ -12,21 +12,21 @@ Queries:
         Name: Windows Your Phone Photos Database
         Query: |
                 SELECT
-                	media.id AS "Media ID",
-                	media.mime_type AS "MIME Type",
-                	media.name AS Name,
-                	datetime( ( "last_updated_time" / 10000000 ) - 11644473600, 'unixepoch' ) AS "Last Updated Time",
-                	datetime( ( "taken_time" / 10000000 ) - 11644473600, 'unixepoch' ) AS "Taken Time",
-                	datetime( ( last_seen_time / 10000000 ) - 11644473600, 'unixepoch' ) AS "Last Seen Time",
-                	media.height AS Height,
-                	media.width AS Width,
-                	media.orientation AS Orientation,
-                	media.size AS "Size (Bytes)",
-                	media.uri AS URI
+                media.id AS 'Media ID',
+                media.mime_type AS 'MIME Type',
+                media.name AS Name,
+                datetime( ( last_updated_time / 10000000 ) - 11644473600, 'unixepoch' ) AS 'Last Updated Time',
+                datetime( ( taken_time / 10000000 ) - 11644473600, 'unixepoch' ) AS 'Taken Time',
+                datetime( ( last_seen_time / 10000000 ) - 11644473600, 'unixepoch' ) AS 'Last Seen Time',
+                media.height AS Height,
+                media.width AS Width,
+                media.orientation AS Orientation,
+                ( media.size / 1000.00 ) AS 'Size (kb)',
+                media.uri AS URI
                 FROM
-                	media
+                media
                 ORDER BY
-                	media.id ASC
+                media.id ASC
         BaseFileName: PhotosDB
 
 # Documentation
