@@ -23,4 +23,5 @@ Queries:
         BaseFileName: es
 
 # Documentation
+# https://anelshaer.medium.com/browsing-history-in-bitdefender-dbs-2d63ba940f92
 # Use SQLECmd in conjunction with the Bitdefender KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Antivirus/Bitdefender.tkape
