@@ -23,7 +23,7 @@ Queries:
                 WHEN Bookmarks.type = 1 THEN
                 'Separator'
                 END AS Type,
-                datetime( Bookmarks.dateAdded / 1000000, 'unixepoch', 'localtime' ) AS DatedAdded,
+                datetime( Bookmarks.dateAdded / 1000000, 'unixepoch', 'localtime' ) AS DateAdded,
                 datetime( Bookmarks.lastModified / 1000000, 'unixepoch', 'localtime' ) AS LastModified,
                 Bookmarks.position AS Position,
                 Bookmarks.title AS Title,
