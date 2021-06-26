@@ -1,0 +1,25 @@
+Description: Description goes here
+Author: Your name here
+Email: youremail@here.com
+Id: dfe5d585-a24b-499e-ad1d-12df107e3e0b
+Version: 1.0
+CSVPrefix: AppName
+FileName: FileName
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='table1' OR name='table2' OR name='table3' OR name='table4' OR name='table5');
+IdentifyValue: 5
+Queries:
+    -
+        Name: AppName Artifact Description 1
+        Query: |
+                SELECT
+                SQL Query goes here with 16 spaces before the text
+        BaseFileName: ArtifactDescription1
+    -
+        Name: AppName Artifact Description 2
+        Query: |
+                SELECT
+                SQL Query goes here with 16 spaces before the text
+        BaseFileName: ArtifactDescription2
+
+# Documentation
+# URLs here relating to this artifact
