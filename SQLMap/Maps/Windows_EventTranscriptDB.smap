@@ -7,7 +7,6 @@ FileName: EventTranscript.db
 CSVPrefix: Windows
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='categories' OR name='event_categories' OR name='event_tags' OR name='events_persisted' OR name='producers' OR name='provider_groups' OR name='tag_descriptions');
 IdentifyValue: 7
-
 Queries:
     -
         Name: Windows EventTranscript.db BrowsingHistory
