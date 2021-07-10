@@ -1,4 +1,4 @@
-Description: EventTranscript.db
+ï»¿Description: EventTranscript.db
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: 4529ee5e-088d-4822-8cfe-ccaf46e0b1f9
@@ -85,14 +85,14 @@ Queries:
                'S-1-5-2 (Network)'
                WHEN events_persisted.sid = 'S-1-5-20' THEN
                'S-1-5-20 (NT Authority)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -498' THEN
-               'S-1-5-21 domain -498 (Enterprise Read-only Domain Controllers)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -521' THEN
-               'S-1-5-21 domain -521 (Read-only Domain Controllers)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -571' THEN
-               'S-1-5-21 domain -571 (Allowed RODC Password Replication Group)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -572' THEN
-               'S-1-5-21 domain -572 (Denied RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-498' THEN
+               'S-1-5-21domain-498 (Enterprise Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-521' THEN
+               'S-1-5-21domain-521 (Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-571' THEN
+               'S-1-5-21domain-571 (Allowed RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-572' THEN
+               'S-1-5-21domain-572 (Denied RODC Password Replication Group)'
                WHEN events_persisted.sid = 'S-1-5-21domain-500' THEN
                'S-1-5-21domain-500 (Administrator)'
                WHEN events_persisted.sid = 'S-1-5-21domain-501' THEN
@@ -192,7 +192,7 @@ Queries:
                WHEN events_persisted.sid = 'S-1-5-64-10' THEN
                'S-1-5-64-10 (NTLM Authentication)'
                WHEN events_persisted.sid = 'S-1-5-64-14' THEN
-               'S-1-5-64-14 (SChannel Authentication)'
+               'S-1-5-64-14 (SChannelAuthentication)'
                WHEN events_persisted.sid = 'S-1-5-64-21' THEN
                'S-1-5-64-21 (Digest Authentication)'
                WHEN events_persisted.sid = 'S-1-5-7' THEN
@@ -319,14 +319,14 @@ Queries:
                'S-1-5-2 (Network)'
                WHEN events_persisted.sid = 'S-1-5-20' THEN
                'S-1-5-20 (NT Authority)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -498' THEN
-               'S-1-5-21 domain -498 (Enterprise Read-only Domain Controllers)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -521' THEN
-               'S-1-5-21 domain -521 (Read-only Domain Controllers)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -571' THEN
-               'S-1-5-21 domain -571 (Allowed RODC Password Replication Group)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -572' THEN
-               'S-1-5-21 domain -572 (Denied RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-498' THEN
+               'S-1-5-21domain-498 (Enterprise Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-521' THEN
+               'S-1-5-21domain-521 (Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-571' THEN
+               'S-1-5-21domain-571 (Allowed RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-572' THEN
+               'S-1-5-21domain-572 (Denied RODC Password Replication Group)'
                WHEN events_persisted.sid = 'S-1-5-21domain-500' THEN
                'S-1-5-21domain-500 (Administrator)'
                WHEN events_persisted.sid = 'S-1-5-21domain-501' THEN
@@ -426,7 +426,7 @@ Queries:
                WHEN events_persisted.sid = 'S-1-5-64-10' THEN
                'S-1-5-64-10 (NTLM Authentication)'
                WHEN events_persisted.sid = 'S-1-5-64-14' THEN
-               'S-1-5-64-14 (SChannel Authentication)'
+               'S-1-5-64-14 (SChannelAuthentication)'
                WHEN events_persisted.sid = 'S-1-5-64-21' THEN
                'S-1-5-64-21 (Digest Authentication)'
                WHEN events_persisted.sid = 'S-1-5-7' THEN
@@ -553,14 +553,14 @@ Queries:
                'S-1-5-2 (Network)'
                WHEN events_persisted.sid = 'S-1-5-20' THEN
                'S-1-5-20 (NT Authority)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -498' THEN
-               'S-1-5-21 domain -498 (Enterprise Read-only Domain Controllers)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -521' THEN
-               'S-1-5-21 domain -521 (Read-only Domain Controllers)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -571' THEN
-               'S-1-5-21 domain -571 (Allowed RODC Password Replication Group)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -572' THEN
-               'S-1-5-21 domain -572 (Denied RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-498' THEN
+               'S-1-5-21domain-498 (Enterprise Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-521' THEN
+               'S-1-5-21domain-521 (Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-571' THEN
+               'S-1-5-21domain-571 (Allowed RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-572' THEN
+               'S-1-5-21domain-572 (Denied RODC Password Replication Group)'
                WHEN events_persisted.sid = 'S-1-5-21domain-500' THEN
                'S-1-5-21domain-500 (Administrator)'
                WHEN events_persisted.sid = 'S-1-5-21domain-501' THEN
@@ -660,7 +660,7 @@ Queries:
                WHEN events_persisted.sid = 'S-1-5-64-10' THEN
                'S-1-5-64-10 (NTLM Authentication)'
                WHEN events_persisted.sid = 'S-1-5-64-14' THEN
-               'S-1-5-64-14 (SChannel Authentication)'
+               'S-1-5-64-14 (SChannelAuthentication)'
                WHEN events_persisted.sid = 'S-1-5-64-21' THEN
                'S-1-5-64-21 (Digest Authentication)'
                WHEN events_persisted.sid = 'S-1-5-7' THEN
@@ -787,14 +787,14 @@ Queries:
                'S-1-5-2 (Network)'
                WHEN events_persisted.sid = 'S-1-5-20' THEN
                'S-1-5-20 (NT Authority)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -498' THEN
-               'S-1-5-21 domain -498 (Enterprise Read-only Domain Controllers)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -521' THEN
-               'S-1-5-21 domain -521 (Read-only Domain Controllers)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -571' THEN
-               'S-1-5-21 domain -571 (Allowed RODC Password Replication Group)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -572' THEN
-               'S-1-5-21 domain -572 (Denied RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-498' THEN
+               'S-1-5-21domain-498 (Enterprise Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-521' THEN
+               'S-1-5-21domain-521 (Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-571' THEN
+               'S-1-5-21domain-571 (Allowed RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-572' THEN
+               'S-1-5-21domain-572 (Denied RODC Password Replication Group)'
                WHEN events_persisted.sid = 'S-1-5-21domain-500' THEN
                'S-1-5-21domain-500 (Administrator)'
                WHEN events_persisted.sid = 'S-1-5-21domain-501' THEN
@@ -894,7 +894,7 @@ Queries:
                WHEN events_persisted.sid = 'S-1-5-64-10' THEN
                'S-1-5-64-10 (NTLM Authentication)'
                WHEN events_persisted.sid = 'S-1-5-64-14' THEN
-               'S-1-5-64-14 (SChannel Authentication)'
+               'S-1-5-64-14 (SChannelAuthentication)'
                WHEN events_persisted.sid = 'S-1-5-64-21' THEN
                'S-1-5-64-21 (Digest Authentication)'
                WHEN events_persisted.sid = 'S-1-5-7' THEN
@@ -1021,14 +1021,14 @@ Queries:
                'S-1-5-2 (Network)'
                WHEN events_persisted.sid = 'S-1-5-20' THEN
                'S-1-5-20 (NT Authority)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -498' THEN
-               'S-1-5-21 domain -498 (Enterprise Read-only Domain Controllers)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -521' THEN
-               'S-1-5-21 domain -521 (Read-only Domain Controllers)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -571' THEN
-               'S-1-5-21 domain -571 (Allowed RODC Password Replication Group)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -572' THEN
-               'S-1-5-21 domain -572 (Denied RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-498' THEN
+               'S-1-5-21domain-498 (Enterprise Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-521' THEN
+               'S-1-5-21domain-521 (Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-571' THEN
+               'S-1-5-21domain-571 (Allowed RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-572' THEN
+               'S-1-5-21domain-572 (Denied RODC Password Replication Group)'
                WHEN events_persisted.sid = 'S-1-5-21domain-500' THEN
                'S-1-5-21domain-500 (Administrator)'
                WHEN events_persisted.sid = 'S-1-5-21domain-501' THEN
@@ -1128,7 +1128,7 @@ Queries:
                WHEN events_persisted.sid = 'S-1-5-64-10' THEN
                'S-1-5-64-10 (NTLM Authentication)'
                WHEN events_persisted.sid = 'S-1-5-64-14' THEN
-               'S-1-5-64-14 (SChannel Authentication)'
+               'S-1-5-64-14 (SChannelAuthentication)'
                WHEN events_persisted.sid = 'S-1-5-64-21' THEN
                'S-1-5-64-21 (Digest Authentication)'
                WHEN events_persisted.sid = 'S-1-5-7' THEN
@@ -1255,14 +1255,14 @@ Queries:
                'S-1-5-2 (Network)'
                WHEN events_persisted.sid = 'S-1-5-20' THEN
                'S-1-5-20 (NT Authority)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -498' THEN
-               'S-1-5-21 domain -498 (Enterprise Read-only Domain Controllers)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -521' THEN
-               'S-1-5-21 domain -521 (Read-only Domain Controllers)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -571' THEN
-               'S-1-5-21 domain -571 (Allowed RODC Password Replication Group)'
-               WHEN events_persisted.sid = 'S-1-5-21 domain -572' THEN
-               'S-1-5-21 domain -572 (Denied RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-498' THEN
+               'S-1-5-21domain-498 (Enterprise Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-521' THEN
+               'S-1-5-21domain-521 (Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-571' THEN
+               'S-1-5-21domain-571 (Allowed RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-572' THEN
+               'S-1-5-21domain-572 (Denied RODC Password Replication Group)'
                WHEN events_persisted.sid = 'S-1-5-21domain-500' THEN
                'S-1-5-21domain-500 (Administrator)'
                WHEN events_persisted.sid = 'S-1-5-21domain-501' THEN
@@ -1362,7 +1362,7 @@ Queries:
                WHEN events_persisted.sid = 'S-1-5-64-10' THEN
                'S-1-5-64-10 (NTLM Authentication)'
                WHEN events_persisted.sid = 'S-1-5-64-14' THEN
-               'S-1-5-64-14 (SChannel Authentication)'
+               'S-1-5-64-14 (SChannelAuthentication)'
                WHEN events_persisted.sid = 'S-1-5-64-21' THEN
                'S-1-5-64-21 (Digest Authentication)'
                WHEN events_persisted.sid = 'S-1-5-7' THEN
