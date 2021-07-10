@@ -1,4 +1,4 @@
-﻿Description: EventTranscript.db
+Description: EventTranscript.db
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: 4529ee5e-088d-4822-8cfe-ccaf46e0b1f9
@@ -1414,4 +1414,5 @@ Queries:
         BaseFileName: EvenTranscriptDB_SoftwareSetupandInventory
 
 # Documentation
-# N/A
+# https://www.kroll.com/en/insights/publications/cyber/forensically-unpacking-eventtranscript
+# https://github.com/rathbuna/EventTranscript.db-Research
