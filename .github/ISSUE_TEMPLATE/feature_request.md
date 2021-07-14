@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-** KAPE version **
+** SQLECmd version **
 The version of SQLECmd you are currently using
 
 **Is your feature request related to a problem? Please describe.**
