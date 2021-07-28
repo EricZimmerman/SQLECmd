@@ -241,7 +241,7 @@ Queries:
                TagName = 'Browsing History'
                ORDER BY
                events_persisted.timestamp ASC
-        BaseFileName: EvenTranscriptDB_BrowsingHistory
+        BaseFileName: EventTranscriptDB_BrowsingHistory
     -
         Name: Windows EventTranscript.db Device Connectivity and Configuration
         Query: |
@@ -475,7 +475,7 @@ Queries:
                TagName = 'Device Connectivity and Configuration'
                ORDER BY
                events_persisted.timestamp ASC
-        BaseFileName: EvenTranscriptDB_DeviceConnectivityandConfiguration
+        BaseFileName: EventTranscriptDB_DeviceConnectivityandConfiguration
     -
         Name: Windows EventTranscript.db Inking Typing and Speech Utterance
         Query: |
@@ -709,7 +709,7 @@ Queries:
                TagName = 'Inking Typing and Speech Utterance'
                ORDER BY
                events_persisted.timestamp ASC
-        BaseFileName: EvenTranscriptDB_InkingTypingandSpeechUtterance
+        BaseFileName: EventTranscriptDB_InkingTypingandSpeechUtterance
     -
         Name: Windows EventTranscript.db_ProductandServicePerformance
         Query: |
@@ -943,7 +943,7 @@ Queries:
                TagName = 'Product and Service Performance'
                ORDER BY
                events_persisted.timestamp ASC
-        BaseFileName: EvenTranscriptDB_ProductandServicePerformance
+        BaseFileName: EventTranscriptDB_ProductandServicePerformance
     -
         Name: Windows EventTranscript.db Product and Service Usage
         Query: |
@@ -1177,7 +1177,7 @@ Queries:
                TagName = 'Product and Service Usage'
                ORDER BY
                events_persisted.timestamp ASC
-        BaseFileName: EvenTranscriptDB_ProductandServiceUsage
+        BaseFileName: EventTranscriptDB_ProductandServiceUsage
     -
         Name: Windows EventTranscript.db Software Setup and Inventory
         Query: |
@@ -1411,7 +1411,7 @@ Queries:
                TagName = 'Software Setup and Inventory'
                ORDER BY
                events_persisted.timestamp ASC
-        BaseFileName: EvenTranscriptDB_SoftwareSetupandInventory
+        BaseFileName: EventTranscriptDB_SoftwareSetupandInventory
 
 # Documentation
 # https://www.kroll.com/en/insights/publications/cyber/forensically-unpacking-eventtranscript
