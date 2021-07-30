@@ -1,0 +1,1406 @@
+Description: EventTranscript.db - No Data Sampling
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: b28f0ea6-d514-4452-a70b-fa29ba303e15
+Version: 1.0
+FileName: EventTranscript.db
+CSVPrefix: Windows
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='categories' OR name='event_categories' OR name='event_tags' OR name='events_persisted' OR name='producers' OR name='provider_groups' OR name='tag_descriptions');
+IdentifyValue: 4
+Queries:
+    -
+        Name: Windows EventTranscript.db BrowsingHistory
+        Query: |
+               SELECT
+               CASE
+
+               WHEN
+               events_persisted.sid = 'S-1-0' THEN
+               'S-1-0 (Null Authority)'
+               WHEN events_persisted.sid = 'S-1-0-0' THEN
+               'S-1-0-0 (Nobody)'
+               WHEN events_persisted.sid = 'S-1-1' THEN
+               'S-1-1 (World Authority)'
+               WHEN events_persisted.sid = 'S-1-1-0' THEN
+               'S-1-1-0 (Everyone)'
+               WHEN events_persisted.sid = 'S-1-16-0' THEN
+               'S-1-16-0 (Untrusted Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-12288' THEN
+               'S-1-16-12288 (High Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-16384' THEN
+               'S-1-16-16384 (System Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-20480' THEN
+               'S-1-16-20480 (Protected Process Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-28672' THEN
+               'S-1-16-28672 (Secure Process Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-4096' THEN
+               'S-1-16-4096 (Low Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-8192' THEN
+               'S-1-16-8192 (Medium Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-8448' THEN
+               'S-1-16-8448 (Medium Plus Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-2' THEN
+               'S-1-2 (Local Authority)'
+               WHEN events_persisted.sid = 'S-1-2-0' THEN
+               'S-1-2-0 (Local)'
+               WHEN events_persisted.sid = 'S-1-2-1' THEN
+               'S-1-2-1 (Console Logon)'
+               WHEN events_persisted.sid = 'S-1-3' THEN
+               'S-1-3 (Creator Authority)'
+               WHEN events_persisted.sid = 'S-1-3-0' THEN
+               'S-1-3-0 (Creator Owner)'
+               WHEN events_persisted.sid = 'S-1-3-1' THEN
+               'S-1-3-1 (Creator Group)'
+               WHEN events_persisted.sid = 'S-1-3-2' THEN
+               'S-1-3-2 (Creator Owner Server)'
+               WHEN events_persisted.sid = 'S-1-3-3' THEN
+               'S-1-3-3 (Creator Group Server)'
+               WHEN events_persisted.sid = 'S-1-3-4' THEN
+               'S-1-3-4 (Owner Rights)'
+               WHEN events_persisted.sid = 'S-1-4' THEN
+               'S-1-4 (Non-unique Authority)'
+               WHEN events_persisted.sid = 'S-1-5' THEN
+               'S-1-5 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-1' THEN
+               'S-1-5-1 (Dialup)'
+               WHEN events_persisted.sid = 'S-1-5-10' THEN
+               'S-1-5-10 (Principal Self)'
+               WHEN events_persisted.sid = 'S-1-5-11' THEN
+               'S-1-5-11 (Authenticated Users)'
+               WHEN events_persisted.sid = 'S-1-5-12' THEN
+               'S-1-5-12 (Restricted Code)'
+               WHEN events_persisted.sid = 'S-1-5-13' THEN
+               'S-1-5-13 (Terminal Server Users)'
+               WHEN events_persisted.sid = 'S-1-5-14' THEN
+               'S-1-5-14 (Remote Interactive Logon)'
+               WHEN events_persisted.sid = 'S-1-5-15' THEN
+               'S-1-5-15 (This Organization)'
+               WHEN events_persisted.sid = 'S-1-5-17' THEN
+               'S-1-5-17 (IUSR)'
+               WHEN events_persisted.sid = 'S-1-5-18' THEN
+               'S-1-5-18 (Local System)'
+               WHEN events_persisted.sid = 'S-1-5-19' THEN
+               'S-1-5-19 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-2' THEN
+               'S-1-5-2 (Network)'
+               WHEN events_persisted.sid = 'S-1-5-20' THEN
+               'S-1-5-20 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-498' THEN
+               'S-1-5-21domain-498 (Enterprise Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-521' THEN
+               'S-1-5-21domain-521 (Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-571' THEN
+               'S-1-5-21domain-571 (Allowed RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-572' THEN
+               'S-1-5-21domain-572 (Denied RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-500' THEN
+               'S-1-5-21domain-500 (Administrator)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-501' THEN
+               'S-1-5-21domain-501 (Guest)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-502' THEN
+               'S-1-5-21domain-502 (KRBTGT)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-512' THEN
+               'S-1-5-21domain-512 (Domain Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-513' THEN
+               'S-1-5-21domain-513 (Domain Users)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-514' THEN
+               'S-1-5-21domain-514 (Domain Guests)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-515' THEN
+               'S-1-5-21domain-515 (Domain Computers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-516' THEN
+               'S-1-5-21domain-516 (Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-517' THEN
+               'S-1-5-21domain-517 (Cert Publishers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-520' THEN
+               'S-1-5-21domain-520 (Group Policy Creator Owners)'
+               WHEN events_persisted.sid = 'S-1-5-21-domain-522' THEN
+               'S-1-5-21-domain-522 (Cloneable Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-526' THEN
+               'S-1-5-21domain-526 (Key Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-527' THEN
+               'S-1-5-21domain-527 (Enterprise Key Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-553' THEN
+               'S-1-5-21domain-553 (RAS and IAS Servers)'
+               WHEN events_persisted.sid = 'S-1-5-21root domain-518' THEN
+               'S-1-5-21root domain-518 (Schema Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21root domain-519' THEN
+               'S-1-5-21root domain-519 (Enterprise Admins)'
+               WHEN events_persisted.sid = 'S-1-5-3' THEN
+               'S-1-5-3 (Batch)'
+               WHEN events_persisted.sid = 'S-1-5-32-544' THEN
+               'S-1-5-32-544 (Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-32-545' THEN
+               'S-1-5-32-545 (Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-546' THEN
+               'S-1-5-32-546 (Guests)'
+               WHEN events_persisted.sid = 'S-1-5-32-547' THEN
+               'S-1-5-32-547 (Power Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-548' THEN
+               'S-1-5-32-548 (Account Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-549' THEN
+               'S-1-5-32-549 (Server Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-550' THEN
+               'S-1-5-32-550 (Print Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-551' THEN
+               'S-1-5-32-551 (Backup Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-552' THEN
+               'S-1-5-32-552 (Replicators)'
+               WHEN events_persisted.sid = 'S-1-5-32-554' THEN
+               'S-1-5-32-554 (Builtin\Pre-Windows 2000 Compatible Access)'
+               WHEN events_persisted.sid = 'S-1-5-32-555' THEN
+               'S-1-5-32-555 (Builtin\Remote Desktop Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-556' THEN
+               'S-1-5-32-556 (Builtin\Network Configuration Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-557' THEN
+               'S-1-5-32-557 (Builtin\Incoming Forest Trust Builders)'
+               WHEN events_persisted.sid = 'S-1-5-32-558' THEN
+               'S-1-5-32-558 (Builtin\Performance Monitor Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-559' THEN
+               'S-1-5-32-559 (Builtin\Performance Log Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-560' THEN
+               'S-1-5-32-560 (Builtin\Windows Authorization Access Group)'
+               WHEN events_persisted.sid = 'S-1-5-32-561' THEN
+               'S-1-5-32-561 (Builtin\Terminal Server License Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-562' THEN
+               'S-1-5-32-562 (Builtin\Distributed COM Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-569' THEN
+               'S-1-5-32-569 (Builtin\Cryptographic Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-573' THEN
+               'S-1-5-32-573 (Builtin\Event Log Readers)'
+               WHEN events_persisted.sid = 'S-1-5-32-574' THEN
+               'S-1-5-32-574 (Builtin\Certificate Service DCOM Access)'
+               WHEN events_persisted.sid = 'S-1-5-32-575' THEN
+               'S-1-5-32-575 (Builtin\RDS Remote Access Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-576' THEN
+               'S-1-5-32-576 (Builtin\RDS Endpoint Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-577' THEN
+               'S-1-5-32-577 (Builtin\RDS Management Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-578' THEN
+               'S-1-5-32-578 (Builtin\Hyper-V Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-32-579' THEN
+               'S-1-5-32-579 (Builtin\Access Control Assistance Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-580' THEN
+               'S-1-5-32-580 (Builtin\Remote Management Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-582' THEN
+               'S-1-5-32-582 (Storage Replica Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-4' THEN
+               'S-1-5-4 (Interactive)'
+               WHEN events_persisted.sid = 'S-1-5-5-X-Y' THEN
+               'S-1-5-5-X-Y (Logon Session)'
+               WHEN events_persisted.sid = 'S-1-5-6' THEN
+               'S-1-5-6 (Service)'
+               WHEN events_persisted.sid = 'S-1-5-64-10' THEN
+               'S-1-5-64-10 (NTLM Authentication)'
+               WHEN events_persisted.sid = 'S-1-5-64-14' THEN
+               'S-1-5-64-14 (SChannelAuthentication)'
+               WHEN events_persisted.sid = 'S-1-5-64-21' THEN
+               'S-1-5-64-21 (Digest Authentication)'
+               WHEN events_persisted.sid = 'S-1-5-7' THEN
+               'S-1-5-7 (Anonymous)'
+               WHEN events_persisted.sid = 'S-1-5-8' THEN
+               'S-1-5-8 (Proxy)'
+               WHEN events_persisted.sid = 'S-1-5-80' THEN
+               'S-1-5-80 (NT Service)'
+               WHEN events_persisted.sid = 'S-1-5-80-0' THEN
+               'S-1-5-80-0 (NT Services\All Services)'
+               WHEN events_persisted.sid = 'S-1-5-80-0' THEN
+               'S-1-5-80-0 (All Services)'
+               WHEN events_persisted.sid = 'S-1-5-83-0' THEN
+               'S-1-5-83-0 (NT Virtual Machine\Virtual Machines)'
+               WHEN events_persisted.sid = 'S-1-5-9' THEN
+               'S-1-5-9 (Enterprise Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-90-0' THEN
+               'S-1-5-90-0 (Windows Manager\Windows Manager Group)' ELSE events_persisted.sid
+               END AS UserSID,
+               datetime( ( events_persisted.timestamp / 10000000 ) - 11644473600, 'unixepoch' ) AS Timestamp,
+               tag_descriptions.locale_name AS LocaleName,
+               tag_descriptions.tag_name AS TagName,
+               events_persisted.full_event_name AS FullEventName,
+               events_persisted.logging_binary_name AS LoggingBinaryName,
+               events_persisted.friendly_logging_binary_name AS FriendlyLoggingBinaryName,
+               events_persisted.full_event_name_hash AS FullEventNameHash,
+               events_persisted.event_keywords AS Keywords,
+               provider_groups.group_guid AS GroupGUID,
+               CASE
+
+               WHEN events_persisted.is_core = 0 THEN
+               'No'
+               WHEN events_persisted.is_core = 1 THEN
+               'Yes' ELSE 'Unknown'
+               END AS IsCore,
+               events_persisted.compressed_payload_size AS CompressedPayloadSize,
+               events_persisted.payload AS JSONPayload
+               FROM
+               events_persisted
+               LEFT JOIN event_tags ON events_persisted.full_event_name_hash = event_tags.full_event_name_hash
+               LEFT JOIN tag_descriptions ON event_tags.tag_id = tag_descriptions.tag_id
+               LEFT JOIN provider_groups ON events_persisted.provider_group_id = provider_groups.group_id
+               WHERE
+               TagName = 'Browsing History'
+               ORDER BY
+               events_persisted.timestamp ASC
+        BaseFileName: EventTranscriptDB_BrowsingHistory_NoDataSampling
+    -
+        Name: Windows EventTranscript.db Device Connectivity and Configuration
+        Query: |
+               SELECT
+               CASE
+
+               WHEN
+               events_persisted.sid = 'S-1-0' THEN
+               'S-1-0 (Null Authority)'
+               WHEN events_persisted.sid = 'S-1-0-0' THEN
+               'S-1-0-0 (Nobody)'
+               WHEN events_persisted.sid = 'S-1-1' THEN
+               'S-1-1 (World Authority)'
+               WHEN events_persisted.sid = 'S-1-1-0' THEN
+               'S-1-1-0 (Everyone)'
+               WHEN events_persisted.sid = 'S-1-16-0' THEN
+               'S-1-16-0 (Untrusted Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-12288' THEN
+               'S-1-16-12288 (High Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-16384' THEN
+               'S-1-16-16384 (System Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-20480' THEN
+               'S-1-16-20480 (Protected Process Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-28672' THEN
+               'S-1-16-28672 (Secure Process Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-4096' THEN
+               'S-1-16-4096 (Low Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-8192' THEN
+               'S-1-16-8192 (Medium Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-8448' THEN
+               'S-1-16-8448 (Medium Plus Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-2' THEN
+               'S-1-2 (Local Authority)'
+               WHEN events_persisted.sid = 'S-1-2-0' THEN
+               'S-1-2-0 (Local)'
+               WHEN events_persisted.sid = 'S-1-2-1' THEN
+               'S-1-2-1 (Console Logon)'
+               WHEN events_persisted.sid = 'S-1-3' THEN
+               'S-1-3 (Creator Authority)'
+               WHEN events_persisted.sid = 'S-1-3-0' THEN
+               'S-1-3-0 (Creator Owner)'
+               WHEN events_persisted.sid = 'S-1-3-1' THEN
+               'S-1-3-1 (Creator Group)'
+               WHEN events_persisted.sid = 'S-1-3-2' THEN
+               'S-1-3-2 (Creator Owner Server)'
+               WHEN events_persisted.sid = 'S-1-3-3' THEN
+               'S-1-3-3 (Creator Group Server)'
+               WHEN events_persisted.sid = 'S-1-3-4' THEN
+               'S-1-3-4 (Owner Rights)'
+               WHEN events_persisted.sid = 'S-1-4' THEN
+               'S-1-4 (Non-unique Authority)'
+               WHEN events_persisted.sid = 'S-1-5' THEN
+               'S-1-5 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-1' THEN
+               'S-1-5-1 (Dialup)'
+               WHEN events_persisted.sid = 'S-1-5-10' THEN
+               'S-1-5-10 (Principal Self)'
+               WHEN events_persisted.sid = 'S-1-5-11' THEN
+               'S-1-5-11 (Authenticated Users)'
+               WHEN events_persisted.sid = 'S-1-5-12' THEN
+               'S-1-5-12 (Restricted Code)'
+               WHEN events_persisted.sid = 'S-1-5-13' THEN
+               'S-1-5-13 (Terminal Server Users)'
+               WHEN events_persisted.sid = 'S-1-5-14' THEN
+               'S-1-5-14 (Remote Interactive Logon)'
+               WHEN events_persisted.sid = 'S-1-5-15' THEN
+               'S-1-5-15 (This Organization)'
+               WHEN events_persisted.sid = 'S-1-5-17' THEN
+               'S-1-5-17 (IUSR)'
+               WHEN events_persisted.sid = 'S-1-5-18' THEN
+               'S-1-5-18 (Local System)'
+               WHEN events_persisted.sid = 'S-1-5-19' THEN
+               'S-1-5-19 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-2' THEN
+               'S-1-5-2 (Network)'
+               WHEN events_persisted.sid = 'S-1-5-20' THEN
+               'S-1-5-20 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-498' THEN
+               'S-1-5-21domain-498 (Enterprise Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-521' THEN
+               'S-1-5-21domain-521 (Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-571' THEN
+               'S-1-5-21domain-571 (Allowed RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-572' THEN
+               'S-1-5-21domain-572 (Denied RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-500' THEN
+               'S-1-5-21domain-500 (Administrator)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-501' THEN
+               'S-1-5-21domain-501 (Guest)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-502' THEN
+               'S-1-5-21domain-502 (KRBTGT)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-512' THEN
+               'S-1-5-21domain-512 (Domain Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-513' THEN
+               'S-1-5-21domain-513 (Domain Users)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-514' THEN
+               'S-1-5-21domain-514 (Domain Guests)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-515' THEN
+               'S-1-5-21domain-515 (Domain Computers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-516' THEN
+               'S-1-5-21domain-516 (Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-517' THEN
+               'S-1-5-21domain-517 (Cert Publishers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-520' THEN
+               'S-1-5-21domain-520 (Group Policy Creator Owners)'
+               WHEN events_persisted.sid = 'S-1-5-21-domain-522' THEN
+               'S-1-5-21-domain-522 (Cloneable Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-526' THEN
+               'S-1-5-21domain-526 (Key Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-527' THEN
+               'S-1-5-21domain-527 (Enterprise Key Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-553' THEN
+               'S-1-5-21domain-553 (RAS and IAS Servers)'
+               WHEN events_persisted.sid = 'S-1-5-21root domain-518' THEN
+               'S-1-5-21root domain-518 (Schema Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21root domain-519' THEN
+               'S-1-5-21root domain-519 (Enterprise Admins)'
+               WHEN events_persisted.sid = 'S-1-5-3' THEN
+               'S-1-5-3 (Batch)'
+               WHEN events_persisted.sid = 'S-1-5-32-544' THEN
+               'S-1-5-32-544 (Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-32-545' THEN
+               'S-1-5-32-545 (Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-546' THEN
+               'S-1-5-32-546 (Guests)'
+               WHEN events_persisted.sid = 'S-1-5-32-547' THEN
+               'S-1-5-32-547 (Power Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-548' THEN
+               'S-1-5-32-548 (Account Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-549' THEN
+               'S-1-5-32-549 (Server Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-550' THEN
+               'S-1-5-32-550 (Print Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-551' THEN
+               'S-1-5-32-551 (Backup Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-552' THEN
+               'S-1-5-32-552 (Replicators)'
+               WHEN events_persisted.sid = 'S-1-5-32-554' THEN
+               'S-1-5-32-554 (Builtin\Pre-Windows 2000 Compatible Access)'
+               WHEN events_persisted.sid = 'S-1-5-32-555' THEN
+               'S-1-5-32-555 (Builtin\Remote Desktop Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-556' THEN
+               'S-1-5-32-556 (Builtin\Network Configuration Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-557' THEN
+               'S-1-5-32-557 (Builtin\Incoming Forest Trust Builders)'
+               WHEN events_persisted.sid = 'S-1-5-32-558' THEN
+               'S-1-5-32-558 (Builtin\Performance Monitor Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-559' THEN
+               'S-1-5-32-559 (Builtin\Performance Log Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-560' THEN
+               'S-1-5-32-560 (Builtin\Windows Authorization Access Group)'
+               WHEN events_persisted.sid = 'S-1-5-32-561' THEN
+               'S-1-5-32-561 (Builtin\Terminal Server License Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-562' THEN
+               'S-1-5-32-562 (Builtin\Distributed COM Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-569' THEN
+               'S-1-5-32-569 (Builtin\Cryptographic Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-573' THEN
+               'S-1-5-32-573 (Builtin\Event Log Readers)'
+               WHEN events_persisted.sid = 'S-1-5-32-574' THEN
+               'S-1-5-32-574 (Builtin\Certificate Service DCOM Access)'
+               WHEN events_persisted.sid = 'S-1-5-32-575' THEN
+               'S-1-5-32-575 (Builtin\RDS Remote Access Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-576' THEN
+               'S-1-5-32-576 (Builtin\RDS Endpoint Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-577' THEN
+               'S-1-5-32-577 (Builtin\RDS Management Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-578' THEN
+               'S-1-5-32-578 (Builtin\Hyper-V Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-32-579' THEN
+               'S-1-5-32-579 (Builtin\Access Control Assistance Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-580' THEN
+               'S-1-5-32-580 (Builtin\Remote Management Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-582' THEN
+               'S-1-5-32-582 (Storage Replica Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-4' THEN
+               'S-1-5-4 (Interactive)'
+               WHEN events_persisted.sid = 'S-1-5-5-X-Y' THEN
+               'S-1-5-5-X-Y (Logon Session)'
+               WHEN events_persisted.sid = 'S-1-5-6' THEN
+               'S-1-5-6 (Service)'
+               WHEN events_persisted.sid = 'S-1-5-64-10' THEN
+               'S-1-5-64-10 (NTLM Authentication)'
+               WHEN events_persisted.sid = 'S-1-5-64-14' THEN
+               'S-1-5-64-14 (SChannelAuthentication)'
+               WHEN events_persisted.sid = 'S-1-5-64-21' THEN
+               'S-1-5-64-21 (Digest Authentication)'
+               WHEN events_persisted.sid = 'S-1-5-7' THEN
+               'S-1-5-7 (Anonymous)'
+               WHEN events_persisted.sid = 'S-1-5-8' THEN
+               'S-1-5-8 (Proxy)'
+               WHEN events_persisted.sid = 'S-1-5-80' THEN
+               'S-1-5-80 (NT Service)'
+               WHEN events_persisted.sid = 'S-1-5-80-0' THEN
+               'S-1-5-80-0 (NT Services\All Services)'
+               WHEN events_persisted.sid = 'S-1-5-80-0' THEN
+               'S-1-5-80-0 (All Services)'
+               WHEN events_persisted.sid = 'S-1-5-83-0' THEN
+               'S-1-5-83-0 (NT Virtual Machine\Virtual Machines)'
+               WHEN events_persisted.sid = 'S-1-5-9' THEN
+               'S-1-5-9 (Enterprise Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-90-0' THEN
+               'S-1-5-90-0 (Windows Manager\Windows Manager Group)' ELSE events_persisted.sid
+               END AS UserSID,
+               datetime( ( events_persisted.timestamp / 10000000 ) - 11644473600, 'unixepoch' ) AS Timestamp,
+               tag_descriptions.locale_name AS LocaleName,
+               tag_descriptions.tag_name AS TagName,
+               events_persisted.full_event_name AS FullEventName,
+               events_persisted.logging_binary_name AS LoggingBinaryName,
+               events_persisted.friendly_logging_binary_name AS FriendlyLoggingBinaryName,
+               events_persisted.full_event_name_hash AS FullEventNameHash,
+               events_persisted.event_keywords AS Keywords,
+               provider_groups.group_guid AS GroupGUID,
+               CASE
+
+               WHEN events_persisted.is_core = 0 THEN
+               'No'
+               WHEN events_persisted.is_core = 1 THEN
+               'Yes' ELSE 'Unknown'
+               END AS IsCore,
+               events_persisted.compressed_payload_size AS CompressedPayloadSize,
+               events_persisted.payload AS JSONPayload
+               FROM
+               events_persisted
+               LEFT JOIN event_tags ON events_persisted.full_event_name_hash = event_tags.full_event_name_hash
+               LEFT JOIN tag_descriptions ON event_tags.tag_id = tag_descriptions.tag_id
+               LEFT JOIN provider_groups ON events_persisted.provider_group_id = provider_groups.group_id
+               WHERE
+               TagName = 'Device Connectivity and Configuration'
+               ORDER BY
+               events_persisted.timestamp ASC
+        BaseFileName: EventTranscriptDB_DeviceConnectivityandConfiguration_NoDataSampling
+    -
+        Name: Windows EventTranscript.db Inking Typing and Speech Utterance
+        Query: |
+               SELECT
+               CASE
+
+               WHEN
+               events_persisted.sid = 'S-1-0' THEN
+               'S-1-0 (Null Authority)'
+               WHEN events_persisted.sid = 'S-1-0-0' THEN
+               'S-1-0-0 (Nobody)'
+               WHEN events_persisted.sid = 'S-1-1' THEN
+               'S-1-1 (World Authority)'
+               WHEN events_persisted.sid = 'S-1-1-0' THEN
+               'S-1-1-0 (Everyone)'
+               WHEN events_persisted.sid = 'S-1-16-0' THEN
+               'S-1-16-0 (Untrusted Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-12288' THEN
+               'S-1-16-12288 (High Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-16384' THEN
+               'S-1-16-16384 (System Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-20480' THEN
+               'S-1-16-20480 (Protected Process Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-28672' THEN
+               'S-1-16-28672 (Secure Process Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-4096' THEN
+               'S-1-16-4096 (Low Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-8192' THEN
+               'S-1-16-8192 (Medium Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-8448' THEN
+               'S-1-16-8448 (Medium Plus Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-2' THEN
+               'S-1-2 (Local Authority)'
+               WHEN events_persisted.sid = 'S-1-2-0' THEN
+               'S-1-2-0 (Local)'
+               WHEN events_persisted.sid = 'S-1-2-1' THEN
+               'S-1-2-1 (Console Logon)'
+               WHEN events_persisted.sid = 'S-1-3' THEN
+               'S-1-3 (Creator Authority)'
+               WHEN events_persisted.sid = 'S-1-3-0' THEN
+               'S-1-3-0 (Creator Owner)'
+               WHEN events_persisted.sid = 'S-1-3-1' THEN
+               'S-1-3-1 (Creator Group)'
+               WHEN events_persisted.sid = 'S-1-3-2' THEN
+               'S-1-3-2 (Creator Owner Server)'
+               WHEN events_persisted.sid = 'S-1-3-3' THEN
+               'S-1-3-3 (Creator Group Server)'
+               WHEN events_persisted.sid = 'S-1-3-4' THEN
+               'S-1-3-4 (Owner Rights)'
+               WHEN events_persisted.sid = 'S-1-4' THEN
+               'S-1-4 (Non-unique Authority)'
+               WHEN events_persisted.sid = 'S-1-5' THEN
+               'S-1-5 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-1' THEN
+               'S-1-5-1 (Dialup)'
+               WHEN events_persisted.sid = 'S-1-5-10' THEN
+               'S-1-5-10 (Principal Self)'
+               WHEN events_persisted.sid = 'S-1-5-11' THEN
+               'S-1-5-11 (Authenticated Users)'
+               WHEN events_persisted.sid = 'S-1-5-12' THEN
+               'S-1-5-12 (Restricted Code)'
+               WHEN events_persisted.sid = 'S-1-5-13' THEN
+               'S-1-5-13 (Terminal Server Users)'
+               WHEN events_persisted.sid = 'S-1-5-14' THEN
+               'S-1-5-14 (Remote Interactive Logon)'
+               WHEN events_persisted.sid = 'S-1-5-15' THEN
+               'S-1-5-15 (This Organization)'
+               WHEN events_persisted.sid = 'S-1-5-17' THEN
+               'S-1-5-17 (IUSR)'
+               WHEN events_persisted.sid = 'S-1-5-18' THEN
+               'S-1-5-18 (Local System)'
+               WHEN events_persisted.sid = 'S-1-5-19' THEN
+               'S-1-5-19 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-2' THEN
+               'S-1-5-2 (Network)'
+               WHEN events_persisted.sid = 'S-1-5-20' THEN
+               'S-1-5-20 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-498' THEN
+               'S-1-5-21domain-498 (Enterprise Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-521' THEN
+               'S-1-5-21domain-521 (Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-571' THEN
+               'S-1-5-21domain-571 (Allowed RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-572' THEN
+               'S-1-5-21domain-572 (Denied RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-500' THEN
+               'S-1-5-21domain-500 (Administrator)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-501' THEN
+               'S-1-5-21domain-501 (Guest)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-502' THEN
+               'S-1-5-21domain-502 (KRBTGT)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-512' THEN
+               'S-1-5-21domain-512 (Domain Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-513' THEN
+               'S-1-5-21domain-513 (Domain Users)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-514' THEN
+               'S-1-5-21domain-514 (Domain Guests)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-515' THEN
+               'S-1-5-21domain-515 (Domain Computers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-516' THEN
+               'S-1-5-21domain-516 (Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-517' THEN
+               'S-1-5-21domain-517 (Cert Publishers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-520' THEN
+               'S-1-5-21domain-520 (Group Policy Creator Owners)'
+               WHEN events_persisted.sid = 'S-1-5-21-domain-522' THEN
+               'S-1-5-21-domain-522 (Cloneable Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-526' THEN
+               'S-1-5-21domain-526 (Key Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-527' THEN
+               'S-1-5-21domain-527 (Enterprise Key Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-553' THEN
+               'S-1-5-21domain-553 (RAS and IAS Servers)'
+               WHEN events_persisted.sid = 'S-1-5-21root domain-518' THEN
+               'S-1-5-21root domain-518 (Schema Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21root domain-519' THEN
+               'S-1-5-21root domain-519 (Enterprise Admins)'
+               WHEN events_persisted.sid = 'S-1-5-3' THEN
+               'S-1-5-3 (Batch)'
+               WHEN events_persisted.sid = 'S-1-5-32-544' THEN
+               'S-1-5-32-544 (Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-32-545' THEN
+               'S-1-5-32-545 (Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-546' THEN
+               'S-1-5-32-546 (Guests)'
+               WHEN events_persisted.sid = 'S-1-5-32-547' THEN
+               'S-1-5-32-547 (Power Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-548' THEN
+               'S-1-5-32-548 (Account Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-549' THEN
+               'S-1-5-32-549 (Server Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-550' THEN
+               'S-1-5-32-550 (Print Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-551' THEN
+               'S-1-5-32-551 (Backup Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-552' THEN
+               'S-1-5-32-552 (Replicators)'
+               WHEN events_persisted.sid = 'S-1-5-32-554' THEN
+               'S-1-5-32-554 (Builtin\Pre-Windows 2000 Compatible Access)'
+               WHEN events_persisted.sid = 'S-1-5-32-555' THEN
+               'S-1-5-32-555 (Builtin\Remote Desktop Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-556' THEN
+               'S-1-5-32-556 (Builtin\Network Configuration Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-557' THEN
+               'S-1-5-32-557 (Builtin\Incoming Forest Trust Builders)'
+               WHEN events_persisted.sid = 'S-1-5-32-558' THEN
+               'S-1-5-32-558 (Builtin\Performance Monitor Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-559' THEN
+               'S-1-5-32-559 (Builtin\Performance Log Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-560' THEN
+               'S-1-5-32-560 (Builtin\Windows Authorization Access Group)'
+               WHEN events_persisted.sid = 'S-1-5-32-561' THEN
+               'S-1-5-32-561 (Builtin\Terminal Server License Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-562' THEN
+               'S-1-5-32-562 (Builtin\Distributed COM Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-569' THEN
+               'S-1-5-32-569 (Builtin\Cryptographic Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-573' THEN
+               'S-1-5-32-573 (Builtin\Event Log Readers)'
+               WHEN events_persisted.sid = 'S-1-5-32-574' THEN
+               'S-1-5-32-574 (Builtin\Certificate Service DCOM Access)'
+               WHEN events_persisted.sid = 'S-1-5-32-575' THEN
+               'S-1-5-32-575 (Builtin\RDS Remote Access Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-576' THEN
+               'S-1-5-32-576 (Builtin\RDS Endpoint Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-577' THEN
+               'S-1-5-32-577 (Builtin\RDS Management Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-578' THEN
+               'S-1-5-32-578 (Builtin\Hyper-V Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-32-579' THEN
+               'S-1-5-32-579 (Builtin\Access Control Assistance Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-580' THEN
+               'S-1-5-32-580 (Builtin\Remote Management Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-582' THEN
+               'S-1-5-32-582 (Storage Replica Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-4' THEN
+               'S-1-5-4 (Interactive)'
+               WHEN events_persisted.sid = 'S-1-5-5-X-Y' THEN
+               'S-1-5-5-X-Y (Logon Session)'
+               WHEN events_persisted.sid = 'S-1-5-6' THEN
+               'S-1-5-6 (Service)'
+               WHEN events_persisted.sid = 'S-1-5-64-10' THEN
+               'S-1-5-64-10 (NTLM Authentication)'
+               WHEN events_persisted.sid = 'S-1-5-64-14' THEN
+               'S-1-5-64-14 (SChannelAuthentication)'
+               WHEN events_persisted.sid = 'S-1-5-64-21' THEN
+               'S-1-5-64-21 (Digest Authentication)'
+               WHEN events_persisted.sid = 'S-1-5-7' THEN
+               'S-1-5-7 (Anonymous)'
+               WHEN events_persisted.sid = 'S-1-5-8' THEN
+               'S-1-5-8 (Proxy)'
+               WHEN events_persisted.sid = 'S-1-5-80' THEN
+               'S-1-5-80 (NT Service)'
+               WHEN events_persisted.sid = 'S-1-5-80-0' THEN
+               'S-1-5-80-0 (NT Services\All Services)'
+               WHEN events_persisted.sid = 'S-1-5-80-0' THEN
+               'S-1-5-80-0 (All Services)'
+               WHEN events_persisted.sid = 'S-1-5-83-0' THEN
+               'S-1-5-83-0 (NT Virtual Machine\Virtual Machines)'
+               WHEN events_persisted.sid = 'S-1-5-9' THEN
+               'S-1-5-9 (Enterprise Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-90-0' THEN
+               'S-1-5-90-0 (Windows Manager\Windows Manager Group)' ELSE events_persisted.sid
+               END AS UserSID,
+               datetime( ( events_persisted.timestamp / 10000000 ) - 11644473600, 'unixepoch' ) AS Timestamp,
+               tag_descriptions.locale_name AS LocaleName,
+               tag_descriptions.tag_name AS TagName,
+               events_persisted.full_event_name AS FullEventName,
+               events_persisted.logging_binary_name AS LoggingBinaryName,
+               events_persisted.friendly_logging_binary_name AS FriendlyLoggingBinaryName,
+               events_persisted.full_event_name_hash AS FullEventNameHash,
+               events_persisted.event_keywords AS Keywords,
+               provider_groups.group_guid AS GroupGUID,
+               CASE
+
+               WHEN events_persisted.is_core = 0 THEN
+               'No'
+               WHEN events_persisted.is_core = 1 THEN
+               'Yes' ELSE 'Unknown'
+               END AS IsCore,
+               events_persisted.compressed_payload_size AS CompressedPayloadSize,
+               events_persisted.payload AS JSONPayload
+               FROM
+               events_persisted
+               LEFT JOIN event_tags ON events_persisted.full_event_name_hash = event_tags.full_event_name_hash
+               LEFT JOIN tag_descriptions ON event_tags.tag_id = tag_descriptions.tag_id
+               LEFT JOIN provider_groups ON events_persisted.provider_group_id = provider_groups.group_id
+               WHERE
+               TagName = 'Inking Typing and Speech Utterance'
+               ORDER BY
+               events_persisted.timestamp ASC
+        BaseFileName: EventTranscriptDB_InkingTypingandSpeechUtterance_NoDataSampling
+    -
+        Name: Windows EventTranscript.db_ProductandServicePerformance
+        Query: |
+               SELECT
+               CASE
+
+               WHEN
+               events_persisted.sid = 'S-1-0' THEN
+               'S-1-0 (Null Authority)'
+               WHEN events_persisted.sid = 'S-1-0-0' THEN
+               'S-1-0-0 (Nobody)'
+               WHEN events_persisted.sid = 'S-1-1' THEN
+               'S-1-1 (World Authority)'
+               WHEN events_persisted.sid = 'S-1-1-0' THEN
+               'S-1-1-0 (Everyone)'
+               WHEN events_persisted.sid = 'S-1-16-0' THEN
+               'S-1-16-0 (Untrusted Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-12288' THEN
+               'S-1-16-12288 (High Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-16384' THEN
+               'S-1-16-16384 (System Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-20480' THEN
+               'S-1-16-20480 (Protected Process Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-28672' THEN
+               'S-1-16-28672 (Secure Process Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-4096' THEN
+               'S-1-16-4096 (Low Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-8192' THEN
+               'S-1-16-8192 (Medium Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-8448' THEN
+               'S-1-16-8448 (Medium Plus Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-2' THEN
+               'S-1-2 (Local Authority)'
+               WHEN events_persisted.sid = 'S-1-2-0' THEN
+               'S-1-2-0 (Local)'
+               WHEN events_persisted.sid = 'S-1-2-1' THEN
+               'S-1-2-1 (Console Logon)'
+               WHEN events_persisted.sid = 'S-1-3' THEN
+               'S-1-3 (Creator Authority)'
+               WHEN events_persisted.sid = 'S-1-3-0' THEN
+               'S-1-3-0 (Creator Owner)'
+               WHEN events_persisted.sid = 'S-1-3-1' THEN
+               'S-1-3-1 (Creator Group)'
+               WHEN events_persisted.sid = 'S-1-3-2' THEN
+               'S-1-3-2 (Creator Owner Server)'
+               WHEN events_persisted.sid = 'S-1-3-3' THEN
+               'S-1-3-3 (Creator Group Server)'
+               WHEN events_persisted.sid = 'S-1-3-4' THEN
+               'S-1-3-4 (Owner Rights)'
+               WHEN events_persisted.sid = 'S-1-4' THEN
+               'S-1-4 (Non-unique Authority)'
+               WHEN events_persisted.sid = 'S-1-5' THEN
+               'S-1-5 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-1' THEN
+               'S-1-5-1 (Dialup)'
+               WHEN events_persisted.sid = 'S-1-5-10' THEN
+               'S-1-5-10 (Principal Self)'
+               WHEN events_persisted.sid = 'S-1-5-11' THEN
+               'S-1-5-11 (Authenticated Users)'
+               WHEN events_persisted.sid = 'S-1-5-12' THEN
+               'S-1-5-12 (Restricted Code)'
+               WHEN events_persisted.sid = 'S-1-5-13' THEN
+               'S-1-5-13 (Terminal Server Users)'
+               WHEN events_persisted.sid = 'S-1-5-14' THEN
+               'S-1-5-14 (Remote Interactive Logon)'
+               WHEN events_persisted.sid = 'S-1-5-15' THEN
+               'S-1-5-15 (This Organization)'
+               WHEN events_persisted.sid = 'S-1-5-17' THEN
+               'S-1-5-17 (IUSR)'
+               WHEN events_persisted.sid = 'S-1-5-18' THEN
+               'S-1-5-18 (Local System)'
+               WHEN events_persisted.sid = 'S-1-5-19' THEN
+               'S-1-5-19 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-2' THEN
+               'S-1-5-2 (Network)'
+               WHEN events_persisted.sid = 'S-1-5-20' THEN
+               'S-1-5-20 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-498' THEN
+               'S-1-5-21domain-498 (Enterprise Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-521' THEN
+               'S-1-5-21domain-521 (Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-571' THEN
+               'S-1-5-21domain-571 (Allowed RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-572' THEN
+               'S-1-5-21domain-572 (Denied RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-500' THEN
+               'S-1-5-21domain-500 (Administrator)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-501' THEN
+               'S-1-5-21domain-501 (Guest)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-502' THEN
+               'S-1-5-21domain-502 (KRBTGT)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-512' THEN
+               'S-1-5-21domain-512 (Domain Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-513' THEN
+               'S-1-5-21domain-513 (Domain Users)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-514' THEN
+               'S-1-5-21domain-514 (Domain Guests)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-515' THEN
+               'S-1-5-21domain-515 (Domain Computers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-516' THEN
+               'S-1-5-21domain-516 (Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-517' THEN
+               'S-1-5-21domain-517 (Cert Publishers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-520' THEN
+               'S-1-5-21domain-520 (Group Policy Creator Owners)'
+               WHEN events_persisted.sid = 'S-1-5-21-domain-522' THEN
+               'S-1-5-21-domain-522 (Cloneable Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-526' THEN
+               'S-1-5-21domain-526 (Key Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-527' THEN
+               'S-1-5-21domain-527 (Enterprise Key Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-553' THEN
+               'S-1-5-21domain-553 (RAS and IAS Servers)'
+               WHEN events_persisted.sid = 'S-1-5-21root domain-518' THEN
+               'S-1-5-21root domain-518 (Schema Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21root domain-519' THEN
+               'S-1-5-21root domain-519 (Enterprise Admins)'
+               WHEN events_persisted.sid = 'S-1-5-3' THEN
+               'S-1-5-3 (Batch)'
+               WHEN events_persisted.sid = 'S-1-5-32-544' THEN
+               'S-1-5-32-544 (Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-32-545' THEN
+               'S-1-5-32-545 (Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-546' THEN
+               'S-1-5-32-546 (Guests)'
+               WHEN events_persisted.sid = 'S-1-5-32-547' THEN
+               'S-1-5-32-547 (Power Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-548' THEN
+               'S-1-5-32-548 (Account Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-549' THEN
+               'S-1-5-32-549 (Server Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-550' THEN
+               'S-1-5-32-550 (Print Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-551' THEN
+               'S-1-5-32-551 (Backup Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-552' THEN
+               'S-1-5-32-552 (Replicators)'
+               WHEN events_persisted.sid = 'S-1-5-32-554' THEN
+               'S-1-5-32-554 (Builtin\Pre-Windows 2000 Compatible Access)'
+               WHEN events_persisted.sid = 'S-1-5-32-555' THEN
+               'S-1-5-32-555 (Builtin\Remote Desktop Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-556' THEN
+               'S-1-5-32-556 (Builtin\Network Configuration Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-557' THEN
+               'S-1-5-32-557 (Builtin\Incoming Forest Trust Builders)'
+               WHEN events_persisted.sid = 'S-1-5-32-558' THEN
+               'S-1-5-32-558 (Builtin\Performance Monitor Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-559' THEN
+               'S-1-5-32-559 (Builtin\Performance Log Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-560' THEN
+               'S-1-5-32-560 (Builtin\Windows Authorization Access Group)'
+               WHEN events_persisted.sid = 'S-1-5-32-561' THEN
+               'S-1-5-32-561 (Builtin\Terminal Server License Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-562' THEN
+               'S-1-5-32-562 (Builtin\Distributed COM Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-569' THEN
+               'S-1-5-32-569 (Builtin\Cryptographic Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-573' THEN
+               'S-1-5-32-573 (Builtin\Event Log Readers)'
+               WHEN events_persisted.sid = 'S-1-5-32-574' THEN
+               'S-1-5-32-574 (Builtin\Certificate Service DCOM Access)'
+               WHEN events_persisted.sid = 'S-1-5-32-575' THEN
+               'S-1-5-32-575 (Builtin\RDS Remote Access Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-576' THEN
+               'S-1-5-32-576 (Builtin\RDS Endpoint Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-577' THEN
+               'S-1-5-32-577 (Builtin\RDS Management Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-578' THEN
+               'S-1-5-32-578 (Builtin\Hyper-V Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-32-579' THEN
+               'S-1-5-32-579 (Builtin\Access Control Assistance Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-580' THEN
+               'S-1-5-32-580 (Builtin\Remote Management Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-582' THEN
+               'S-1-5-32-582 (Storage Replica Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-4' THEN
+               'S-1-5-4 (Interactive)'
+               WHEN events_persisted.sid = 'S-1-5-5-X-Y' THEN
+               'S-1-5-5-X-Y (Logon Session)'
+               WHEN events_persisted.sid = 'S-1-5-6' THEN
+               'S-1-5-6 (Service)'
+               WHEN events_persisted.sid = 'S-1-5-64-10' THEN
+               'S-1-5-64-10 (NTLM Authentication)'
+               WHEN events_persisted.sid = 'S-1-5-64-14' THEN
+               'S-1-5-64-14 (SChannelAuthentication)'
+               WHEN events_persisted.sid = 'S-1-5-64-21' THEN
+               'S-1-5-64-21 (Digest Authentication)'
+               WHEN events_persisted.sid = 'S-1-5-7' THEN
+               'S-1-5-7 (Anonymous)'
+               WHEN events_persisted.sid = 'S-1-5-8' THEN
+               'S-1-5-8 (Proxy)'
+               WHEN events_persisted.sid = 'S-1-5-80' THEN
+               'S-1-5-80 (NT Service)'
+               WHEN events_persisted.sid = 'S-1-5-80-0' THEN
+               'S-1-5-80-0 (NT Services\All Services)'
+               WHEN events_persisted.sid = 'S-1-5-80-0' THEN
+               'S-1-5-80-0 (All Services)'
+               WHEN events_persisted.sid = 'S-1-5-83-0' THEN
+               'S-1-5-83-0 (NT Virtual Machine\Virtual Machines)'
+               WHEN events_persisted.sid = 'S-1-5-9' THEN
+               'S-1-5-9 (Enterprise Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-90-0' THEN
+               'S-1-5-90-0 (Windows Manager\Windows Manager Group)' ELSE events_persisted.sid
+               END AS UserSID,
+               datetime( ( events_persisted.timestamp / 10000000 ) - 11644473600, 'unixepoch' ) AS Timestamp,
+               tag_descriptions.locale_name AS LocaleName,
+               tag_descriptions.tag_name AS TagName,
+               events_persisted.full_event_name AS FullEventName,
+               events_persisted.logging_binary_name AS LoggingBinaryName,
+               events_persisted.friendly_logging_binary_name AS FriendlyLoggingBinaryName,
+               events_persisted.full_event_name_hash AS FullEventNameHash,
+               events_persisted.event_keywords AS Keywords,
+               provider_groups.group_guid AS GroupGUID,
+               CASE
+
+               WHEN events_persisted.is_core = 0 THEN
+               'No'
+               WHEN events_persisted.is_core = 1 THEN
+               'Yes' ELSE 'Unknown'
+               END AS IsCore,
+               events_persisted.compressed_payload_size AS CompressedPayloadSize,
+               events_persisted.payload AS JSONPayload
+               FROM
+               events_persisted
+               LEFT JOIN event_tags ON events_persisted.full_event_name_hash = event_tags.full_event_name_hash
+               LEFT JOIN tag_descriptions ON event_tags.tag_id = tag_descriptions.tag_id
+               LEFT JOIN provider_groups ON events_persisted.provider_group_id = provider_groups.group_id
+               WHERE
+               TagName = 'Product and Service Performance'
+               ORDER BY
+               events_persisted.timestamp ASC
+        BaseFileName: EventTranscriptDB_ProductandServicePerformance_NoDataSampling
+    -
+        Name: Windows EventTranscript.db Product and Service Usage
+        Query: |
+               SELECT
+               CASE
+
+               WHEN
+               events_persisted.sid = 'S-1-0' THEN
+               'S-1-0 (Null Authority)'
+               WHEN events_persisted.sid = 'S-1-0-0' THEN
+               'S-1-0-0 (Nobody)'
+               WHEN events_persisted.sid = 'S-1-1' THEN
+               'S-1-1 (World Authority)'
+               WHEN events_persisted.sid = 'S-1-1-0' THEN
+               'S-1-1-0 (Everyone)'
+               WHEN events_persisted.sid = 'S-1-16-0' THEN
+               'S-1-16-0 (Untrusted Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-12288' THEN
+               'S-1-16-12288 (High Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-16384' THEN
+               'S-1-16-16384 (System Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-20480' THEN
+               'S-1-16-20480 (Protected Process Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-28672' THEN
+               'S-1-16-28672 (Secure Process Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-4096' THEN
+               'S-1-16-4096 (Low Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-8192' THEN
+               'S-1-16-8192 (Medium Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-8448' THEN
+               'S-1-16-8448 (Medium Plus Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-2' THEN
+               'S-1-2 (Local Authority)'
+               WHEN events_persisted.sid = 'S-1-2-0' THEN
+               'S-1-2-0 (Local)'
+               WHEN events_persisted.sid = 'S-1-2-1' THEN
+               'S-1-2-1 (Console Logon)'
+               WHEN events_persisted.sid = 'S-1-3' THEN
+               'S-1-3 (Creator Authority)'
+               WHEN events_persisted.sid = 'S-1-3-0' THEN
+               'S-1-3-0 (Creator Owner)'
+               WHEN events_persisted.sid = 'S-1-3-1' THEN
+               'S-1-3-1 (Creator Group)'
+               WHEN events_persisted.sid = 'S-1-3-2' THEN
+               'S-1-3-2 (Creator Owner Server)'
+               WHEN events_persisted.sid = 'S-1-3-3' THEN
+               'S-1-3-3 (Creator Group Server)'
+               WHEN events_persisted.sid = 'S-1-3-4' THEN
+               'S-1-3-4 (Owner Rights)'
+               WHEN events_persisted.sid = 'S-1-4' THEN
+               'S-1-4 (Non-unique Authority)'
+               WHEN events_persisted.sid = 'S-1-5' THEN
+               'S-1-5 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-1' THEN
+               'S-1-5-1 (Dialup)'
+               WHEN events_persisted.sid = 'S-1-5-10' THEN
+               'S-1-5-10 (Principal Self)'
+               WHEN events_persisted.sid = 'S-1-5-11' THEN
+               'S-1-5-11 (Authenticated Users)'
+               WHEN events_persisted.sid = 'S-1-5-12' THEN
+               'S-1-5-12 (Restricted Code)'
+               WHEN events_persisted.sid = 'S-1-5-13' THEN
+               'S-1-5-13 (Terminal Server Users)'
+               WHEN events_persisted.sid = 'S-1-5-14' THEN
+               'S-1-5-14 (Remote Interactive Logon)'
+               WHEN events_persisted.sid = 'S-1-5-15' THEN
+               'S-1-5-15 (This Organization)'
+               WHEN events_persisted.sid = 'S-1-5-17' THEN
+               'S-1-5-17 (IUSR)'
+               WHEN events_persisted.sid = 'S-1-5-18' THEN
+               'S-1-5-18 (Local System)'
+               WHEN events_persisted.sid = 'S-1-5-19' THEN
+               'S-1-5-19 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-2' THEN
+               'S-1-5-2 (Network)'
+               WHEN events_persisted.sid = 'S-1-5-20' THEN
+               'S-1-5-20 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-498' THEN
+               'S-1-5-21domain-498 (Enterprise Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-521' THEN
+               'S-1-5-21domain-521 (Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-571' THEN
+               'S-1-5-21domain-571 (Allowed RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-572' THEN
+               'S-1-5-21domain-572 (Denied RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-500' THEN
+               'S-1-5-21domain-500 (Administrator)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-501' THEN
+               'S-1-5-21domain-501 (Guest)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-502' THEN
+               'S-1-5-21domain-502 (KRBTGT)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-512' THEN
+               'S-1-5-21domain-512 (Domain Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-513' THEN
+               'S-1-5-21domain-513 (Domain Users)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-514' THEN
+               'S-1-5-21domain-514 (Domain Guests)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-515' THEN
+               'S-1-5-21domain-515 (Domain Computers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-516' THEN
+               'S-1-5-21domain-516 (Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-517' THEN
+               'S-1-5-21domain-517 (Cert Publishers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-520' THEN
+               'S-1-5-21domain-520 (Group Policy Creator Owners)'
+               WHEN events_persisted.sid = 'S-1-5-21-domain-522' THEN
+               'S-1-5-21-domain-522 (Cloneable Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-526' THEN
+               'S-1-5-21domain-526 (Key Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-527' THEN
+               'S-1-5-21domain-527 (Enterprise Key Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-553' THEN
+               'S-1-5-21domain-553 (RAS and IAS Servers)'
+               WHEN events_persisted.sid = 'S-1-5-21root domain-518' THEN
+               'S-1-5-21root domain-518 (Schema Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21root domain-519' THEN
+               'S-1-5-21root domain-519 (Enterprise Admins)'
+               WHEN events_persisted.sid = 'S-1-5-3' THEN
+               'S-1-5-3 (Batch)'
+               WHEN events_persisted.sid = 'S-1-5-32-544' THEN
+               'S-1-5-32-544 (Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-32-545' THEN
+               'S-1-5-32-545 (Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-546' THEN
+               'S-1-5-32-546 (Guests)'
+               WHEN events_persisted.sid = 'S-1-5-32-547' THEN
+               'S-1-5-32-547 (Power Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-548' THEN
+               'S-1-5-32-548 (Account Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-549' THEN
+               'S-1-5-32-549 (Server Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-550' THEN
+               'S-1-5-32-550 (Print Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-551' THEN
+               'S-1-5-32-551 (Backup Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-552' THEN
+               'S-1-5-32-552 (Replicators)'
+               WHEN events_persisted.sid = 'S-1-5-32-554' THEN
+               'S-1-5-32-554 (Builtin\Pre-Windows 2000 Compatible Access)'
+               WHEN events_persisted.sid = 'S-1-5-32-555' THEN
+               'S-1-5-32-555 (Builtin\Remote Desktop Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-556' THEN
+               'S-1-5-32-556 (Builtin\Network Configuration Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-557' THEN
+               'S-1-5-32-557 (Builtin\Incoming Forest Trust Builders)'
+               WHEN events_persisted.sid = 'S-1-5-32-558' THEN
+               'S-1-5-32-558 (Builtin\Performance Monitor Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-559' THEN
+               'S-1-5-32-559 (Builtin\Performance Log Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-560' THEN
+               'S-1-5-32-560 (Builtin\Windows Authorization Access Group)'
+               WHEN events_persisted.sid = 'S-1-5-32-561' THEN
+               'S-1-5-32-561 (Builtin\Terminal Server License Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-562' THEN
+               'S-1-5-32-562 (Builtin\Distributed COM Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-569' THEN
+               'S-1-5-32-569 (Builtin\Cryptographic Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-573' THEN
+               'S-1-5-32-573 (Builtin\Event Log Readers)'
+               WHEN events_persisted.sid = 'S-1-5-32-574' THEN
+               'S-1-5-32-574 (Builtin\Certificate Service DCOM Access)'
+               WHEN events_persisted.sid = 'S-1-5-32-575' THEN
+               'S-1-5-32-575 (Builtin\RDS Remote Access Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-576' THEN
+               'S-1-5-32-576 (Builtin\RDS Endpoint Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-577' THEN
+               'S-1-5-32-577 (Builtin\RDS Management Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-578' THEN
+               'S-1-5-32-578 (Builtin\Hyper-V Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-32-579' THEN
+               'S-1-5-32-579 (Builtin\Access Control Assistance Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-580' THEN
+               'S-1-5-32-580 (Builtin\Remote Management Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-582' THEN
+               'S-1-5-32-582 (Storage Replica Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-4' THEN
+               'S-1-5-4 (Interactive)'
+               WHEN events_persisted.sid = 'S-1-5-5-X-Y' THEN
+               'S-1-5-5-X-Y (Logon Session)'
+               WHEN events_persisted.sid = 'S-1-5-6' THEN
+               'S-1-5-6 (Service)'
+               WHEN events_persisted.sid = 'S-1-5-64-10' THEN
+               'S-1-5-64-10 (NTLM Authentication)'
+               WHEN events_persisted.sid = 'S-1-5-64-14' THEN
+               'S-1-5-64-14 (SChannelAuthentication)'
+               WHEN events_persisted.sid = 'S-1-5-64-21' THEN
+               'S-1-5-64-21 (Digest Authentication)'
+               WHEN events_persisted.sid = 'S-1-5-7' THEN
+               'S-1-5-7 (Anonymous)'
+               WHEN events_persisted.sid = 'S-1-5-8' THEN
+               'S-1-5-8 (Proxy)'
+               WHEN events_persisted.sid = 'S-1-5-80' THEN
+               'S-1-5-80 (NT Service)'
+               WHEN events_persisted.sid = 'S-1-5-80-0' THEN
+               'S-1-5-80-0 (NT Services\All Services)'
+               WHEN events_persisted.sid = 'S-1-5-80-0' THEN
+               'S-1-5-80-0 (All Services)'
+               WHEN events_persisted.sid = 'S-1-5-83-0' THEN
+               'S-1-5-83-0 (NT Virtual Machine\Virtual Machines)'
+               WHEN events_persisted.sid = 'S-1-5-9' THEN
+               'S-1-5-9 (Enterprise Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-90-0' THEN
+               'S-1-5-90-0 (Windows Manager\Windows Manager Group)' ELSE events_persisted.sid
+               END AS UserSID,
+               datetime( ( events_persisted.timestamp / 10000000 ) - 11644473600, 'unixepoch' ) AS Timestamp,
+               tag_descriptions.locale_name AS LocaleName,
+               tag_descriptions.tag_name AS TagName,
+               events_persisted.full_event_name AS FullEventName,
+               events_persisted.logging_binary_name AS LoggingBinaryName,
+               events_persisted.friendly_logging_binary_name AS FriendlyLoggingBinaryName,
+               events_persisted.full_event_name_hash AS FullEventNameHash,
+               events_persisted.event_keywords AS Keywords,
+               provider_groups.group_guid AS GroupGUID,
+               CASE
+
+               WHEN events_persisted.is_core = 0 THEN
+               'No'
+               WHEN events_persisted.is_core = 1 THEN
+               'Yes' ELSE 'Unknown'
+               END AS IsCore,
+               events_persisted.compressed_payload_size AS CompressedPayloadSize,
+               events_persisted.payload AS JSONPayload
+               FROM
+               events_persisted
+               LEFT JOIN event_tags ON events_persisted.full_event_name_hash = event_tags.full_event_name_hash
+               LEFT JOIN tag_descriptions ON event_tags.tag_id = tag_descriptions.tag_id
+               LEFT JOIN provider_groups ON events_persisted.provider_group_id = provider_groups.group_id
+               WHERE
+               TagName = 'Product and Service Usage'
+               ORDER BY
+               events_persisted.timestamp ASC
+        BaseFileName: EventTranscriptDB_ProductandServiceUsage_NoDataSampling
+    -
+        Name: Windows EventTranscript.db Software Setup and Inventory
+        Query: |
+               SELECT
+               CASE
+
+               WHEN
+               events_persisted.sid = 'S-1-0' THEN
+               'S-1-0 (Null Authority)'
+               WHEN events_persisted.sid = 'S-1-0-0' THEN
+               'S-1-0-0 (Nobody)'
+               WHEN events_persisted.sid = 'S-1-1' THEN
+               'S-1-1 (World Authority)'
+               WHEN events_persisted.sid = 'S-1-1-0' THEN
+               'S-1-1-0 (Everyone)'
+               WHEN events_persisted.sid = 'S-1-16-0' THEN
+               'S-1-16-0 (Untrusted Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-12288' THEN
+               'S-1-16-12288 (High Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-16384' THEN
+               'S-1-16-16384 (System Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-20480' THEN
+               'S-1-16-20480 (Protected Process Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-28672' THEN
+               'S-1-16-28672 (Secure Process Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-4096' THEN
+               'S-1-16-4096 (Low Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-8192' THEN
+               'S-1-16-8192 (Medium Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-16-8448' THEN
+               'S-1-16-8448 (Medium Plus Mandatory Level)'
+               WHEN events_persisted.sid = 'S-1-2' THEN
+               'S-1-2 (Local Authority)'
+               WHEN events_persisted.sid = 'S-1-2-0' THEN
+               'S-1-2-0 (Local)'
+               WHEN events_persisted.sid = 'S-1-2-1' THEN
+               'S-1-2-1 (Console Logon)'
+               WHEN events_persisted.sid = 'S-1-3' THEN
+               'S-1-3 (Creator Authority)'
+               WHEN events_persisted.sid = 'S-1-3-0' THEN
+               'S-1-3-0 (Creator Owner)'
+               WHEN events_persisted.sid = 'S-1-3-1' THEN
+               'S-1-3-1 (Creator Group)'
+               WHEN events_persisted.sid = 'S-1-3-2' THEN
+               'S-1-3-2 (Creator Owner Server)'
+               WHEN events_persisted.sid = 'S-1-3-3' THEN
+               'S-1-3-3 (Creator Group Server)'
+               WHEN events_persisted.sid = 'S-1-3-4' THEN
+               'S-1-3-4 (Owner Rights)'
+               WHEN events_persisted.sid = 'S-1-4' THEN
+               'S-1-4 (Non-unique Authority)'
+               WHEN events_persisted.sid = 'S-1-5' THEN
+               'S-1-5 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-1' THEN
+               'S-1-5-1 (Dialup)'
+               WHEN events_persisted.sid = 'S-1-5-10' THEN
+               'S-1-5-10 (Principal Self)'
+               WHEN events_persisted.sid = 'S-1-5-11' THEN
+               'S-1-5-11 (Authenticated Users)'
+               WHEN events_persisted.sid = 'S-1-5-12' THEN
+               'S-1-5-12 (Restricted Code)'
+               WHEN events_persisted.sid = 'S-1-5-13' THEN
+               'S-1-5-13 (Terminal Server Users)'
+               WHEN events_persisted.sid = 'S-1-5-14' THEN
+               'S-1-5-14 (Remote Interactive Logon)'
+               WHEN events_persisted.sid = 'S-1-5-15' THEN
+               'S-1-5-15 (This Organization)'
+               WHEN events_persisted.sid = 'S-1-5-17' THEN
+               'S-1-5-17 (IUSR)'
+               WHEN events_persisted.sid = 'S-1-5-18' THEN
+               'S-1-5-18 (Local System)'
+               WHEN events_persisted.sid = 'S-1-5-19' THEN
+               'S-1-5-19 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-2' THEN
+               'S-1-5-2 (Network)'
+               WHEN events_persisted.sid = 'S-1-5-20' THEN
+               'S-1-5-20 (NT Authority)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-498' THEN
+               'S-1-5-21domain-498 (Enterprise Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-521' THEN
+               'S-1-5-21domain-521 (Read-only Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-571' THEN
+               'S-1-5-21domain-571 (Allowed RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-572' THEN
+               'S-1-5-21domain-572 (Denied RODC Password Replication Group)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-500' THEN
+               'S-1-5-21domain-500 (Administrator)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-501' THEN
+               'S-1-5-21domain-501 (Guest)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-502' THEN
+               'S-1-5-21domain-502 (KRBTGT)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-512' THEN
+               'S-1-5-21domain-512 (Domain Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-513' THEN
+               'S-1-5-21domain-513 (Domain Users)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-514' THEN
+               'S-1-5-21domain-514 (Domain Guests)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-515' THEN
+               'S-1-5-21domain-515 (Domain Computers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-516' THEN
+               'S-1-5-21domain-516 (Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-517' THEN
+               'S-1-5-21domain-517 (Cert Publishers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-520' THEN
+               'S-1-5-21domain-520 (Group Policy Creator Owners)'
+               WHEN events_persisted.sid = 'S-1-5-21-domain-522' THEN
+               'S-1-5-21-domain-522 (Cloneable Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-526' THEN
+               'S-1-5-21domain-526 (Key Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-527' THEN
+               'S-1-5-21domain-527 (Enterprise Key Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21domain-553' THEN
+               'S-1-5-21domain-553 (RAS and IAS Servers)'
+               WHEN events_persisted.sid = 'S-1-5-21root domain-518' THEN
+               'S-1-5-21root domain-518 (Schema Admins)'
+               WHEN events_persisted.sid = 'S-1-5-21root domain-519' THEN
+               'S-1-5-21root domain-519 (Enterprise Admins)'
+               WHEN events_persisted.sid = 'S-1-5-3' THEN
+               'S-1-5-3 (Batch)'
+               WHEN events_persisted.sid = 'S-1-5-32-544' THEN
+               'S-1-5-32-544 (Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-32-545' THEN
+               'S-1-5-32-545 (Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-546' THEN
+               'S-1-5-32-546 (Guests)'
+               WHEN events_persisted.sid = 'S-1-5-32-547' THEN
+               'S-1-5-32-547 (Power Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-548' THEN
+               'S-1-5-32-548 (Account Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-549' THEN
+               'S-1-5-32-549 (Server Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-550' THEN
+               'S-1-5-32-550 (Print Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-551' THEN
+               'S-1-5-32-551 (Backup Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-552' THEN
+               'S-1-5-32-552 (Replicators)'
+               WHEN events_persisted.sid = 'S-1-5-32-554' THEN
+               'S-1-5-32-554 (Builtin\Pre-Windows 2000 Compatible Access)'
+               WHEN events_persisted.sid = 'S-1-5-32-555' THEN
+               'S-1-5-32-555 (Builtin\Remote Desktop Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-556' THEN
+               'S-1-5-32-556 (Builtin\Network Configuration Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-557' THEN
+               'S-1-5-32-557 (Builtin\Incoming Forest Trust Builders)'
+               WHEN events_persisted.sid = 'S-1-5-32-558' THEN
+               'S-1-5-32-558 (Builtin\Performance Monitor Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-559' THEN
+               'S-1-5-32-559 (Builtin\Performance Log Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-560' THEN
+               'S-1-5-32-560 (Builtin\Windows Authorization Access Group)'
+               WHEN events_persisted.sid = 'S-1-5-32-561' THEN
+               'S-1-5-32-561 (Builtin\Terminal Server License Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-562' THEN
+               'S-1-5-32-562 (Builtin\Distributed COM Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-569' THEN
+               'S-1-5-32-569 (Builtin\Cryptographic Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-573' THEN
+               'S-1-5-32-573 (Builtin\Event Log Readers)'
+               WHEN events_persisted.sid = 'S-1-5-32-574' THEN
+               'S-1-5-32-574 (Builtin\Certificate Service DCOM Access)'
+               WHEN events_persisted.sid = 'S-1-5-32-575' THEN
+               'S-1-5-32-575 (Builtin\RDS Remote Access Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-576' THEN
+               'S-1-5-32-576 (Builtin\RDS Endpoint Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-577' THEN
+               'S-1-5-32-577 (Builtin\RDS Management Servers)'
+               WHEN events_persisted.sid = 'S-1-5-32-578' THEN
+               'S-1-5-32-578 (Builtin\Hyper-V Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-32-579' THEN
+               'S-1-5-32-579 (Builtin\Access Control Assistance Operators)'
+               WHEN events_persisted.sid = 'S-1-5-32-580' THEN
+               'S-1-5-32-580 (Builtin\Remote Management Users)'
+               WHEN events_persisted.sid = 'S-1-5-32-582' THEN
+               'S-1-5-32-582 (Storage Replica Administrators)'
+               WHEN events_persisted.sid = 'S-1-5-4' THEN
+               'S-1-5-4 (Interactive)'
+               WHEN events_persisted.sid = 'S-1-5-5-X-Y' THEN
+               'S-1-5-5-X-Y (Logon Session)'
+               WHEN events_persisted.sid = 'S-1-5-6' THEN
+               'S-1-5-6 (Service)'
+               WHEN events_persisted.sid = 'S-1-5-64-10' THEN
+               'S-1-5-64-10 (NTLM Authentication)'
+               WHEN events_persisted.sid = 'S-1-5-64-14' THEN
+               'S-1-5-64-14 (SChannelAuthentication)'
+               WHEN events_persisted.sid = 'S-1-5-64-21' THEN
+               'S-1-5-64-21 (Digest Authentication)'
+               WHEN events_persisted.sid = 'S-1-5-7' THEN
+               'S-1-5-7 (Anonymous)'
+               WHEN events_persisted.sid = 'S-1-5-8' THEN
+               'S-1-5-8 (Proxy)'
+               WHEN events_persisted.sid = 'S-1-5-80' THEN
+               'S-1-5-80 (NT Service)'
+               WHEN events_persisted.sid = 'S-1-5-80-0' THEN
+               'S-1-5-80-0 (NT Services\All Services)'
+               WHEN events_persisted.sid = 'S-1-5-80-0' THEN
+               'S-1-5-80-0 (All Services)'
+               WHEN events_persisted.sid = 'S-1-5-83-0' THEN
+               'S-1-5-83-0 (NT Virtual Machine\Virtual Machines)'
+               WHEN events_persisted.sid = 'S-1-5-9' THEN
+               'S-1-5-9 (Enterprise Domain Controllers)'
+               WHEN events_persisted.sid = 'S-1-5-90-0' THEN
+               'S-1-5-90-0 (Windows Manager\Windows Manager Group)' ELSE events_persisted.sid
+               END AS UserSID,
+               datetime( ( events_persisted.timestamp / 10000000 ) - 11644473600, 'unixepoch' ) AS Timestamp,
+               tag_descriptions.locale_name AS LocaleName,
+               tag_descriptions.tag_name AS TagName,
+               events_persisted.full_event_name AS FullEventName,
+               events_persisted.logging_binary_name AS LoggingBinaryName,
+               events_persisted.friendly_logging_binary_name AS FriendlyLoggingBinaryName,
+               events_persisted.full_event_name_hash AS FullEventNameHash,
+               events_persisted.event_keywords AS Keywords,
+               provider_groups.group_guid AS GroupGUID,
+               CASE
+
+               WHEN events_persisted.is_core = 0 THEN
+               'No'
+               WHEN events_persisted.is_core = 1 THEN
+               'Yes' ELSE 'Unknown'
+               END AS IsCore,
+               events_persisted.compressed_payload_size AS CompressedPayloadSize,
+               events_persisted.payload AS JSONPayload
+               FROM
+               events_persisted
+               LEFT JOIN event_tags ON events_persisted.full_event_name_hash = event_tags.full_event_name_hash
+               LEFT JOIN tag_descriptions ON event_tags.tag_id = tag_descriptions.tag_id
+               LEFT JOIN provider_groups ON events_persisted.provider_group_id = provider_groups.group_id
+               WHERE
+               TagName = 'Software Setup and Inventory'
+               ORDER BY
+               events_persisted.timestamp ASC
+        BaseFileName: EventTranscriptDB_SoftwareSetupandInventory_NoDataSampling
+
+# Documentation
+# https://www.kroll.com/en/insights/publications/cyber/forensically-unpacking-eventtranscript
+# https://github.com/rathbuna/EventTranscript.db-Research
