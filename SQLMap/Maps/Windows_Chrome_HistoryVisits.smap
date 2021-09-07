@@ -13,8 +13,8 @@ Queries:
         Query: |
                 SELECT
                 urls.id AS ID,
-                datetime( visits.visit_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS VisitTime,
-                datetime( urls.last_visit_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS LastVisitedTime,
+                datetime( visits.visit_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS 'VisitTime (Local)',
+                datetime( urls.last_visit_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS 'LastVisitedTime (Local)',
                 urls.title AS URLTitle,
                 urls.url AS URL,
                 urls.visit_count AS VisitCount,
@@ -43,3 +43,4 @@ Queries:
 # https://forensicswiki.xyz/page/Google_Chrome
 # https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
 # Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape
+# Please note, timestamps will be in LOCAL time, not UTC
