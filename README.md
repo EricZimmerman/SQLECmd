@@ -4,7 +4,7 @@ This repo that contains all the Maps used by Eric Zimmerman's SQLECmd.
 
 ## Ongoing Projects
 
- * [SQLECmdMapIdeas](https://github.com/EricZimmerman/SQLECmd/projects/1) - Development roadmap for SQLECmd Maps. Please feel free to contribute by adding ideas or by finishing tasks in the `To Do` column. Any help is appreciated! 
+ * [SQLECmd Map Ideas](https://github.com/EricZimmerman/SQLECmd/projects/1) - Development roadmap for SQLECmd Maps. Please feel free to contribute by adding ideas or by finishing tasks in the `To Do` column. Any help is appreciated! 
 
 ## Command Line Interface
 
