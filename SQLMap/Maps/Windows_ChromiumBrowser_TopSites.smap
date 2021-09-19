@@ -1,15 +1,15 @@
-Description: Google Chrome Top Sites
+Description: Chromium Browser Top Sites
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: 3b2fc9c8-23ea-4694-82a2-266aa819db3b
 Version: 1.0
-CSVPrefix: GoogleChrome
+CSVPrefix: ChromiumBrowser
 FileName: Top Sites
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='meta' OR name='top_sites');
 IdentifyValue: 2
 Queries:
     -
-        Name: Chrome Autofill Entries
+        Name: Chromium Browser Top Sites
         Query: |
                 SELECT
                 top_sites.url_rank AS URLRank,
@@ -31,3 +31,4 @@ Queries:
 # https://forensicswiki.xyz/page/Google_Chrome
 # https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
 # Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape
+# This Map technically parses any Chromium-based Browser so the name has been changed from Chrome to Chromium as of September 2021

@@ -1,15 +1,15 @@
-Description: Google Chrome Cookies
+Description: Chromium Browser Cookies
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: e1849119-3265-4880-a45e-a6029757625d
 Version: 1.0
-CSVPrefix: GoogleChrome
+CSVPrefix: ChromiumBrowser
 FileName: Cookies
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='cookies' OR name='meta');
 IdentifyValue: 2
 Queries:
     -
-        Name: Chrome Cookies
+        Name: Chromium Browser Cookies
         Query: |
                 SELECT
                 datetime ( cookies.creation_utc / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS CreationUTC,
@@ -63,3 +63,4 @@ Queries:
 # https://forensicswiki.xyz/page/Google_Chrome
 # https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
 # Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape
+# This Map technically parses any Chromium-based Browser so the name has been changed from Chrome to Chromium as of September 2021
