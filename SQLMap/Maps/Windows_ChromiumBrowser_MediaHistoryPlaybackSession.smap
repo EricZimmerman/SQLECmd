@@ -1,15 +1,15 @@
-Description: Google Chrome Media History Playback Session
+Description: Chromium Browser Media History Playback Session
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: 22fd15b3-3028-4b95-b706-829eca7d1bc4
 Version: 1.0
-CSVPrefix: GoogleChrome
+CSVPrefix: ChromiumBrowser
 FileName: Media History
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='origin' OR name='playback' OR name='playbackSession');
 IdentifyValue: 3
 Queries:
     -
-        Name: Chrome Media History Playback Session
+        Name: Chromium Browser Media History Playback Session
         Query: |
                 SELECT
                 	playbackSession.id AS ID,
@@ -38,3 +38,4 @@ Queries:
 # https://forensicswiki.xyz/page/Google_Chrome
 # https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
 # Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape
+# This Map technically parses any Chromium-based Browser so the name has been changed from Chrome to Chromium as of September 2021

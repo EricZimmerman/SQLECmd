@@ -1,15 +1,15 @@
-Description: Google Chrome Network Action Predictor
+Description: Chromium Browser Network Action Predictor
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: ecca7ec3-3c7d-4c79-a394-091e7d7f4f97
 Version: 1.0
-CSVPrefix: GoogleChrome
+CSVPrefix: ChromiumBrowser
 FileName: Network Action Predictor
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='resource_prefetch_predictor_host_redirect' OR name='network_action_predictor' OR name='resource_prefetch_predictor_metadata');
 IdentifyValue: 3
 Queries:
     -
-        Name: Chrome Network Action Predictor
+        Name: Chromium Browser Network Action Predictor
         Query: |
                 SELECT
                 network_action_predictor.id AS ID,
@@ -34,3 +34,4 @@ Queries:
 # https://forensicswiki.xyz/page/Google_Chrome
 # https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
 # Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape
+# This Map technically parses any Chromium-based Browser so the name has been changed from Chrome to Chromium as of September 2021

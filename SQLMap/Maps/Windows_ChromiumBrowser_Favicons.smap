@@ -1,15 +1,15 @@
-Description: Google Chrome Favicons
+Description: Chromium Browser Favicons
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: d13f7b03-3fa3-497b-a3b7-3b7936b46ad4
 Version: 1.0
-CSVPrefix: GoogleChrome
+CSVPrefix: ChromiumBrowser
 FileName: Favicons
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='icon_mapping' OR name='favicons' OR name='favicon_bitmaps');
 IdentifyValue: 3
 Queries:
     -
-        Name: Chrome Favicons
+        Name: Chromium Browser Favicons
         Query: |
                 SELECT
                 favicons.id AS ID,
@@ -37,3 +37,4 @@ Queries:
 # https://forensicswiki.xyz/page/Google_Chrome
 # https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
 # Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape
+# This Map technically parses any Chromium-based Browser so the name has been changed from Chrome to Chromium as of September 2021

@@ -1,15 +1,15 @@
-Description: Google Chrome Downloads
+Description: Chromium Browser Downloads
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: 0b575bcf-ade3-44e5-8162-eb52a96c2b06
 Version: 1.0
-CSVPrefix: GoogleChrome
+CSVPrefix: ChromiumBrowser
 FileName: History
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='urls' OR name='visits' OR name='downloads' OR name='segments' OR name='typed_url_sync_metadata');
 IdentifyValue: 5
 Queries:
     -
-        Name: Chrome Downloads
+        Name: Chromium Browser Downloads
         Query: |
                 SELECT
                 downloads.id AS ID,
@@ -139,3 +139,4 @@ Queries:
 # https://forensicswiki.xyz/page/Google_Chrome
 # https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
 # Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape
+# This Map technically parses any Chromium-based Browser so the name has been changed from Chrome to Chromium as of September 2021

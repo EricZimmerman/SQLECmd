@@ -1,15 +1,15 @@
-Description: Google Chrome Autofill Entries
+Description: Chromium Browser Autofill Entries
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: 7cf6de25-2953-46aa-b555-7a5c7bf35b07
 Version: 1.0
-CSVPrefix: GoogleChrome
+CSVPrefix: ChromiumBrowser
 FileName: Web Data
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='autofill' OR name='credit_cards' OR name='offer_data' OR name='server_addresses' OR name='keywords');
 IdentifyValue: 5
 Queries:
     -
-        Name: Chrome Autofill Entries
+        Name: Chromium Browser Autofill Entries
         Query: |
                 SELECT
                 autofill.name AS Name,
@@ -33,3 +33,4 @@ Queries:
 # https://forensicswiki.xyz/page/Google_Chrome
 # https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
 # Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape
+# This Map technically parses any Chromium-based Browser so the name has been changed from Chrome to Chromium as of September 2021
