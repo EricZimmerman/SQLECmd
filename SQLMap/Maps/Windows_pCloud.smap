@@ -12,7 +12,7 @@ Queries:
         Name: pCloud Settings
         Query: |
                SELECT
-               setting.id, 
+               setting.id,
                setting.value
                FROM
                setting
