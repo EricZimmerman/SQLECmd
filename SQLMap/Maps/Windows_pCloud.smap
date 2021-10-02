@@ -5,7 +5,7 @@ Id: 4a5e2e51-8951-445f-8988-8742e1681604
 Version: 1.0
 CSVPrefix: pCloud
 FileName: data.db
-IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='task’ OR name='syncfolderdelayed’ OR name='syncfolder’ OR name='syncedfolder’ OR name='sqlite_stat1’ OR name='sqlite_sequence’ OR name='sharerequest’ OR name='sharedfolder’ OR name='setting’ OR name='resolver’ OR name='pagecachetask’ OR name='pagecache’ OR name='myteams’ OR name='localfolder’ OR name='localfileupload’ OR name='localfile’ OR name='links’ OR name='hashchecksum’ OR name='fsxattr’ OR name='fstaskupload’ OR name='fstaskfileid’ OR name='fstaskdepend’ OR name='fstask’ OR name='folder’ OR name='filerevision’ OR name='file’ OR name='devices’ OR name='cryptofolderkey’ OR name='cryptofilekey’ OR name='contacts’ OR name='bsharedfolder’ OR name='baccountteam’ OR baccountemail');
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='task' OR name='syncfolderdelayed' OR name='syncfolder' OR name='syncedfolder' OR name='sqlite_stat1' OR name='sqlite_sequence' OR name='sharerequest' OR name='sharedfolder' OR name='setting' OR name='resolver' OR name='pagecachetask' OR name='pagecache' OR name='myteams' OR name='localfolder' OR name='localfileupload' OR name='localfile' OR name='links' OR name='hashchecksum' OR name='fsxattr' OR name='fstaskupload' OR name='fstaskfileid' OR name='fstaskdepend' OR name='fstask' OR name='folder' OR name='filerevision' OR name='file' OR name='devices' OR name='cryptofolderkey' OR name='cryptofilekey' OR name='contacts' OR name='bsharedfolder' OR name='baccountteam' OR baccountemail');
 IdentifyValue: 15
 Queries:
     -
