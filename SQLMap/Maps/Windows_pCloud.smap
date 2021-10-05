@@ -1,0 +1,57 @@
+Description: pCloud
+Author: Clifton Martin and Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 4a5e2e51-8951-445f-8988-8742e1681604
+Version: 1.0
+CSVPrefix: pCloud
+FileName: data.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='task' OR name='syncfolderdelayed' OR name='syncfolder' OR name='syncedfolder' OR name='sqlite_stat1' OR name='sqlite_sequence' OR name='sharerequest' OR name='sharedfolder' OR name='setting' OR name='resolver' OR name='pagecachetask' OR name='pagecache' OR name='myteams' OR name='localfolder' OR name='localfileupload' OR name='localfile' OR name='links' OR name='hashchecksum' OR name='fsxattr' OR name='fstaskupload' OR name='fstaskfileid' OR name='fstaskdepend' OR name='fstask' OR name='folder' OR name='filerevision' OR name='file' OR name='devices' OR name='cryptofolderkey' OR name='cryptofilekey' OR name='contacts' OR name='bsharedfolder' OR name='baccountteam' OR NAME='baccountemail');
+IdentifyValue: 33
+Queries:
+    -
+        Name: pCloud Settings
+        Query: |
+               SELECT
+               setting.id,
+               setting.value
+               FROM
+               setting
+        BaseFileName: Settings
+    -
+        Name: pCloud
+        Query: |
+               WITH RECURSIVE folder_lookup ( folder_id, parent_folder_id, full_path ) AS (
+               VALUES
+               ( '0', '', '' ) UNION
+               SELECT
+               id,
+               folder.parentfolderid,
+               full_path || '\' || name
+               FROM
+               folder,
+               folder_lookup
+               WHERE
+               folder_lookup.folder_id = folder.parentfolderid
+               ) SELECT
+               folder_id AS FolderID,
+               parent_folder_id AS ParentFolderID,
+               file.id AS FileId,
+               full_path || '\' || file.name AS FilePath,
+               file.size AS FileSizeBytes,
+               ( file.size / 1048576.0 ) AS FileSizeMB,
+               icon AS FileType,
+               file.ctime AS FileCTime,
+               datetime( file.ctime, 'unixepoch', 'utc' ) AS FileCTimeConvertedUTC,
+               file.mtime AS FileMtime,
+               datetime( file.mtime, 'unixepoch', 'utc' ) AS FileMTimeConvertedUTC
+               FROM
+               folder_lookup,
+               file
+               WHERE
+               file.parentfolderid = folder_id
+        BaseFileName: SyncedItems
+
+# Documentation
+# https://cyberforensicator.com/2018/05/05/cloud-forensics-pcloud-drive/
+# https://www.sciencedirect.com/science/article/pii/B9780128053034000137
+# Use SQLECmd in conjunction with the pCloudDatabase KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Apps/pCloudDatabase.tkape
