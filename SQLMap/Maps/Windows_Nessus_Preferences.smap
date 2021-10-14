@@ -1,0 +1,71 @@
+Description: Nessus Preferences Database
+Author: Andrew Rathbun
+Email: andrew.rathbun@kroll.com
+Id: 6f9a2fe7-6052-414e-bda0-448b95e8d5ac
+Version: 1.0
+CSVPrefix: Nessus
+FileName: nessusd.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='PREFERENCES');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Nessus Preferences Database
+        Query: |
+                SELECT
+                PREFERENCES.name AS Name,
+                PREFERENCES.value AS Value
+                FROM
+                PREFERENCES
+        BaseFileName: Preferences
+
+# Documentation
+# Will contain the following fields and corresponding values:
+# qdb_mem_usage - low
+# report_crashes - yes
+# stop_scan_on_disconnect - no
+# reduce_connections_on_congestion - no
+# global.max_simult_tcp_sessions - 50
+# global.max_web_users - 1024
+# global.max_scans - 0
+# nasl_log_type - normal
+# nasl_no_signature_check - no
+# ssl_mode - tls_1_2
+# xmlrpc_idle_session_timeout - 30
+# xmlrpc_listen_port - 8834
+# listen_address - 0.0.0.0
+# slice_network_addresses - no
+# plugin_upload - yes
+# silent_dependencies - yes
+# auto_enable_dependencies - yes
+# safe_checks - yes
+# plugins_timeout - 320
+# non_simult_ports - 139, 445, 3389
+# checks_read_timeout - 5
+# allow_post_scan_editing - yes
+# optimize_test - yes
+# port_range - default
+# cgi_path - /cgi-bin:/scripts
+# rules - C:\ProgramData\Tenable\Nessus\conf\nessusd.rules
+# dumpfile - C:\ProgramData\Tenable\Nessus\nessus\logs\nessusd.dumpa
+# log_whole_attack - no
+# www_logfile - C:\ProgramData\Tenable\Nessus\nessus\logs\www_server.log
+# logfile - C:\ProgramData\Tenable\Nessus\nessus\logs\nessusd.messages
+# max_checks - 5
+# global.max_hosts - 1234
+# max_hosts - 5
+# listen_port - 1234
+# report_cleanup_threshold_days - 30
+# scan_vulnerability_groups - yes
+# track_unique_agents - yes
+# scan_history_expiration_days - 0
+# scan_vulnerability_groups_mixed - yes
+# bw_permanent_blackout_window - no
+# bw_prevent_core_updates - yes
+# bw_prevent_plugin_updates - yes
+# bw_prevent_agent_scans - yes
+# disable_api - no
+# severity_basis - cvss_v3
+# auto_update - yes
+# auto_update_ui - yes
+# auto_update_delay - 720
+# disable_guides - yes
