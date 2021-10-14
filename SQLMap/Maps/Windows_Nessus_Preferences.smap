@@ -9,7 +9,7 @@ IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='
 IdentifyValue: 1
 Queries:
     -
-        Name: Nessus Preferences Databas
+        Name: Nessus Preferences Database
         Query: |
                 SELECT
                 PREFERENCES.name AS Name,
