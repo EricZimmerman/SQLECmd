@@ -9,7 +9,7 @@ IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='
 IdentifyValue: 1
 Queries:
     -
-        Name: Drobpox
+        Name: Dropbox
         Query: |
                 SELECT
                 id,
