@@ -1,28 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFrameworks>net472</TargetFrameworks>
+    <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="NLog" Version="4.7.8" />
     <PackageReference Include="NUnit" Version="3.13.1" />
     <PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="5.10.4" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="TestFiles\" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\SQLMap\SQLMaps.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <None Update="TestFiles\Contacts.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
 </Project>
