@@ -1,0 +1,25 @@
+Description: Dropbox Tray Thumbnails
+Author: Chad Tilbury
+Email: ctilbury@sans.org
+Id: 662fdfe2-021b-4404-b899-fe53c55fe3e1
+Version: 1.0
+CSVPrefix: Dropbox
+FileName: tray-thumbnails.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='cached_thumbnail_table');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Dropbox Tray Thumbnails
+        Query: |
+               SELECT
+               datetime( "timestamp", 'unixepoch' ) AS Timestamp,
+               cached_thumbnail_table.file_name AS FileName,
+               cached_thumbnail_table.blocklist AS BlockList
+               FROM
+               cached_thumbnail_table
+               ORDER BY
+               cached_thumbnail_table.timestamp ASC
+        BaseFileName: TrayThumbnails
+
+# Documentation
+# tray-thumbnails.db: SQLite database containing references to image files at one time present in a user’s Dropbox instance.  Can include references to deleted files no longer present in Dropbox.
