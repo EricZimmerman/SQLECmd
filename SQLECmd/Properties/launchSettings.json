@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "SQLECmd": {
-      "commandName": "Project",
-      "commandLineArgs": "-d D:\\Code\\SQLECmd\\SQLMap.Test\\TestFiles --csv c:\\temp"
-    }
-  }
-}
