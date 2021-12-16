@@ -17,11 +17,12 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Exceptionless" Version="4.6.2" />
-    <PackageReference Include="FluentCommandLineParser-netstandard" Version="1.4.3.13" />
     <PackageReference Include="NLog" Version="4.7.13" />
     <PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="5.13.2" />
     <PackageReference Include="ServiceStack.Text" Version="5.13.2" />
     <PackageReference Include="SharpZipLib" Version="1.3.3" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta2.21615.1" />
+    <PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta2.21615.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SQLMap\SQLMaps.csproj" />
