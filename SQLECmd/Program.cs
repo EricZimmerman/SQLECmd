@@ -114,7 +114,6 @@ class Program
 
     private static void DoWork(string f, string d, string csv, string json, bool dedupe, bool hunt, string maps, bool sync, bool debug, bool trace)
     {
-        
         if (sync)
         {
             try
@@ -445,11 +444,7 @@ class Program
                         csvWriter.WriteRecord(result);
                         csvWriter.NextRecord();
                     }
-
-                    // csv.WriteComment("");
-                    // csv.NextRecord();
-                    // csv.WriteComment($"SourceFile: {fileName}");
-                    // csv.NextRecord();
+                
                     csvWriter.Flush();
                     writer.Flush();
                 }
