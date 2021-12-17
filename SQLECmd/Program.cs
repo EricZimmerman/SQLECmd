@@ -174,7 +174,7 @@ class Program
         var sw = new Stopwatch();
         sw.Start();
 
-        var ts = DateTimeOffset.UtcNow;
+       
 
         if (Directory.Exists(maps) == false)
         {
@@ -238,14 +238,14 @@ class Program
                 var directoryEnumerationFilters = new DirectoryEnumerationFilters
                 {
                     RecursionFilter = entryInfo => !entryInfo.IsMountPoint && !entryInfo.IsSymbolicLink,
-                    ErrorFilter = (errorCode, errorMessage, pathProcessed) => true
+                    ErrorFilter = (_, errorMessage, pathProcessed) => true
                 };
 
                 var dbNames = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
                 if (hunt)
                 {
-                    directoryEnumerationFilters.InclusionFilter = fsei => true;
+                    directoryEnumerationFilters.InclusionFilter = _ => true;
                 }
                 else
                 {
@@ -317,20 +317,17 @@ class Program
     {
         var dbFactory = new OrmLiteConnectionFactory($"{unmatchedDb}",SqliteDialect.Provider);
 
-        using (var db = dbFactory.Open())
-        {
-            _logger.Trace($"\tGetting table names for '{unmatchedDb}'");
-            var reader=   db.ExecuteReader("SELECT name FROM sqlite_master WHERE type='table' order by name");
+        using var db = dbFactory.Open();
+        _logger.Trace($"\tGetting table names for '{unmatchedDb}'");
+        var reader=   db.ExecuteReader("SELECT name FROM sqlite_master WHERE type='table' order by name");
 
-            var tables = new List<string>();
-            while (reader.Read())
-            {
-                tables.Add(reader[0].ToString());
-            }
-                
-            _logger.Info($"\tFile name: '{unmatchedDb}', Tables: {string.Join(",",tables)}");                
-                     
+        var tables = new List<string>();
+        while (reader.Read())
+        {
+            tables.Add(reader[0].ToString());
         }
+                
+        _logger.Info($"\tFile name: '{unmatchedDb}', Tables: {string.Join(",",tables)}");
     }
 
     private static readonly List<string> ProcessedFiles  = new List<string>();
@@ -379,7 +376,7 @@ class Program
 
         ProcessedFiles.Add(fileName);
 
-        var maps = new List<MapFile>();
+        List<MapFile> maps;
 
         if (hunt)
         {
@@ -404,73 +401,64 @@ class Program
 
             var baseTime = DateTimeOffset.UtcNow;
 
-            using (var db = dbFactory.Open())
+            using var db = dbFactory.Open();
+            _logger.Debug($"\tVerifying database via '{map.IdentifyQuery}'");
+
+            var id = db.ExecuteScalar<string>(map.IdentifyQuery);
+
+            if (string.Equals(id,map.IdentifyValue,StringComparison.InvariantCultureIgnoreCase) == false)
             {
-                _logger.Debug($"\tVerifying database via '{map.IdentifyQuery}'");
+                _logger.Error($"\tFor map w/ description '{map.Description}', got value '{id}' from IdentityQuery, but expected '{map.IdentifyValue}'. Queries will not be processed!");
+                continue;
+            }
 
-                var id = db.ExecuteScalar<string>(map.IdentifyQuery);
-
-                if (string.Equals(id,map.IdentifyValue,StringComparison.InvariantCultureIgnoreCase) == false)
-                {
-                    _logger.Error($"\tFor map w/ description '{map.Description}', got value '{id}' from IdentityQuery, but expected '{map.IdentifyValue}'. Queries will not be processed!");
-                    continue;
-                }
-
-                //if we find any matches, its not unmatched anymore
-                foundMap = true;
+            //if we find any matches, its not unmatched anymore
+            foundMap = true;
                                     
-                _logger.Error($"\tMap queries found: {map.Queries.Count:N0}. Processing queries...");
-                foreach (var queryInfo in map.Queries)
-                {
-                    _logger.Debug($"Processing query '{queryInfo.Name}'");
+            _logger.Error($"\tMap queries found: {map.Queries.Count:N0}. Processing queries...");
+            foreach (var queryInfo in map.Queries)
+            {
+                _logger.Debug($"Processing query '{queryInfo.Name}'");
 
-                    try
-                    {
-                        var results = db.Query<dynamic>(queryInfo.Query).ToList();
+                try
+                {
+                    var results = db.Query<dynamic>(queryInfo.Query).ToList();
                              
-                        var outName =
-                            $"{baseTime:yyyyMMddHHmmssffffff}_{map.CSVPrefix}_{queryInfo.BaseFileName}_{map.Id}.csv";
+                    var outName =
+                        $"{baseTime:yyyyMMddHHmmssffffff}_{map.CSVPrefix}_{queryInfo.BaseFileName}_{map.Id}.csv";
 
-                        var fullOutName = Path.Combine(csv, outName);
+                    var fullOutName = Path.Combine(csv, outName);
 
-                        if (results.Any() == false)
-                        {
-                            _logger.Warn($"\t '{queryInfo.Name}' did not return any results. CSV will not be saved.");
-                            continue;
-                        }
-
-                        _logger.Info($"\tDumping '{queryInfo.Name}' to '{fullOutName}'");
-
-                        using (var writer = new StreamWriter(new FileStream(fullOutName,FileMode.CreateNew)))
-                        {
-                            using (var csvWriter = new CsvWriter(writer,CultureInfo.InvariantCulture))
-                            {
-                                    
-                                //   csv.WriteRecords(results);
-
-                                foreach (var result in results)
-                                {
-                                    result.SourceFile = fileName;
-                                    csvWriter.WriteRecord(result);
-                                    csvWriter.NextRecord();
-                                }
-
-                                // csv.WriteComment("");
-                                // csv.NextRecord();
-                                // csv.WriteComment($"SourceFile: {fileName}");
-                                // csv.NextRecord();
-                                csvWriter.Flush();
-                                writer.Flush();
-                            }
-                        }
-                    }
-                    catch (Exception e)
+                    if (results.Any() == false)
                     {
-                        _logger.Fatal($"Error processing map '{map.Description}' with Id '{map.Id}' for query '{queryInfo.Name}':");
-                        _logger.Error($"\t{e.Message.Replace("\r\n","\r\n\t")}");
+                        _logger.Warn($"\t '{queryInfo.Name}' did not return any results. CSV will not be saved.");
+                        continue;
                     }
 
+                    _logger.Info($"\tDumping '{queryInfo.Name}' to '{fullOutName}'");
+
+                    using var writer = new StreamWriter(new FileStream(fullOutName,FileMode.CreateNew));
+                    using var csvWriter = new CsvWriter(writer,CultureInfo.InvariantCulture);
+                    foreach (var result in results)
+                    {
+                        result.SourceFile = fileName;
+                        csvWriter.WriteRecord(result);
+                        csvWriter.NextRecord();
+                    }
+
+                    // csv.WriteComment("");
+                    // csv.NextRecord();
+                    // csv.WriteComment($"SourceFile: {fileName}");
+                    // csv.NextRecord();
+                    csvWriter.Flush();
+                    writer.Flush();
                 }
+                catch (Exception e)
+                {
+                    _logger.Fatal($"Error processing map '{map.Description}' with Id '{map.Id}' for query '{queryInfo.Name}':");
+                    _logger.Error($"\t{e.Message.Replace("\r\n","\r\n\t")}");
+                }
+
             }
         }
 
