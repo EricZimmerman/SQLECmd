@@ -1,0 +1,45 @@
+Description: Google Drive for Desktop Metadata
+Author: Chad Tilbury
+Email: ctilbury@sans.org
+Id: 2f075e8c-7789-437d-90c6-96c45387f08f
+Version: 1.0
+CSVPrefix: GoogleDrive
+FileName: metadata_sqlite_db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='items');
+IdentifyValue: 1
+
+Queries:
+    -
+        Name: Google Drive for Desktop Metadata
+        Query: |
+                SELECT
+                items.stable_id,
+                items.local_title as "Name",
+                items.file_size as "SizeInBytes",
+                items.mime_type,
+                datetime(items.modified_date / 1000, 'unixepoch') as "ModifiedTime",
+                datetime(items.viewed_by_me_date / 1000, 'unixepoch') as "LastInteractionTime",
+                CASE
+                when items.is_folder = 1 then "Folder"
+                when items.is_folder = 0 then "File"
+                end as "IsFolder",
+                CASE
+                when items.trashed = 1 then "Deleted"
+                when items.trashed = 0 then "Not Deleted"
+                end as "DeletionStatus",
+                CASE
+                when items.is_owner = 1 then "Owner"
+                when items.is_owner = 0 then "Not Owner"
+                end as "Ownership",
+                CASE
+                when items.shared_with_me_date = 1 then "Shared"
+                when items.shared_with_me_date = 0 then "Not Shared"
+                end as "SharedWithUser",
+                items.id AS "CloudIdentifier"
+                FROM
+                items
+        BaseFileName: metadata_sqlite_db
+
+# Documentation
+# Google Drive for Desktop was formerly known as Google File Stream
+# https://support.google.com/drive/answer/10309431
