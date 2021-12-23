@@ -36,7 +36,7 @@ Queries:
                 when items.shared_with_me_date = 0 then "Not Shared"
                 end as "SharedWithUser",
                 items.id AS "CloudIdentifier"
-                FROM 
+                FROM
                 items
         BaseFileName: metadata_sqlite_db
 
