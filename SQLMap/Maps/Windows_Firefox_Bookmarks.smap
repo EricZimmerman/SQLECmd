@@ -20,7 +20,7 @@ Queries:
                 'URL'
                 WHEN Bookmarks.type = 2 THEN
                 'Folder'
-                WHEN Bookmarks.type = 1 THEN
+                WHEN Bookmarks.type = 3 THEN
                 'Separator'
                 END AS Type,
                 datetime( Bookmarks.dateAdded / 1000000, 'unixepoch', 'localtime' ) AS DateAdded,
