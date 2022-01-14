@@ -3,7 +3,7 @@
 Please include a summary of the change and (if applicable) which issue is fixed.
 
 ## Checklist:
-Please replace every instance of `[ ]` with `[X]`
+Please replace every instance of `[ ]` with `[X]` OR click on the checkboxes after you submit your PR
 
 - [ ] I have generated a unique `GUID` for my Map(s)
 - [ ] I have tested and validated that the new Map(s) work with test data and achieved the desired output
