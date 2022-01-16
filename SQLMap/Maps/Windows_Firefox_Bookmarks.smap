@@ -2,7 +2,7 @@ Description: Firefox Bookmarks
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: eda1fb9b-8275-4fb5-9ff2-ac557dc0d399
-Version: 1.0.1
+Version: 1.1
 CSVPrefix: Firefox
 FileName: places.sqlite
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='moz_historyvisits' OR name='moz_bookmarks' OR name='moz_places' OR name='moz_inputhistory');
