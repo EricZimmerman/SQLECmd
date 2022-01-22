@@ -106,6 +106,8 @@ class Program
         _rootCommand.Handler = CommandHandler.Create(DoWork);
 
         await _rootCommand.InvokeAsync(args);
+
+        Log.CloseAndFlush();
     }
 
     class DateTimeOffsetFormatter : IFormatProvider, ICustomFormatter
@@ -394,8 +396,12 @@ Console.WriteLine();
 
     private static void DumpSqliteDll()
     {
+       
         var sqllitefile = "SQLite.Interop.dll";
         File.WriteAllBytes(sqllitefile, Resources.SQLite_Interop);
+     
+
+    
     }
 
     private static void ProcessFile(string fileName, bool hunt, bool dedupe, string csv)
