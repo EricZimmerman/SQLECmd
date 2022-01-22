@@ -2,48 +2,43 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using NLog;
+using Serilog;
 
-namespace SQLMaps
-{
-    public static class SQLiteFile
+namespace SQLMaps;
+
+    public static class SqLiteFile
     {
         private const long Sig = 0x66206574694c5153;
 
-        public static bool IsSQLiteFile(string path)
+        public static bool IsSqLiteFile(string path)
         {
             if (File.Exists(path) == false)
             {
-                var l = LogManager.GetLogger("FileVerify");
-
-                l.Warn($"'{path}' not found!");
+                Log.Warning("{Path} not found!",path);
             }
 
             try
             {
-                using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+                using var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
+                if (fs.Length < 8)
                 {
-                    if (fs.Length < 8)
-                    {
-                        return false;
-                    }
+                    return false;
+                }
 
-                    using (var br = new BinaryReader(fs))
-                    {
-                        var fileSig = br.ReadInt64();
+                using (var br = new BinaryReader(fs))
+                {
+                    var fileSig = br.ReadInt64();
 
-                        return fileSig == Sig;
-                    }
+                    return fileSig == Sig;
                 }
             }
             catch (Exception a)
             {
-                var l = LogManager.GetLogger("FileVerify");
-                l.Error($"Error accessing '{path}': {a.Message}");
+                Log.Error("Error accessing {Path}: {Message}",path,a.Message);
                 return false;
             }
         }
     }
-}
+
 
 

@@ -15,9 +15,9 @@ using Alphaleonis.Win32.Security;
 using CsvHelper;
 using Exceptionless;
 using ICSharpCode.SharpZipLib.Zip;
-using NLog;
-using NLog.Config;
-using NLog.Targets;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 using ServiceStack.OrmLite;
 using ServiceStack.OrmLite.Dapper;
 using SQLECmd.Properties;
@@ -31,8 +31,8 @@ namespace SQLECmd;
 
 class Program
 {
-    private static Logger _logger;
-
+    
+      private static string _activeDateTimeFormat;
     private static RootCommand _rootCommand;
     private static readonly string BaseDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -53,10 +53,6 @@ class Program
     static async Task Main(string[] args)
     {
         ExceptionlessClient.Default.Startup("DyZCm8aZbNXf2iZ6BV00wY2UoR3U2tymh3cftNZs");
-
-        SetupNLog();
-
-        _logger = LogManager.GetLogger("EvtxECmd");
 
         _rootCommand = new RootCommand
         {
@@ -112,20 +108,81 @@ class Program
         await _rootCommand.InvokeAsync(args);
     }
 
+    class DateTimeOffsetFormatter : IFormatProvider, ICustomFormatter
+    {
+        private readonly IFormatProvider _innerFormatProvider;
+
+        public DateTimeOffsetFormatter(IFormatProvider innerFormatProvider)
+        {
+            _innerFormatProvider = innerFormatProvider;
+        }
+
+        public object GetFormat(Type formatType)
+        {
+            return formatType == typeof(ICustomFormatter) ? this : _innerFormatProvider.GetFormat(formatType);
+        }
+
+        public string Format(string format, object arg, IFormatProvider formatProvider)
+        {
+            if (arg is DateTimeOffset)
+            {
+                var size = (DateTimeOffset)arg;
+                return size.ToString(_activeDateTimeFormat);
+            }
+
+            var formattable = arg as IFormattable;
+            if (formattable != null)
+            {
+                return formattable.ToString(format, _innerFormatProvider);
+            }
+
+            return arg.ToString();
+        }
+    }
+    
     private static void DoWork(string f, string d, string csv, string json, bool dedupe, bool hunt, string maps, bool sync, bool debug, bool trace)
     {
+        var levelSwitch = new LoggingLevelSwitch();
+
+        _activeDateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+        
+        var formatter  =
+            new DateTimeOffsetFormatter(CultureInfo.CurrentCulture);
+
+        var template = "{Message:lj}{NewLine}{Exception}";
+
+        if (debug)
+        {
+            levelSwitch.MinimumLevel = LogEventLevel.Debug;
+            template = "[{Timestamp:HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}";
+        }
+
+        if (trace)
+        {
+            levelSwitch.MinimumLevel = LogEventLevel.Verbose;
+            template = "[{Timestamp:HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}";
+        }
+        
+        var conf = new LoggerConfiguration()
+            .WriteTo.Console(outputTemplate: template,formatProvider: formatter)
+            .MinimumLevel.ControlledBy(levelSwitch);
+      
+        Log.Logger = conf.CreateLogger();
+        
+        
         if (sync)
         {
             try
             {
-                _logger.Info(Header);
+                Log.Information("{Header}",Header);
                 UpdateFromRepo();
             }
             catch (Exception e)
             {
-                _logger.Error(e, $"There was an error checking for updates: {e.Message}");
+                Log.Error(e, "There was an error checking for updates: {Message}",e.Message);
             }
 
+            Console.WriteLine();
             Environment.Exit(0);
         }
 
@@ -137,7 +194,8 @@ class Program
 
             helpBld.Write(hc);
 
-            _logger.Warn("-f or -d is required. Exiting");
+            Log.Warning("-f or -d is required. Exiting");
+            Console.WriteLine();
             return;
         }
 
@@ -148,26 +206,16 @@ class Program
 
             helpBld.Write(hc);
 
-            _logger.Warn("--csv is required. Exiting");
+            Log.Warning("--csv is required. Exiting");
+            Console.WriteLine();
             return;
         }
 
-        _logger.Info(Header);
-        _logger.Info("");
-        _logger.Info($"Command line: {string.Join(" ", Environment.GetCommandLineArgs().Skip(1))}\r\n");
-
-        if (debug)
-        {
-            LogManager.Configuration.LoggingRules.First().EnableLoggingForLevel(LogLevel.Debug);
-        }
-
-        if (trace)
-        {
-            LogManager.Configuration.LoggingRules.First().EnableLoggingForLevel(LogLevel.Trace);
-        }
-
-        LogManager.ReconfigExistingLoggers();
-
+        Log.Information("{Header}",Header);
+        
+        Log.Information("Command line: {Args}",string.Join(" ", Environment.GetCommandLineArgs().Skip(1)));
+Console.WriteLine();
+       
         DumpSqliteDll();
 
         var sw = new Stopwatch();
@@ -177,35 +225,33 @@ class Program
 
         if (Directory.Exists(maps) == false)
         {
-            _logger.Warn(
-                $"Maps directory '{maps}' does not exist! Database maps will not be loaded!!");
+            Log.Warning("Maps directory {Maps} does not exist! Database maps will not be loaded!!",maps);
         }
         else
         {
-            _logger.Debug($"Loading maps from '{Path.GetFullPath(maps)}'");
-            var errors =  SQLMap.LoadMaps(Path.GetFullPath(maps));
+            Log.Debug("Loading maps from {Path}",Path.GetFullPath(maps));
+            var errors =  SqlMap.LoadMaps(Path.GetFullPath(maps));
                 
             if (errors)
             {
                 return;
             }
 
-            _logger.Info($"Maps loaded: {SQLMap.MapFiles.Count:N0}");
+            Log.Information("Maps loaded: {Count:N0}",SqlMap.MapFiles.Count);
         }
 
         if (Directory.Exists(csv) == false)
         {
-            _logger.Warn(
-                $"Path to '{csv}' doesn't exist. Creating...");
+            Log.Information("Path to {Csv} doesn't exist. Creating...",csv);
 
             try
             {
                 Directory.CreateDirectory(csv);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                _logger.Fatal(
-                    $"Unable to create directory '{csv}'. Does a file with the same name exist? Exiting");
+                Log.Fatal(e,"Unable to create directory {Csv}. Does a file with the same name exist? Exiting",csv);
+                Console.WriteLine();
                 return;
             }
         }
@@ -214,7 +260,8 @@ class Program
         {
             if (File.Exists(f) == false)
             {
-                _logger.Warn($"'{f}' does not exist! Exiting");
+                Log.Warning("{F} does not exist! Exiting",f);
+                Console.WriteLine();
                 return;
             }
 
@@ -223,55 +270,63 @@ class Program
         else
         {
             //Directories
-            _logger.Info($"Looking for files in '{d}'");
-            _logger.Info("");
+            Log.Information("Looking for files in {D}",d);
+            Console.WriteLine();
 
+            IEnumerable<string> files;
+
+#if !NET6_0
             Privilege[] privs = {Privilege.EnableDelegation, Privilege.Impersonate, Privilege.Tcb};
-            using (new PrivilegeEnabler(Privilege.Backup, privs))
+            using var enabler = new PrivilegeEnabler(Privilege.Backup, privs);
+            var dirEnumOptions =
+                DirectoryEnumerationOptions.Files | DirectoryEnumerationOptions.Recursive |
+                DirectoryEnumerationOptions.SkipReparsePoints | DirectoryEnumerationOptions.ContinueOnException |
+                DirectoryEnumerationOptions.BasicSearch;
+
+            var directoryEnumerationFilters = new DirectoryEnumerationFilters
             {
-                var dirEnumOptions =
-                    DirectoryEnumerationOptions.Files | DirectoryEnumerationOptions.Recursive |
-                    DirectoryEnumerationOptions.SkipReparsePoints | DirectoryEnumerationOptions.ContinueOnException |
-                    DirectoryEnumerationOptions.BasicSearch;
+                RecursionFilter = entryInfo => !entryInfo.IsMountPoint && !entryInfo.IsSymbolicLink,
+                ErrorFilter = (_, errorMessage, pathProcessed) => true
+            };
 
-                var directoryEnumerationFilters = new DirectoryEnumerationFilters
-                {
-                    RecursionFilter = entryInfo => !entryInfo.IsMountPoint && !entryInfo.IsSymbolicLink,
-                    ErrorFilter = (_, errorMessage, pathProcessed) => true
-                };
+            var dbNames = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
-                var dbNames = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-
-                if (hunt)
-                {
-                    directoryEnumerationFilters.InclusionFilter = _ => true;
-                }
-                else
-                {
-                    foreach (var mapFile in SQLMap.MapFiles)
-                    {
-                        dbNames.Add(mapFile.Value.FileName);
-                    }
-
-                    directoryEnumerationFilters.InclusionFilter = fsei => dbNames.Contains(fsei.FileName);
-                }
-
-                var files2 =
-                    Directory.EnumerateFileSystemEntries(Path.GetFullPath(d), dirEnumOptions, directoryEnumerationFilters);
-
-                foreach (var file in files2)
-                {
-                    try
-                    {
-                        ProcessFile(file,hunt,dedupe,csv);
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.Error($"Error processing '{file}': {e.Message}");
-                    }
-                }
-
+            if (hunt)
+            {
+                directoryEnumerationFilters.InclusionFilter = _ => true;
             }
+            else
+            {
+                foreach (var mapFile in SqlMap.MapFiles)
+                {
+                    dbNames.Add(mapFile.Value.FileName);
+                }
+
+                directoryEnumerationFilters.InclusionFilter = fsei => dbNames.Contains(fsei.FileName);
+            }
+
+            files =
+                Directory.EnumerateFileSystemEntries(Path.GetFullPath(d), dirEnumOptions, directoryEnumerationFilters);
+
+            
+            
+#else
+            throw new Exception("File iteration like we need to do is too painful on .net 6 for now");
+#endif
+            
+            foreach (var file in files)
+            {
+                try
+                {
+                    ProcessFile(file,hunt,dedupe,csv);
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e,"Error processing {File}: {Message}",file,e.Message);
+                }
+            }
+
+           
         }
 
         sw.Stop();
@@ -279,7 +334,7 @@ class Program
         if (UnmatchedDbs.Any())
         {
             Console.WriteLine();
-            _logger.Fatal($"At least one database was found with no corresponding map (Use --debug for more details about discovery process)");
+            Log.Fatal("At least one database was found with no corresponding map (Use {Switch} for more details about discovery process)","--debug");
 
             foreach (var unmatchedDb in UnmatchedDbs)
             {
@@ -287,15 +342,20 @@ class Program
             }
         }
             
-        var extra = string.Empty;
+        Console.WriteLine();
 
-        if (ProcessedFiles.Count > 1)
+        if (ProcessedFiles.Count == 1)
         {
-            extra = "s";
+            Log.Information("Processed {Count:N0} file in {TotalSeconds:N4} seconds",ProcessedFiles.Count,sw.Elapsed.TotalSeconds);    
         }
-
-        _logger.Info($"\r\nProcessed {ProcessedFiles.Count:N0} file{extra} in {sw.Elapsed.TotalSeconds:N4} seconds\r\n");
-
+        else
+        {
+            Log.Information("Processed {Count:N0} files in {TotalSeconds:N4} seconds",ProcessedFiles.Count,sw.Elapsed.TotalSeconds);
+        }
+        
+        
+        Console.WriteLine();
+        
         if (!File.Exists("SQLite.Interop.dll"))
         {
             return;
@@ -307,7 +367,8 @@ class Program
         }
         catch (Exception)
         {
-            _logger.Warn("Unable to delete 'SQLite.Interop.dll'. Delete manually if needed.\r\n");
+            Log.Warning("Unable to delete {File}. Delete manually if needed","SQLite.Interop.dll");
+            Console.WriteLine();
         }
 
     }
@@ -317,7 +378,7 @@ class Program
         var dbFactory = new OrmLiteConnectionFactory($"{unmatchedDb}",SqliteDialect.Provider);
 
         using var db = dbFactory.Open();
-        _logger.Trace($"\tGetting table names for '{unmatchedDb}'");
+        Log.Verbose("\tGetting table names for {UnmatchedDb}",unmatchedDb);
         var reader=   db.ExecuteReader("SELECT name FROM sqlite_master WHERE type='table' order by name");
 
         var tables = new List<string>();
@@ -326,7 +387,7 @@ class Program
             tables.Add(reader[0].ToString());
         }
                 
-        _logger.Info($"\tFile name: '{unmatchedDb}', Tables: {string.Join(",",tables)}");
+        Log.Information("\tFile name: {UnmatchedDb}, Tables: {Tables}",unmatchedDb,string.Join(",",tables));
     }
 
     private static readonly List<string> ProcessedFiles  = new List<string>();
@@ -339,22 +400,22 @@ class Program
 
     private static void ProcessFile(string fileName, bool hunt, bool dedupe, string csv)
     {
-        _logger.Debug($"Checking if '{fileName}' is a SQLite file");
-        if (SQLiteFile.IsSQLiteFile(fileName) == false)
+        Log.Debug("Checking if {FileName} is a SQLite file",fileName);
+        if (SqLiteFile.IsSqLiteFile(fileName) == false)
         {
             if (hunt == false)
             {
-                _logger.Error($"\t'{fileName}' is not a SQLite file! Skipping...");
+                Log.Warning("\t{FileName} is not a SQLite file! Skipping...",fileName);
             }
             else
             {
-                _logger.Debug($"\t'{fileName}' is not a SQLite file! Skipping...");
+                Log.Warning("\t{FileName} is not a SQLite file! Skipping...",fileName);
             }
                 
             return;
         }
 
-        _logger.Debug($"'{fileName}' is a SQLite file!");
+        Log.Debug("{ileName} is a SQLite file!",fileName);
 
         if (dedupe)
         {
@@ -362,16 +423,16 @@ class Program
 
             if (SeenHashes.Contains(sha))
             {
-                _logger.Error($"Skipping '{fileName}' as a file with SHA-1 '{sha}' has already been processed");
+                Log.Warning("Skipping {FileName} as a file with SHA-1 {Sha} has already been processed",fileName,sha);
                 Console.WriteLine();
                 return;
             }
 
-            _logger.Debug($"Adding '{fileName}' SHA-1 '{sha}' to seen hashes collection");
+            Log.Debug("Adding {FileName} SHA-1 {Sha} to seen hashes collection",fileName,sha);
             SeenHashes.Add(sha);
         }
 
-        _logger.Warn($"Processing '{fileName}'...");
+        Log.Information($"Processing {fileName}...",fileName);
 
         ProcessedFiles.Add(fileName);
 
@@ -379,12 +440,12 @@ class Program
 
         if (hunt)
         {
-            maps = SQLMap.MapFiles.Values.ToList();
+            maps = SqlMap.MapFiles.Values.ToList();
         }
         else
         {
             //only find maps tht match the db filename
-            maps = SQLMap.MapFiles.Values.Where(t => string.Equals(t.FileName, Path.GetFileName(fileName),
+            maps = SqlMap.MapFiles.Values.Where(t => string.Equals(t.FileName, Path.GetFileName(fileName),
                 StringComparison.InvariantCultureIgnoreCase)).ToList();
         }
 
@@ -394,30 +455,30 @@ class Program
         //process each one that matches
         foreach (var map in maps)
         {
-            _logger.Debug($"Processing map '{map.Description}' with Id '{map.Id}'");
+            Log.Debug("Processing map {Description} with Id {Id}",map.Description,map.Id);
 
             var dbFactory = new OrmLiteConnectionFactory($"{fileName}",SqliteDialect.Provider);
 
             var baseTime = DateTimeOffset.UtcNow;
 
             using var db = dbFactory.Open();
-            _logger.Debug($"\tVerifying database via '{map.IdentifyQuery}'");
+            Log.Debug("\tVerifying database via {IdentifyQuery}",map.IdentifyQuery);
 
             var id = db.ExecuteScalar<string>(map.IdentifyQuery);
 
             if (string.Equals(id,map.IdentifyValue,StringComparison.InvariantCultureIgnoreCase) == false)
             {
-                _logger.Error($"\tFor map w/ description '{map.Description}', got value '{id}' from IdentityQuery, but expected '{map.IdentifyValue}'. Queries will not be processed!");
+                Log.Warning("\tFor map w/ description {Description}, got value {Id} from IdentityQuery, but expected {IdentifyValue}. Queries will not be processed!",map.Description,id,map.IdentifyValue);
                 continue;
             }
 
             //if we find any matches, its not unmatched anymore
             foundMap = true;
                                     
-            _logger.Error($"\tMap queries found: {map.Queries.Count:N0}. Processing queries...");
+            Log.Information("\tMap queries found: {Count:N0}. Processing queries...",map.Queries.Count);
             foreach (var queryInfo in map.Queries)
             {
-                _logger.Debug($"Processing query '{queryInfo.Name}'");
+                Log.Debug("Processing query {Name}",queryInfo.Name);
 
                 try
                 {
@@ -430,11 +491,11 @@ class Program
 
                     if (results.Any() == false)
                     {
-                        _logger.Warn($"\t '{queryInfo.Name}' did not return any results. CSV will not be saved.");
+                        Log.Warning("\t {Name} did not return any results. CSV will not be saved",queryInfo.Name);
                         continue;
                     }
 
-                    _logger.Info($"\tDumping '{queryInfo.Name}' to '{fullOutName}'");
+                    Log.Information("\tDumping {Name} to {FullOutName}",queryInfo.Name,fullOutName);
 
                     using var writer = new StreamWriter(new FileStream(fullOutName,FileMode.CreateNew));
                     using var csvWriter = new CsvWriter(writer,CultureInfo.InvariantCulture);
@@ -450,8 +511,8 @@ class Program
                 }
                 catch (Exception e)
                 {
-                    _logger.Fatal($"Error processing map '{map.Description}' with Id '{map.Id}' for query '{queryInfo.Name}':");
-                    _logger.Error($"\t{e.Message.Replace("\r\n","\r\n\t")}");
+                    Log.Fatal(e,"Error processing map {Description} with Id {Id} for query {Name}",map.Description,map.Id,queryInfo.Name);
+                    Log.Error("\t{Replace}",e.Message.Replace("\r\n","\r\n\t"));
                 }
 
             }
@@ -459,7 +520,7 @@ class Program
 
         if (foundMap == false)
         {
-            _logger.Info($"\tNo maps found for '{fileName}'. Adding to unmatched database list");
+            Log.Information("\tNo maps found for {FileName}. Adding to unmatched database list",fileName);
             UnmatchedDbs.Add(fileName);
         }
 
@@ -473,8 +534,8 @@ class Program
     {
         Console.WriteLine();
 
-        _logger.Info(
-            "Checking for updated maps at https://github.com/EricZimmerman/SQLECmd/tree/master/SQLMap/Maps...");
+        Log.Information(
+            "Checking for updated maps at {Url}...","https://github.com/EricZimmerman/SQLECmd/tree/master/SQLMap/Maps");
         Console.WriteLine();
         var archivePath = Path.Combine(BaseDirectory, "____master.zip");
 
@@ -546,15 +607,15 @@ class Program
 
         if (newlocalMaps.Count > 0 || updatedlocalMaps.Count > 0)
         {
-            _logger.Fatal("Updates found!");
+            Log.Information("Updates found!");
             Console.WriteLine();
 
             if (newlocalMaps.Count > 0)
             {
-                _logger.Error("New maps");
+                Log.Information("New maps");
                 foreach (var newLocalMap in newlocalMaps)
                 {
-                    _logger.Info(Path.GetFileNameWithoutExtension(newLocalMap));
+                    Log.Information("{Path}",Path.GetFileNameWithoutExtension(newLocalMap));
                 }
 
                 Console.WriteLine();
@@ -562,10 +623,10 @@ class Program
 
             if (updatedlocalMaps.Count > 0)
             {
-                _logger.Error("Updated maps");
+                Log.Information("Updated maps");
                 foreach (var um in updatedlocalMaps)
                 {
-                    _logger.Info(Path.GetFileNameWithoutExtension(um));
+                    Log.Information("{Path}",Path.GetFileNameWithoutExtension(um));
                 }
 
                 Console.WriteLine();
@@ -576,36 +637,14 @@ class Program
         else
         {
             Console.WriteLine();
-            _logger.Info("No new maps available");
+            Log.Information("No new maps available");
             Console.WriteLine();
         }
 
         Directory.Delete(Path.Combine(BaseDirectory, "SQLECmd-master"), true);
     }
 
-    private static void SetupNLog()
-    {
-        if (File.Exists(Path.Combine(BaseDirectory, "Nlog.config")))
-        {
-            return;
-        }
-
-        var config = new LoggingConfiguration();
-        var loglevel = LogLevel.Info;
-
-        var layout = @"${message}";
-
-        var consoleTarget = new ColoredConsoleTarget();
-
-        config.AddTarget("console", consoleTarget);
-
-        consoleTarget.Layout = layout;
-
-        var rule1 = new LoggingRule("*", loglevel, consoleTarget);
-        config.LoggingRules.Add(rule1);
-
-        LogManager.Configuration = config;
-    }
+    
 }
 
 internal class ApplicationArguments

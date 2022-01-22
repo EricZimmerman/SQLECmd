@@ -4,178 +4,197 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.Globalization;
 using System.IO;
+using System.IO.MemoryMappedFiles;
 using System.Linq;
 using System.Net;
-using Alphaleonis.Win32.Filesystem;
 using CsvHelper;
 using FluentValidation.Results;
-using NLog;
+using Serilog;
 using ServiceStack;
 using ServiceStack.Text;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 using CsvWriter = CsvHelper.CsvWriter;
+
+
+#if NET462
 using Directory = Alphaleonis.Win32.Filesystem.Directory;
 using File = Alphaleonis.Win32.Filesystem.File;
+using FileInfo = Alphaleonis.Win32.Filesystem.FileInfo;
 using Path = Alphaleonis.Win32.Filesystem.Path;
+#else
+using Directory = System.IO.Directory;
+using File = System.IO.File;
+using Path = System.IO.Path;
+#endif
 
 
-namespace SQLMaps
+namespace SQLMaps;
+
+public class SqlMap
 {
-    public class SQLMap
+    public static Dictionary<string, MapFile> MapFiles { get; private set; } =
+        new Dictionary<string, MapFile>();
+
+    private static bool DisplayValidationResults(ValidationResult result, string source)
     {
-        public static Dictionary<string, MapFile> MapFiles { get; private set; } =
-            new Dictionary<string, MapFile>();
-
-        private static bool DisplayValidationResults(ValidationResult result, string source)
+        Log.Verbose("Performing validation on {Source}: {Result}",source,result.Dump());
+        if (result.Errors.Count == 0)
         {
-            var l = LogManager.GetLogger("LoadMaps");
-            l.Trace($"Performing validation on '{source}': {result.Dump()}");
-            if (result.Errors.Count == 0)
-            {
-                return true;
-            }
-
-            Console.WriteLine();
-            l.Error($"{source} had validation errors:");
-
-            //   _loggerCopyLog.Error($"\r\n{source} had validation errors:");
-
-            foreach (var validationFailure in result.Errors)
-            {
-                l.Error(validationFailure);
-            }
-
-            Console.WriteLine();
-            l.Error("\r\nCorrect the errors and try again. Exiting");
-            //   _loggerCopyLog.Error("Correct the errors and try again. Exiting");
-
-            return false;
+            return true;
         }
 
-        public static bool LoadMaps(string mapPath)
+        Console.WriteLine();
+        Log.Error("{Source} had validation errors",source);
+
+        foreach (var validationFailure in result.Errors)
         {
-            MapFiles = new Dictionary<string, MapFile>();
+            Log.Information("{Val}",validationFailure);
+        }
 
-            var f = new DirectoryEnumerationFilters
+        Console.WriteLine();
+        Console.WriteLine();
+        Log.Error("Correct the errors and try again. Exiting");
+        Console.WriteLine();
+        
+        return false;
+    }
+
+    public static bool LoadMaps(string mapPath)
+    {
+        MapFiles = new Dictionary<string, MapFile>();
+
+        IEnumerable<string> files;
+
+#if !NET6_0
+  var f = new Alphaleonis.Win32.Filesystem.DirectoryEnumerationFilters
+        {
+            InclusionFilter = entry => entry.Extension.ToUpperInvariant() == ".SMAP",
+            RecursionFilter = null,
+            ErrorFilter = (errorCode, errorMessage, pathProcessed) => true
+        };
+
+        var dirEnumOptions =
+            Alphaleonis.Win32.Filesystem.DirectoryEnumerationOptions.Files |
+            Alphaleonis.Win32.Filesystem.DirectoryEnumerationOptions.SkipReparsePoints | Alphaleonis.Win32.Filesystem.DirectoryEnumerationOptions.ContinueOnException |
+            Alphaleonis.Win32.Filesystem.DirectoryEnumerationOptions.BasicSearch;
+
+       files =
+            Alphaleonis.Win32.Filesystem.Directory.EnumerateFileSystemEntries(mapPath, dirEnumOptions, f).ToList();
+#else
+
+        var enumerationOptions = new EnumerationOptions
+        {
+            IgnoreInaccessible = true,
+            MatchCasing = MatchCasing.CaseInsensitive,
+            RecurseSubdirectories = true,
+            AttributesToSkip = 0
+        };
+
+        files = Directory.EnumerateFileSystemEntries(mapPath, "*.SMAP", enumerationOptions);
+#endif
+        
+      
+
+        var deserializer = new DeserializerBuilder()
+            .Build();
+
+        var validator = new MapFileMapValidator();
+
+        var errorMaps = new List<string>();
+
+        foreach (var mapFile in files.OrderBy(t => t))
+        {
+            try
             {
-                InclusionFilter = entry => entry.Extension.ToUpperInvariant() == ".SMAP",
-                RecursionFilter = null,
-                ErrorFilter = (errorCode, errorMessage, pathProcessed) => true
-            };
+                var mf = deserializer.Deserialize<MapFile>(File.ReadAllText(mapFile));
 
-            var dirEnumOptions =
-                DirectoryEnumerationOptions.Files |
-                DirectoryEnumerationOptions.SkipReparsePoints | DirectoryEnumerationOptions.ContinueOnException |
-                DirectoryEnumerationOptions.BasicSearch;
+                Log.Verbose("{Mf}",mf.Dump());
 
-            var mapFiles =
-                Directory.EnumerateFileSystemEntries(mapPath, dirEnumOptions, f).ToList();
+                var validate = validator.Validate(mf);
 
-            var l = LogManager.GetLogger("LoadMaps");
-
-            var deserializer = new DeserializerBuilder()
-                .Build();
-
-            var validator = new MapFileMapValidator();
-
-            var errorMaps = new List<string>();
-
-            foreach (var mapFile in mapFiles.OrderBy(t => t))
-            {
-                try
+                if (DisplayValidationResults(validate, mapFile))
                 {
-                    var mf = deserializer.Deserialize<MapFile>(File.ReadAllText(mapFile));
-
-                    l.Trace(mf.Dump());
-
-                    var validate = validator.Validate(mf);
-
-                    if (DisplayValidationResults(validate, mapFile))
+                    if (MapFiles.ContainsKey(
+                            $"{mf.Id.ToUpperInvariant()}") == false)
                     {
-                        if (MapFiles.ContainsKey(
-                                $"{mf.Id.ToUpperInvariant()}") == false)
-                        {
-                            l.Debug($"'{Path.GetFileName(mapFile)}' is valid. Id: '{mf.Id}'. Adding to maps...");
-                            MapFiles.Add($"{mf.Id.ToUpperInvariant()}",
-                                mf);
-                        }
-                        else
-                        {
-                            l.Warn(
-                                $"A map with Id '{mf.Id}' already exists (File name: '{mf.FileName}'). Map '{Path.GetFileName(mapFile)}' will be skipped");
-                        }
+                        Log.Debug("{Path} is valid. Id: {Mf}. Adding to maps...",Path.GetFileName(mapFile),mf.Id);
+                        MapFiles.Add($"{mf.Id.ToUpperInvariant()}",
+                            mf);
                     }
                     else
                     {
-                        errorMaps.Add(Path.GetFileName(mapFile));
+                        Log.Warning("A map with Id {Id} already exists (File name: {FileName}). Map {Path} will be skipped",mf.Id,mf.FileName,Path.GetFileName(mapFile));
                     }
                 }
-                catch (SyntaxErrorException se)
+                else
                 {
                     errorMaps.Add(Path.GetFileName(mapFile));
-
-                    Console.WriteLine();
-                    l.Warn($"Syntax error in '{mapFile}':");
-                    l.Fatal(se.Message);
-
-                    var lines = File.ReadLines(mapFile).ToList();
-                    var fileContents = mapFile.ReadAllText();
-
-                    var badLine = lines[se.Start.Line - 1];
-                    Console.WriteLine();
-                    l.Fatal(
-                        $"Bad line (or close to it) '{badLine}' has invalid data at column '{se.Start.Column}'");
-
-                    if (fileContents.Contains('\t'))
-                    {
-                        Console.WriteLine();
-                        l.Error(
-                            "Bad line contains one or more tab characters. Replace them with spaces");
-                        Console.WriteLine();
-                        l.Info(fileContents.Replace("\t", "<TAB>"));
-                    }
-                }
-                catch (YamlException ye)
-                {
-                    errorMaps.Add(Path.GetFileName(mapFile));
-
-                    Console.WriteLine();
-                    l.Warn($"Syntax error in '{mapFile}':");
-
-                    var fileContents = mapFile.ReadAllText();
-
-                    l.Info(fileContents);
-
-                    if (ye.InnerException != null)
-                    {
-                        l.Fatal(ye.InnerException.Message);
-                    }
-
-                    Console.WriteLine();
-                    l.Fatal("Verify all properties against example files or manual and try again.");
-                }
-                catch (Exception e)
-                {
-                    l.Error($"Error loading map file '{mapFile}': {e.Message}");
                 }
             }
-
-            if (errorMaps.Count > 0)
+            catch (SyntaxErrorException se)
             {
-                l.Error("\r\nThe following maps had errors. Scroll up to review errors, correct them, and try again.");
-                foreach (var errorMap in errorMaps)
+                errorMaps.Add(Path.GetFileName(mapFile));
+
+                Console.WriteLine();
+                Log.Warning("Syntax error in {MapFile}",mapFile);
+                Log.Fatal("{Message}",se.Message);
+
+                var lines = File.ReadLines(mapFile).ToList();
+                var fileContents = mapFile.ReadAllText();
+
+                var badLine = lines[se.Start.Line - 1];
+                Console.WriteLine();
+                Log.Fatal("Bad line (or close to it) {BadLine} has invalid data at column {Column}",badLine,se.Start.Column);
+
+                if (fileContents.Contains('\t'))
                 {
-                    l.Info(errorMap);
+                    Console.WriteLine();
+                    Log.Error("Bad line contains one or more tab characters. Replace them with spaces");
+                    Console.WriteLine();
+                    Log.Information("{File}",fileContents.Replace("\t", "<TAB>"));
+                }
+            }
+            catch (YamlException ye)
+            {
+                errorMaps.Add(Path.GetFileName(mapFile));
+
+                Console.WriteLine();
+                Log.Warning("Syntax error in {MapFile}",mapFile);
+
+                var fileContents = mapFile.ReadAllText();
+
+                Log.Information("{Contents}",fileContents);
+
+                if (ye.InnerException != null)
+                {
+                    Log.Fatal("{Ye}",ye.InnerException.Message);
                 }
 
-                l.Info("");
+                Console.WriteLine();
+                Log.Fatal("Verify all properties against example files or manual and try again");
             }
-
-            return errorMaps.Count > 0;
+            catch (Exception e)
+            {
+                Log.Error(e,"Error loading map file '{MapFile}': {Message}",mapFile,e.Message);
+            }
         }
 
+        if (errorMaps.Count > 0)
+        {
+            Console.WriteLine();
+            Log.Error("The following maps had errors. Scroll up to review errors, correct them, and try again");
+            foreach (var errorMap in errorMaps)
+            {
+                Log.Information("{Map}",errorMap);
+            }
 
+            Console.WriteLine();
+        }
 
+        return errorMaps.Count > 0;
     }
+
+
+
 }
