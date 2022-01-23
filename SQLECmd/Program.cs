@@ -15,6 +15,7 @@ using Alphaleonis.Win32.Security;
 using CsvHelper;
 using Exceptionless;
 using ICSharpCode.SharpZipLib.Zip;
+using RawCopy;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -22,10 +23,17 @@ using ServiceStack.OrmLite;
 using ServiceStack.OrmLite.Dapper;
 using SQLECmd.Properties;
 using SQLMaps;
+
+#if NET462
 using Directory = Alphaleonis.Win32.Filesystem.Directory;
 using File = Alphaleonis.Win32.Filesystem.File;
 using FileInfo = Alphaleonis.Win32.Filesystem.FileInfo;
 using Path = Alphaleonis.Win32.Filesystem.Path;
+#else
+using Directory = System.IO.Directory;
+using File = System.IO.File;
+using Path = System.IO.Path;
+#endif
 
 namespace SQLECmd;
 
@@ -398,10 +406,15 @@ Console.WriteLine();
     {
        
         var sqllitefile = "SQLite.Interop.dll";
-        File.WriteAllBytes(sqllitefile, Resources.SQLite_Interop);
-     
 
-    
+        if (Environment.Is64BitProcess)
+        {
+            System.IO.File.WriteAllBytes(sqllitefile, Resources.x64SQLite_Interop);
+        }
+        else
+        {
+            System.IO.File.WriteAllBytes(sqllitefile, Resources.x86SQLite_Interop);
+        }
     }
 
     private static void ProcessFile(string fileName, bool hunt, bool dedupe, string csv)
@@ -425,20 +438,24 @@ Console.WriteLine();
 
         if (dedupe)
         {
-            var sha = File.GetHash(fileName, HashType.SHA1);
+            
+            
+            var s1 = new StreamReader(fileName);
+            var newSha = Helper.GetSha1FromStream(s1.BaseStream, 0);
 
-            if (SeenHashes.Contains(sha))
+
+            if (SeenHashes.Contains(newSha))
             {
-                Log.Warning("Skipping {FileName} as a file with SHA-1 {Sha} has already been processed",fileName,sha);
+                Log.Warning("Skipping {FileName} as a file with SHA-1 {Sha} has already been processed",fileName,newSha);
                 Console.WriteLine();
                 return;
             }
 
-            Log.Debug("Adding {FileName} SHA-1 {Sha} to seen hashes collection",fileName,sha);
-            SeenHashes.Add(sha);
+            Log.Debug("Adding {FileName} SHA-1 {Sha} to seen hashes collection",fileName,newSha);
+            SeenHashes.Add(newSha);
         }
 
-        Log.Information($"Processing {fileName}...",fileName);
+        Log.Information("Processing {FileName}...",fileName);
 
         ProcessedFiles.Add(fileName);
 
@@ -598,17 +615,25 @@ Console.WriteLine();
             else
             {
                 //current destination file exists, so compare to new
-                var fiNew = new FileInfo(newMap);
-                var fi = new FileInfo(dest);
+                
+                var s1 = new StreamReader(newMap);
+                var newSha = Helper.GetSha1FromStream(s1.BaseStream, 0);
 
-                if (fiNew.GetHash(HashType.SHA1) != fi.GetHash(HashType.SHA1))
+                var s2 = new StreamReader(dest);
+                    
+                var destSha = Helper.GetSha1FromStream(s2.BaseStream, 0);
+                    
+                s2.Close();
+                s1.Close();
+                
+                if (newSha != destSha)
                 {
                     //updated file
                     updatedlocalMaps.Add(mName);
                 }
             }
 
-            File.Copy(newMap, dest, CopyOptions.None);
+            File.Copy(newMap, dest,true);
         }
 
         if (newlocalMaps.Count > 0 || updatedlocalMaps.Count > 0)
