@@ -1,23 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Dynamic;
-using System.Globalization;
-using System.IO;
-using System.IO.MemoryMappedFiles;
-using System.Linq;
-using System.Net;
-using CsvHelper;
-using FluentValidation.Results;
-using Serilog;
-using ServiceStack;
-using ServiceStack.Text;
-using YamlDotNet.Core;
-using YamlDotNet.Serialization;
-using CsvWriter = CsvHelper.CsvWriter;
-
-
-#if NET462
+﻿#if NET462
 using Directory = Alphaleonis.Win32.Filesystem.Directory;
 using File = Alphaleonis.Win32.Filesystem.File;
 using FileInfo = Alphaleonis.Win32.Filesystem.FileInfo;
@@ -27,36 +8,45 @@ using Directory = System.IO.Directory;
 using File = System.IO.File;
 using Path = System.IO.Path;
 #endif
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using FluentValidation.Results;
+using Serilog;
+using ServiceStack;
+using ServiceStack.Text;
+using YamlDotNet.Core;
+using YamlDotNet.Serialization;
 
 
 namespace SQLMaps;
 
 public class SqlMap
 {
-    public static Dictionary<string, MapFile> MapFiles { get; private set; } =
-        new Dictionary<string, MapFile>();
+    public static Dictionary<string, MapFile> MapFiles { get; private set; } = new();
 
     private static bool DisplayValidationResults(ValidationResult result, string source)
     {
-        Log.Verbose("Performing validation on {Source}: {Result}",source,result.Dump());
+        Log.Verbose("Performing validation on {Source}: {Result}", source, result.Dump());
         if (result.Errors.Count == 0)
         {
             return true;
         }
 
         Console.WriteLine();
-        Log.Error("{Source} had validation errors",source);
+        Log.Error("{Source} had validation errors", source);
 
         foreach (var validationFailure in result.Errors)
         {
-            Log.Information("{Val}",validationFailure);
+            Log.Information("{Val}", validationFailure);
         }
 
         Console.WriteLine();
         Console.WriteLine();
         Log.Error("Correct the errors and try again. Exiting");
         Console.WriteLine();
-        
+
         return false;
     }
 
@@ -93,8 +83,7 @@ public class SqlMap
 
         files = Directory.EnumerateFileSystemEntries(mapPath, "*.SMAP", enumerationOptions);
 #endif
-        
-      
+
 
         var deserializer = new DeserializerBuilder()
             .Build();
@@ -109,7 +98,7 @@ public class SqlMap
             {
                 var mf = deserializer.Deserialize<MapFile>(File.ReadAllText(mapFile));
 
-                Log.Verbose("{Mf}",mf.Dump());
+                Log.Verbose("{Mf}", mf.Dump());
 
                 var validate = validator.Validate(mf);
 
@@ -118,13 +107,13 @@ public class SqlMap
                     if (MapFiles.ContainsKey(
                             $"{mf.Id.ToUpperInvariant()}") == false)
                     {
-                        Log.Debug("{Path} is valid. Id: {Mf}. Adding to maps...",Path.GetFileName(mapFile),mf.Id);
+                        Log.Debug("{Path} is valid. Id: {Mf}. Adding to maps...", Path.GetFileName(mapFile), mf.Id);
                         MapFiles.Add($"{mf.Id.ToUpperInvariant()}",
                             mf);
                     }
                     else
                     {
-                        Log.Warning("A map with Id {Id} already exists (File name: {FileName}). Map {Path} will be skipped",mf.Id,mf.FileName,Path.GetFileName(mapFile));
+                        Log.Warning("A map with Id {Id} already exists (File name: {FileName}). Map {Path} will be skipped", mf.Id, mf.FileName, Path.GetFileName(mapFile));
                     }
                 }
                 else
@@ -137,22 +126,22 @@ public class SqlMap
                 errorMaps.Add(Path.GetFileName(mapFile));
 
                 Console.WriteLine();
-                Log.Warning("Syntax error in {MapFile}",mapFile);
-                Log.Fatal("{Message}",se.Message);
+                Log.Warning("Syntax error in {MapFile}", mapFile);
+                Log.Fatal("{Message}", se.Message);
 
                 var lines = File.ReadLines(mapFile).ToList();
                 var fileContents = mapFile.ReadAllText();
 
                 var badLine = lines[se.Start.Line - 1];
                 Console.WriteLine();
-                Log.Fatal("Bad line (or close to it) {BadLine} has invalid data at column {Column}",badLine,se.Start.Column);
+                Log.Fatal("Bad line (or close to it) {BadLine} has invalid data at column {Column}", badLine, se.Start.Column);
 
                 if (fileContents.Contains('\t'))
                 {
                     Console.WriteLine();
                     Log.Error("Bad line contains one or more tab characters. Replace them with spaces");
                     Console.WriteLine();
-                    Log.Information("{File}",fileContents.Replace("\t", "<TAB>"));
+                    Log.Information("{File}", fileContents.Replace("\t", "<TAB>"));
                 }
             }
             catch (YamlException ye)
@@ -160,15 +149,15 @@ public class SqlMap
                 errorMaps.Add(Path.GetFileName(mapFile));
 
                 Console.WriteLine();
-                Log.Warning("Syntax error in {MapFile}",mapFile);
+                Log.Warning("Syntax error in {MapFile}", mapFile);
 
                 var fileContents = mapFile.ReadAllText();
 
-                Log.Information("{Contents}",fileContents);
+                Log.Information("{Contents}", fileContents);
 
                 if (ye.InnerException != null)
                 {
-                    Log.Fatal("{Ye}",ye.InnerException.Message);
+                    Log.Fatal("{Ye}", ye.InnerException.Message);
                 }
 
                 Console.WriteLine();
@@ -176,7 +165,7 @@ public class SqlMap
             }
             catch (Exception e)
             {
-                Log.Error(e,"Error loading map file '{MapFile}': {Message}",mapFile,e.Message);
+                Log.Error(e, "Error loading map file '{MapFile}': {Message}", mapFile, e.Message);
             }
         }
 
@@ -186,7 +175,7 @@ public class SqlMap
             Log.Error("The following maps had errors. Scroll up to review errors, correct them, and try again");
             foreach (var errorMap in errorMaps)
             {
-                Log.Information("{Map}",errorMap);
+                Log.Information("{Map}", errorMap);
             }
 
             Console.WriteLine();
@@ -194,7 +183,4 @@ public class SqlMap
 
         return errorMaps.Count > 0;
     }
-
-
-
 }

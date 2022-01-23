@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -15,7 +13,6 @@ namespace SQLMaps.Test;
 
 public class TestMain
 {
-
     [OneTimeSetUp]
     public void SetupNLog()
     {
@@ -27,10 +24,9 @@ public class TestMain
 
 
     /// <summary>
-    /// For normal mode, the database name is the first check to see if any maps exist.
-    /// In hunting mode, the name does not matter and all maps must be checked via IdentityQuery
+    ///     For normal mode, the database name is the first check to see if any maps exist.
+    ///     In hunting mode, the name does not matter and all maps must be checked via IdentityQuery
     /// </summary>
-
     [Test]
     public void FindSqlFiles()
     {
@@ -42,7 +38,7 @@ public class TestMain
 
         var foundFiles = 0;
 
-        foreach (var fileSystemEntry in Directory.GetFiles(dir,"*",SearchOption.AllDirectories))
+        foreach (var fileSystemEntry in Directory.GetFiles(dir, "*", SearchOption.AllDirectories))
         {
             Log.Verbose($"Checking '{fileSystemEntry}'");
 
@@ -62,7 +58,7 @@ public class TestMain
                     var outPath = @"C:\temp\sqlout";
                     if (Directory.Exists(outPath))
                     {
-                        Directory.Delete(outPath,true);
+                        Directory.Delete(outPath, true);
                     }
 
                     var baseTime = DateTimeOffset.UtcNow;
@@ -75,22 +71,22 @@ public class TestMain
 
                         foreach (var map in maps)
                         {
-                            Log.Information("{@Map}",map);
+                            Log.Information("{@Map}", map);
 
 
-                            var dbFactory = new OrmLiteConnectionFactory($"{fileSystemEntry}",SqliteDialect.Provider);
+                            var dbFactory = new OrmLiteConnectionFactory($"{fileSystemEntry}", SqliteDialect.Provider);
 
                             using (var db = dbFactory.Open())
                             {
                                 Log.Information($"Verifying database via '{map.IdentifyQuery}'");
                                 var id = db.ExecuteScalar<string>(map.IdentifyQuery);
 
-                                if (string.Equals(id,map.IdentifyValue,StringComparison.InvariantCultureIgnoreCase) == false)
+                                if (string.Equals(id, map.IdentifyValue, StringComparison.InvariantCultureIgnoreCase) == false)
                                 {
                                     Log.Warning($"Got value '{id}' from IdentityQuery, but expected '{map.IdentifyValue}'. Queries will not be processed!");
                                     continue;
                                 }
-                                    
+
                                 Log.Information($"Map queries found: {map.Queries.Count:N0}. Processing...");
                                 foreach (var queryInfo in map.Queries)
                                 {
@@ -109,13 +105,13 @@ public class TestMain
 
                                         var fullOutName = Path.Combine(outPath, outName);
 
-                                        using (var writer = new StreamWriter(new FileStream(fullOutName,FileMode.CreateNew))) //var writer = new StringWriter()
+                                        using (var writer = new StreamWriter(new FileStream(fullOutName, FileMode.CreateNew))) //var writer = new StringWriter()
                                         {
-                                            using (var csv = new CsvWriter(writer,CultureInfo.InvariantCulture))
+                                            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
                                             {
                                                 //  csv.WriteDynamicHeader(foo.First());
                                                 //   csv.NextRecord();
-                        
+
                                                 // foreach(IDictionary<string, object> row in foo) {
                                                 //     Console.WriteLine("row:");
                                                 //     foreach(var pair in row) {
@@ -124,26 +120,20 @@ public class TestMain
                                                 // }
 
                                                 csv.WriteRecords(foo);
-                        
+
                                                 //Log.Information(writer.ToString());
 
                                                 csv.Flush();
                                                 writer.Flush();
                                             }
-                                                
                                         }
                                     }
                                     catch (Exception e)
                                     {
                                         Log.Error(e.Message);
                                     }
-                                        
-
                                 }
                             }
-
-
-
                         }
                     }
 
@@ -153,13 +143,11 @@ public class TestMain
             }
             catch (Exception e)
             {
-                Log.Error(e,"{Error}",e.Message);
-                    
+                Log.Error(e, "{Error}", e.Message);
             }
         }
 
         foundFiles.Should().Be(1);
-
     }
 
     [Test]
@@ -168,8 +156,5 @@ public class TestMain
         Log.Information("Loading maps!");
 
         SqlMap.LoadMaps(@"D:\OneDrive\!Projects\sqliteTestFiles");
-
     }
-
-       
 }
