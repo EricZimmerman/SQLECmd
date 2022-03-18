@@ -1,0 +1,31 @@
+Description: Bitdefender Sqlite Quarantine Cache Database
+Author: Paul Elliott
+Email: cluelessatcoding@outlook.com
+Id: a2341bd2-9fa9-4715-9a86-4fcde59aca432
+Version: 1.0
+CSVPrefix: Bitdefender
+FileName: cache.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='entries');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Bitdefender cache DB
+        Query: |
+                SELECT
+                quarId AS QuarantineID,
+                path AS FilePath,
+                threat AS Threat,
+                size AS Size,
+                datetime( quartime, 'unixepoch', 'localtime' ) AS QuarantineTime,
+                datetime( acctime, 'unixepoch', 'localtime' ) AS LastAccessedTime,
+                datetime( modtime, 'unixepoch', 'localtime' ) AS LastModifiedTime,
+                usersid AS UserSID
+                FROM
+                entries
+                ORDER BY
+                QuarantineTime ASC;
+        BaseFileName: cache
+
+# Documentation
+# https://www.cyberdrain.com/monitoring-with-powershell-monitoring-bitdefender-status/
+# Use SQLECmd in conjunction with the Bitdefender KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Antivirus/Bitdefender.tkape
