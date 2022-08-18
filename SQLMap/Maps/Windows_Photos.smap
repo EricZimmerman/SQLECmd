@@ -1,0 +1,45 @@
+Description: Windows Photos Database
+Author: Hyun Yi @hyuunnn
+Email: hy00un__@naver.com
+Id: 4d4cfd29-ebc9-4382-a946-5de2878e1c3c
+Version: 1.0
+CSVPrefix: WindowsPhotos
+FileName: MediaDb.v1.sqlite
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='Item' OR name='Folder');
+IdentifyValue: 2
+Queries:
+    -
+        Name: Windows Photos Items
+        Query: |
+                select item.Item_FileName AS Item_FileName,
+                item.Item_FileSize AS Item_FileSize,
+                item.Item_Width AS Item_Width,
+                item.Item_Height AS Item_Height,
+                item.Item_Latitude AS Item_Latitude,
+                item.Item_Longitude AS Item_Longitude,
+                ApplicationName.ApplicationName_Text,
+                CameraManufacturer.CameraManufacturer_Text,
+                CameraModel.CameraModel_Text,
+                datetime((item.Item_DateTaken - 116444736000000000) / 10000000, 'unixepoch', 'localtime') AS Item_DateTaken,
+                datetime((item.Item_DateCreated - 116444736000000000) / 10000000, 'unixepoch', 'localtime') AS Item_DateCreated,
+                datetime((item.Item_DateModified - 116444736000000000) / 10000000, 'unixepoch', 'localtime') AS Item_DateModified,
+                datetime((item.Item_DateIngested - 116444736000000000) / 10000000, 'unixepoch', 'localtime') AS Item_DateIngested
+                FROM item
+                LEFT JOIN ApplicationName ON item.Item_ApplicationNameId = ApplicationName.ApplicationName_Id
+                LEFT JOIN CameraManufacturer ON item.Item_CameraManufacturerId = CameraManufacturer.CameraManufacturer_Id
+                LEFT JOIN CameraModel ON item.Item_CameraModelId = CameraModel.CameraModel_Id
+                ORDER BY Item_DateCreated DESC
+        BaseFileName: ItemDB
+    -
+        Name: Windows Photos Folders
+        Query: |
+                select Folder.Folder_Path AS Folder_Path,
+                Folder.Folder_DisplayName AS Folder_DisplayName,
+                Folder.Folder_ItemCount AS Folder_ItemCount,
+                datetime((Folder.Folder_DateCreated - 116444736000000000) / 10000000, 'unixepoch', 'localtime') AS Folder_DateCreated,
+                datetime((Folder.Folder_DateModified - 116444736000000000) / 10000000, 'unixepoch', 'localtime') AS Folder_DateModified
+                FROM Folder ORDER BY Folder_DateCreated DESC
+        BaseFileName: FolderDB
+
+# Documentation
+# https://forensafe.com/blogs/winphotos.html
