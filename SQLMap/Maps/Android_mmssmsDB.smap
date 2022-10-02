@@ -1,0 +1,62 @@
+Description: Android - mmssms.db
+Author: Andrew Rathbun
+Email: andrew.d.rathbun@gmail.com
+Id: 11cd4add-f57d-48f4-bd1b-07deb3b3442a
+Version: 1.0
+CSVPrefix: Android
+FileName: mmssms.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='words_content' OR name='wpm' OR name='words_segments' OR name='im_threads' OR name='part' OR name='pdu' OR name='ft_retry' OR name='drm' OR name='cmas' OR name='im' OR name='im_threads' OR name='bin_im' OR name='bin_part' OR name='bin_addr' OR name='attachments' OR name='categories' OR name='spam_ft' OR name='ft' OR name='words' OR name='canonical_address');
+IdentifyValue: 18
+Queries:
+    -
+        Name: SMS
+        Query: |
+                SELECT
+                _id AS SmsID,
+                thread_id AS SmsThreadID,
+                address AS SmsAddress,
+                datetime( date / 1000, 'unixepoch', 'localtime' ) AS Date,
+                datetime( date_sent / 1000, 'unixepoch', 'localtime' ) AS DateSent,
+                CASE
+
+                WHEN read = 0 THEN
+                'No'
+                WHEN read = 1 THEN
+                'Yes'
+                END AS Read,
+                CASE
+
+                WHEN type = 1 THEN
+                'Outgoing Message'
+                WHEN type = 2 THEN
+                'Incoming Message'
+                END AS Type,
+                subject AS Subject,
+                body AS Body,
+                service_center AS ServiceCenter,
+                creator AS Creator,
+                CASE
+
+                WHEN seen = 0 THEN
+                'No'
+                WHEN seen = 1 THEN
+                'Yes'
+                END AS Seen,
+                sim_slot,
+                sim_imsi,
+                CASE
+
+                WHEN hidden = 0 THEN
+                'No'
+                WHEN hidden = 1 THEN
+                'Yes'
+                END AS Hidden
+                FROM
+                sms
+                WHERE
+                type = 1
+                OR type = 2
+        BaseFileName: mmssmsDB_SMSMessages
+
+# Documentation
+# N/A
