@@ -1,0 +1,30 @@
+Description: Android - Contacts2.db
+Author: Andrew Rathbun
+Email: andrew.d.rathbun@gmail.com
+Id: 60b52b68-5040-4913-bcf5-ebfb185bf6cb
+Version: 1.0
+CSVPrefix: Android
+FileName: contacts2.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='agg_exceptions' OR name='default_directory' OR name='location' OR name='phone_lookup' OR name='data_usage_stat' OR name='raw_contacts' OR name='accounts' OR name='speed_dial' OR name='' OR name='v1_settings' OR name='' OR name='visible_contacts' OR name='photo_files' OR name='presence' OR name='pre_authorized_uris' OR name='nickname_lookup' OR name='mimetypes' OR name='_sync_state' OR name='android_metadata' OR name='deleted_contacts');
+IdentifyValue: 18
+Queries:
+    -
+        Name: Accounts
+        Query: |
+                SELECT
+                accounts._id AS ID,
+                accounts.account_name AS AccountName,
+                accounts.account_type AS AccountType,
+                CASE
+
+                WHEN accounts.sec_supports_uploading = 0 THEN
+                'No'
+                WHEN accounts.sec_supports_uploading = 1 THEN
+                'Yes'
+                END AS "SecSupportsUploading"
+                FROM
+                accounts
+        BaseFileName: Contacts2DB_Accounts
+
+# Documentation
+# N/A
