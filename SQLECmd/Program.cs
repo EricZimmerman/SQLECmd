@@ -419,7 +419,7 @@ internal class Program
             return;
         }
 
-        Log.Debug("{ileName} is a SQLite file!", fileName);
+        Log.Debug("{FileName} is a SQLite file!", fileName);
 
         if (dedupe)
         {
@@ -450,7 +450,7 @@ internal class Program
         }
         else
         {
-            //only find maps tht match the db filename
+            //only find maps that match the db filename
             maps = SqlMap.MapFiles.Values.Where(t => string.Equals(t.FileName, Path.GetFileName(fileName),
                 StringComparison.InvariantCultureIgnoreCase)).ToList();
         }
