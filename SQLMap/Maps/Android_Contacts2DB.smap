@@ -25,6 +25,118 @@ Queries:
                 FROM
                 accounts
         BaseFileName: Contacts2DB_Accounts
+    -
+        Name: Properties
+        Query: |
+                SELECT
+                properties.property_key AS PropertyKey,
+                properties.property_value AS PropertyValue
+                FROM
+                properties
+        BaseFileName: Contacts2DB_Properties
+    -
+        Name: Settings
+        Query: |
+                SELECT
+                settings.account_name AS AccountName,
+                settings.account_type AS AccountType,
+                CASE
+
+                WHEN settings.ungrouped_visible = 0 THEN
+                'No'
+                WHEN settings.ungrouped_visible = 1 THEN
+                'Yes'
+                END AS "UngroupedVisible",
+                CASE
+
+                WHEN settings.should_sync = 0 THEN
+                'No'
+                WHEN settings.should_sync = 1 THEN
+                'Yes'
+                END AS "ShouldSync"
+                FROM
+                settings
+        BaseFileName: Contacts2DB_Settings
+    -
+        Name: Contacts
+        Query: |
+                SELECT
+                raw_contacts._id AS ID,
+                raw_contacts.creation_time AS CreationTime,
+                CASE
+
+                WHEN contacts.pinned = 0 THEN
+                'No'
+                WHEN contacts.pinned = 1 THEN
+                'Yes'
+                END AS "ContactPinned",
+                CASE
+
+                WHEN contacts.starred = 0 THEN
+                'No'
+                WHEN contacts.starred = 1 THEN
+                'Yes'
+                END AS "ContactStarred",
+                CASE
+
+                WHEN data.is_read_only = 0 THEN
+                'No'
+                WHEN data.is_read_only = 1 THEN
+                'Yes'
+                END AS "IsReadOnly",
+                CASE
+
+                WHEN data.is_primary = 0 THEN
+                'No'
+                WHEN data.is_primary = 1 THEN
+                'Yes'
+                END AS "IsPrimary",
+                CASE
+
+                WHEN data.is_super_primary = 0 THEN
+                'No'
+                WHEN data.is_super_primary = 1 THEN
+                'Yes'
+                END AS "IsSuperPrimary",
+                CASE
+
+                WHEN contacts.send_to_voicemail = 0 THEN
+                'No'
+                WHEN contacts.send_to_voicemail = 1 THEN
+                'Yes'
+                END AS "SendToVoicemail",
+                CASE
+
+                WHEN contacts.has_phone_number = 0 THEN
+                'No'
+                WHEN contacts.has_phone_number = 1 THEN
+                'Yes'
+                END AS "HasPhoneNumber",
+                CASE
+
+                WHEN contacts.has_email = 0 THEN
+                'No'
+                WHEN contacts.has_email = 1 THEN
+                'Yes'
+                END AS "HasEmail",
+                CASE
+
+                WHEN contacts.is_private = 0 THEN
+                'No'
+                WHEN contacts.is_private = 1 THEN
+                'Yes'
+                END AS "IsPrivate",
+                contacts.times_contacted AS TimesContacted,
+                datetime( contacts.last_time_contacted / 1000, 'unixepoch', 'localtime' ) AS LastTimeContacted,
+                datetime( contacts.contact_last_updated_timestamp / 1000, 'unixepoch', 'localtime' ) AS ContactLastUpdated
+                FROM
+                raw_contacts
+                LEFT JOIN contacts ON raw_contacts.contact_id = contacts._id
+                AND raw_contacts._id = contacts.name_raw_contact_id
+                LEFT JOIN data ON contacts.photo_id = data._id
+                AND contacts.status_update_id = data._id
+                AND raw_contacts._id = data.raw_contact_id
+        BaseFileName: Contacts2DB_Contacts
 
 # Documentation
 # N/A
