@@ -137,6 +137,24 @@ Queries:
                 AND contacts.status_update_id = data._id
                 AND raw_contacts._id = data.raw_contact_id
         BaseFileName: Contacts2DB_Contacts
+    -
+        Name: ContactsWithDisplayNames
+        Query: |
+                SELECT
+                raw_contacts.contact_id AS ContactID,
+                raw_contacts._id AS ID,
+                raw_contacts.display_name AS DisplayName,
+                raw_contacts.display_name_alt AS DisplayNameAlt,
+                data.raw_contact_id AS RawContactID,
+                data._id AS IDOther,
+                data.data1 AS Data1,
+                data.data2 AS Data2,
+                data.data3 AS Data3,
+                data.data4 AS Data4
+                FROM
+                raw_contacts
+                INNER JOIN data ON data.raw_contact_id = raw_contacts._id
+        BaseFileName: Contacts2DB_ContactsDisplayNames
 
 # Documentation
 # N/A
