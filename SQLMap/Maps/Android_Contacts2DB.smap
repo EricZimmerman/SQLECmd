@@ -143,14 +143,14 @@ Queries:
                 SELECT
                 Group_Concat( DISTINCT accounts.account_name ) AS AccountName,
                 raw_contacts.display_name AS DisplayName,
-                phone_lookup.normalized_number AS NormalizedNumber 
+                phone_lookup.normalized_number AS NormalizedNumber
                 FROM
                 accounts
                 INNER JOIN raw_contacts ON raw_contacts.account_id = accounts._id
-                INNER JOIN phone_lookup ON phone_lookup.raw_contact_id = raw_contacts._id 
+                INNER JOIN phone_lookup ON phone_lookup.raw_contact_id = raw_contacts._id
                 GROUP BY
                 raw_contacts.display_name,
-                phone_lookup.normalized_number                
+                phone_lookup.normalized_number
         BaseFileName: Contacts2DB_ContactsDisplayNames
 
 # Documentation
