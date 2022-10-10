@@ -141,19 +141,16 @@ Queries:
         Name: ContactsWithDisplayNames
         Query: |
                 SELECT
-                raw_contacts.contact_id AS ContactID,
-                raw_contacts._id AS ID,
+                Group_Concat( DISTINCT accounts.account_name ) AS AccountName,
                 raw_contacts.display_name AS DisplayName,
-                raw_contacts.display_name_alt AS DisplayNameAlt,
-                data.raw_contact_id AS RawContactID,
-                data._id AS IDOther,
-                data.data1 AS Data1,
-                data.data2 AS Data2,
-                data.data3 AS Data3,
-                data.data4 AS Data4
+                phone_lookup.normalized_number AS NormalizedNumber 
                 FROM
-                raw_contacts
-                INNER JOIN data ON data.raw_contact_id = raw_contacts._id
+                accounts
+                INNER JOIN raw_contacts ON raw_contacts.account_id = accounts._id
+                INNER JOIN phone_lookup ON phone_lookup.raw_contact_id = raw_contacts._id 
+                GROUP BY
+                raw_contacts.display_name,
+                phone_lookup.normalized_number                
         BaseFileName: Contacts2DB_ContactsDisplayNames
 
 # Documentation
