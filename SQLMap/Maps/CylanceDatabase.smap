@@ -5,7 +5,7 @@ Id: d5f096d7-3cd2-4613-93bf-b6744fb528a8
 Version: 1.0
 CSVPrefix: Cylance
 FileName: chp.db
-IdentifyQuery:  SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='AnalyzedCache' OR name='Quarantine' OR name='AddFileInfo');
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='AnalyzedCache' OR name='Quarantine' OR name='AddFileInfo');
 IdentifyValue: 3
 Queries:
     -
