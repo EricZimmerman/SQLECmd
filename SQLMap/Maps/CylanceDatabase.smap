@@ -1,0 +1,28 @@
+Description: Cylance CHP.DB
+Author: Ron Rader
+Email: ronald.rader@kroll.com
+Id: d5f096d7-3cd2-4613-93bf-b6744fb528a8
+Version: 1.0
+CSVPrefix: Cylance
+FileName: chp.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='AnalyzedCache' OR name='Quarantine' OR name='AddFileInfo');
+IdentifyValue: 3
+Queries:
+    -
+        Name: Cylance Analyzed Cache
+        Query: |
+               SELECT * FROM AnalyzedCache
+        BaseFileName: AnalyzedCache
+    -
+        Name: Cylance Quarantine
+        Query: |
+               SELECT * FROM Quarantine
+        BaseFileName: Quarantine
+    -
+        Name: Cylance AddFileInfo
+        Query: |
+               SELECT * FROM AddFileInfo
+        BaseFileName: AddFileInfo
+
+# Documentation
+# Use SQLECmd in conjunction with the Cylance KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Antivirus/Cylance.tkape
