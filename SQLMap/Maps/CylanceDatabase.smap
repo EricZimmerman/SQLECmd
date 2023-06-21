@@ -23,7 +23,6 @@ Queries:
         Query: |
                SELECT * FROM AddFileInfo
         BaseFileName: AddFileInfo
- 
 
 # Documentation
-# Use SQLECmd in conjunction with the pCloudDatabase KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Antivirus/Cylance.tkape
+# Use SQLECmd in conjunction with the Cylance KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Antivirus/Cylance.tkape
