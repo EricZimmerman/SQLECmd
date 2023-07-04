@@ -1,0 +1,25 @@
+Description: Windows Search Index Windows Gather DB
+Author: Ahmed Elshaer
+Email: anelshaer@gmail.com
+Id: 27d84ae5-df65-4eec-9dd4-0a573f3ea86b
+Version: 0.1
+CSVPrefix: Windows_gather
+FileName: Windows-gather.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='SystemIndex_Gthr' OR name='SystemIndex_GthrPth' OR name='SystemIndex_GthrAppOwner');
+IdentifyValue: 3
+Queries:
+    -
+        Name: SystemIndex Gthr
+        Query: SELECT * FROM SystemIndex_Gthr;
+        BaseFileName: SystemIndex_Gthr
+    -
+        Name: SystemIndex GthrPth
+        Query: SELECT * FROM SystemIndex_GthrPth;
+        BaseFileName: SystemIndex_GthrPth
+    -
+        Name: SystemIndex GthrAppOwner
+        Query: SELECT * FROM SystemIndex_GthrAppOwner;
+        BaseFileName: SystemIndex_GthrAppOwner
+
+# Documentation
+# https://www.aon.com/cyber-solutions/aon_cyber_labs/windows-search-index-the-forensic-artifact-youve-been-searching-for/

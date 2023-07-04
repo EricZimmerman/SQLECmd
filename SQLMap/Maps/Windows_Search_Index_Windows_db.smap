@@ -1,0 +1,30 @@
+Description: Windows Search Index Windows DB
+Author: Ahmed Elshaer
+Email: anelshaer@gmail.com
+Id: 3985bd8a-6b2a-4ea3-ae32-5fccf14d6562
+Version: 0.1
+CSVPrefix: Windows
+FileName: Windows.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='SystemIndex_1_Properties' OR name='SystemIndex_1_PropertyStore' OR name='SystemIndex_1_PropertyStore_Metadata');
+IdentifyValue: 3
+Queries:
+    -
+        Name: SystemIndex Properties
+        Query: SELECT * FROM SystemIndex_1_Properties;
+        BaseFileName: SystemIndex_1_Properties
+    -
+        Name: SystemIndex PropertyStore
+        Query: SELECT * FROM SystemIndex_1_PropertyStore;
+        BaseFileName: SystemIndex_1_PropertyStore
+    -
+        Name: SystemIndex PropertyStore Metadata
+        Query: SELECT * FROM SystemIndex_1_PropertyStore_Metadata;
+        BaseFileName: SystemIndex_1_PropertyStore_Metadata
+
+    -
+        Name: Joined PropertyStore Metadata
+        Query: SELECT * FROM SystemIndex_1_PropertyStore AS PS JOIN SystemIndex_1_PropertyStore_Metadata AS PS_META WHERE PS_META.Id = PS.ColumnId;
+        BaseFileName: Joined_PropertyStore_Metadata
+
+# Documentation
+# https://www.aon.com/cyber-solutions/aon_cyber_labs/windows-search-index-the-forensic-artifact-youve-been-searching-for/
