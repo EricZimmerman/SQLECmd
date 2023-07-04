@@ -10,7 +10,7 @@ IdentifyValue: 3
 Queries:
     -
         Name: SystemIndex Properties
-        Query: SELECT * FROM SystemIndex_1_Properties;                
+        Query: SELECT * FROM SystemIndex_1_Properties;
         BaseFileName: SystemIndex_1_Properties
     -
         Name: SystemIndex PropertyStore
@@ -20,8 +20,8 @@ Queries:
         Name: SystemIndex PropertyStore Metadata
         Query: SELECT * FROM SystemIndex_1_PropertyStore_Metadata;
         BaseFileName: SystemIndex_1_PropertyStore_Metadata
-    
-    - 
+
+    -
         Name: Joined PropertyStore Metadata
         Query: SELECT * FROM SystemIndex_1_PropertyStore AS PS JOIN SystemIndex_1_PropertyStore_Metadata AS PS_META WHERE PS_META.Id = PS.ColumnId;
         BaseFileName: Joined_PropertyStore_Metadata
