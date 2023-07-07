@@ -2,7 +2,19 @@
     <PropertyGroup>
         <TargetFrameworks>net6.0;netstandard2.0</TargetFrameworks>
         <LangVersion>10</LangVersion>
-        <Version>0.6.0.0</Version>
+        <Version>0.6.0</Version>
+        <Authors>Eric R. Zimmerman</Authors>
+        <Description>SQLite maps manager</Description>
+        <PackageProjectUrl>https://github.com/EricZimmerman/SQLECmd</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Version>1.0.0</Version>
+
+        <PackageTags>SRUM</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>icon.png</PackageIcon>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <!-- If all members are not documented, you can disable the compiler warnings -->
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="AlphaFS.New" Version="2.3.0"/>
@@ -11,6 +23,17 @@
         <PackageReference Include="Serilog" Version="2.10.0"/>
         <PackageReference Include="ServiceStack.Text" Version="5.13.2"/>
         <PackageReference Include="YamlDotNet" Version="11.2.1"/>
+
+        <None Include="../README.md" Pack="true" PackagePath=""/>
+        <None Include="../icon.png" Pack="true" PackagePath=""/>
+        <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="MinVer" Version="4.3.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
     <ItemGroup>
         <Folder Include="Maps\"/>
