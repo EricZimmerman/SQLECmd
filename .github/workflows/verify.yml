@@ -8,5 +8,7 @@ jobs:
       - name: yaml-lint
         uses: ibiqlik/action-yamllint@v3
         with:
-          exclude: |
-            .github/workflows/verify.yml
+          file_or_dir: .github\workkflows
+          config_data: |
+            ignore: verify.yml
+            
