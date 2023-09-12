@@ -20,7 +20,6 @@ Queries:
         Name: SystemIndex PropertyStore Metadata
         Query: SELECT * FROM SystemIndex_1_PropertyStore_Metadata;
         BaseFileName: SystemIndex_1_PropertyStore_Metadata
-
     -
         Name: Joined PropertyStore Metadata
         Query: SELECT * FROM SystemIndex_1_PropertyStore AS PS JOIN SystemIndex_1_PropertyStore_Metadata AS PS_META WHERE PS_META.Id = PS.ColumnId;
