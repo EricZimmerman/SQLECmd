@@ -4,7 +4,7 @@ Email: andrew.rathbun@kroll.com
 Id: e470201e-f1d6-448d-8876-4ee267dc523b
 Version: 1.0
 CSVPrefix: TeraCopy
-FileName: Main.db
+FileName: main.db
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='list');
 IdentifyValue: 1
 
