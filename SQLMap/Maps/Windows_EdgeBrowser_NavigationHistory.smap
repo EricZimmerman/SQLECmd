@@ -23,4 +23,5 @@ Queries:
                 navigation_history.last_visited_time ASC;
         BaseFileName: NavigationHistory
 
-
+# Documentation
+# N/A
