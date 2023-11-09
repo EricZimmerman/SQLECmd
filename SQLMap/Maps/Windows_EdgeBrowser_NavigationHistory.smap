@@ -1,0 +1,27 @@
+Description: Edge Browser Navigation History
+Author: Suyash Tripathi
+Email: suyash.tripathi@cybercx.com.au
+Id: 4231f387-d112-458d-8a19-704e91125ea78
+Version: 1.0
+CSVPrefix: EdgeBrowser
+FileName: WebAssistDatabase
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND name='navigation_history';
+IdentifyValue: 1
+Queries:
+    -
+        Name: WebAssistdatabase Navigation History
+        Query: |
+                SELECT
+                navigation_history.id AS ID,
+                datetime(navigation_history.last_visited_time, 'unixepoch') AS 'Last Visited Time',
+                navigation_history.title AS Title,
+                navigation_history.url AS URL,
+                navigation_history.num_visits AS VisitCount
+                FROM
+                navigation_history
+                ORDER BY
+                navigation_history.last_visited_time ASC;
+        BaseFileName: NavigationHistory
+
+# Documentation
+# N/A
