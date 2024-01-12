@@ -2,7 +2,7 @@ Description: Chromium Browser Keyword Searches
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: d968ece4-d24a-4baf-8f07-78da07727712
-Version: 1.0
+Version: 1.1
 CSVPrefix: ChromiumBrowser
 FileName: History
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='urls' OR name='visits' OR name='downloads' OR name='segments' OR name='keyword_search_terms');
