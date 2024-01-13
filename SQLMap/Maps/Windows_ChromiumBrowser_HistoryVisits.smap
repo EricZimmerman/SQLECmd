@@ -2,10 +2,10 @@ Description: Chromium Browser History Visits
 Author: Andrew Rathbun
 Email: andrew.rathbun@kroll.com
 Id: 1f37cc07-2b10-4c80-b845-84708e4f7429
-Version: 1.1
+Version: 1.2
 CSVPrefix: ChromiumBrowser
 FileName: History
-IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='urls' OR name='visits' OR name='downloads' OR name='segments' OR name='typed_url_sync_metadata');
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='urls' OR name='visits' OR name='downloads' OR name='segments' OR name='keyword_search_terms');
 IdentifyValue: 5
 Queries:
     -
