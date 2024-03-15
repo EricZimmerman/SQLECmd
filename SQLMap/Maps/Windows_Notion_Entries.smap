@@ -1,0 +1,36 @@
+Description: Notion App Entries
+Author: Thomas Burnette
+Email: thomas.burnette@cox.com
+Id: 46qxess2-p252-j011-y626-a2l74p3sx815
+Version: 1.0
+CSVPrefix: Notion
+FileName: notion.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='block');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Entries
+        Query: |
+                SELECT
+                    block.id,
+                    space_id,
+                    block.version,
+                    type,
+                    properties,
+                    collection_id,
+                    created_time,
+                    created_by,
+                    name AS "created_by_name",
+                    last_edited_time,
+                    last_edited_by,
+                    parent_id
+                FROM
+                    block
+                INNER JOIN
+                    notion_user
+                ON
+                    notion_user.id = block.created_by_id;
+        BaseFileName: NotionEntries
+
+# Documentation
+# https://www.notion.so/
