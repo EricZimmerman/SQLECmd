@@ -26,9 +26,9 @@ Queries:
                     parent_id
                 FROM
                     block
-                INNER JOIN 
+                INNER JOIN
                     notion_user
-                ON 
+                ON
                     notion_user.id = block.created_by_id;
         BaseFileName: NotionEntries
 
