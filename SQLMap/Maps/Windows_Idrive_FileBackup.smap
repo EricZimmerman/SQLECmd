@@ -1,0 +1,38 @@
+Description: Idrive Backups
+Author: Thomas Burnette
+Email: thomas.burnette@cox.com
+Id: 35e1ef80-0311-4eb7-8b18-724aa572ae46
+Version: 1.0
+CSVPrefix: Idrive
+FileName: random.db # run --hunt mode on the directory to make use of this map
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='ibfile');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Files
+        Query: |
+                SELECT
+                    ibfolder.NAME
+                AS
+                    'file_directory',
+                    ibfile.NAME
+                AS
+                    'filen_name',
+                    ibfile.FILE_SIZE
+                AS
+                    'file_size',
+                    ibfile.FILE_LMD
+                AS
+                    'file_modify_date'
+                FROM
+                    ibfile
+                INNER JOIN
+                    ibfolder
+                ON
+                    ibfile.DIRID = ibfolder.DIRID;
+        BaseFileName: BackupFiles
+
+# Documentation
+# https://www.idrive.com/
+# IDrive provides Online cloud Backup for PCs, Macs, iPhones, Android and other Mobile Devices.
+# Sqlite database that contains the file name, directory, and file size of files that are backed up from a local drive.
