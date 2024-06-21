@@ -1,0 +1,96 @@
+Description: Edge Browser Collections
+Author: John Woeltje & David Diehl
+Email: 19861970+jfdubya@users.noreply.github.com
+Id: 4d00388b-eab3-42de-b7c6-784d385708d4
+Version: 1.0
+CSVPrefix: EdgeBrowser
+FileName: collectionsSQLite
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='collections' OR name='items');
+IdentifyValue: 2
+Queries:
+
+    -
+        Name: Edge Browser Collections - Collections, Items, and Comments
+        Query: |
+                SELECT
+                /* Collections table */
+                datetime(collections.date_created/1000, 'unixepoch', 'utc') AS Collection_CreationUTC,
+                datetime(collections.date_modified/1000, 'unixepoch', 'utc') AS Collection_ModifiedUTC,
+                collections.title as Collection_Title,
+                collections.position as Collection_Position,
+                collections.is_syncable as Collection_IsSyncable,
+                collections.suggestion_url as Collection_SuggestionUrl,
+                collections.suggestion_dismissed as Collection_SuggestionDismissed,
+                collections.suggestion_type as Collection_SuggestionType,
+                cast(collections.thumbnail as varchar) as Collection_Thumbnail,
+                collections.is_custom_thumbnail as Collection_IsCustomThumbnail,
+                collections.tag as Collection_Tag,
+                collections.thumbnail_url as Collection_ThumbnailUrl,
+                collections.is_marked_for_deletion as Collection_IsMarkedForDeletion,
+
+                /* Collections_Sync table */
+                datetime(collections_sync.date_last_synced/1000, 'unixepoch', 'utc') AS CollectionSync_DateLastSynced,
+                collections_sync.is_syncable AS CollectionSync_IsSyncable,
+                collections_sync.server_id AS CollectionSync_ServerId,
+
+                /* Items table */
+                case when items.type == "website"
+                    then datetime(items.date_created, 'unixepoch', 'utc')
+                    else datetime(items.date_created/1000, 'unixepoch', 'utc')
+                end AS Item_CreationUTC,
+                datetime(items.date_modified/1000, 'unixepoch', 'utc') AS Item_ModifiedUTC,
+                cast(items.source as varchar) AS Item_Source,
+                items.Title AS Item_Title,
+                cast(items.entity_blob as varchar) AS Item_EntityBlob,
+                cast(items.canonical_image_data as varchar) AS Item_CanonicalImageData,
+                cast(items.third_party_data as varchar) AS Item_ThirdPartyData,
+                items.favicon_url AS Item_FaviconUrl,
+                items.text_content AS Item_TextContent,
+                items.html_content AS Item_HtmlContent,
+                items.type AS Item_Type,
+                items.tag AS Item_Tag,
+
+                /* Items Offline Data */
+                items_offline_data.offline_file_data AS Item_OfflineFileData,
+
+                /* Items_Sync Data */
+                datetime(items_sync.date_last_synced/1000, 'unixepoch', 'utc') AS ItemSync_DateLastSynced,
+                items_sync.is_syncable AS ItemSync_IsSyncable,
+
+                /* Comments table */
+                comments.text as Comment_Text,
+                comments.properties as Comment_Properties,
+
+                /* All the raw fields here */
+                collections.id as collection_id,
+                collections.date_created as raw_collection_created,
+                collections.date_modified as raw_collection_modified,
+                items.id AS item_id,
+                items.date_created AS raw_item_created,
+                items.date_modified AS raw_item_modified,
+                comments.id as comment_id,
+                comments.parent_id as comment_parent_id
+
+
+                FROM
+                items
+                    left join collections_items_relationship
+                        on items.id = collections_items_relationship.item_id
+                    left join collections
+                        on collections_items_relationship.parent_id = collections.id
+                    left join collections_sync
+                        on collections.id = collections_sync.collection_id
+                    left join comments
+                        on items.id = comments.parent_id
+                    left join items_offline_data
+                        on items.id = items_offline_data.item_id
+                    left join items_sync
+                        on items.id = items_sync.item_id
+
+                ORDER BY
+                    Collection_Title ASC, items.date_created DESC
+        BaseFileName: Collections
+
+# Documentation
+# https://support.microsoft.com/en-us/microsoft-edge/organize-your-ideas-with-collections-in-microsoft-edge-60fd7bba-6cfd-00b9-3787-b197231b507e
+# https://docs.velociraptor.app/artifact_references/pages/windows.kapefiles.targets/
