@@ -14,7 +14,7 @@ Queries:
         Query: |
                 SELECT
                 /* Collections table */
-                datetime(collections.date_created/1000, 'unixepoch', 'utc') AS Collection_CreationUTC, 
+                datetime(collections.date_created/1000, 'unixepoch', 'utc') AS Collection_CreationUTC,
                 datetime(collections.date_modified/1000, 'unixepoch', 'utc') AS Collection_ModifiedUTC,
                 collections.title as Collection_Title,
                 collections.position as Collection_Position,
@@ -37,7 +37,7 @@ Queries:
                 case when items.type == "website"
                     then datetime(items.date_created, 'unixepoch', 'utc')
                     else datetime(items.date_created/1000, 'unixepoch', 'utc')
-                end AS Item_CreationUTC, 
+                end AS Item_CreationUTC,
                 datetime(items.date_modified/1000, 'unixepoch', 'utc') AS Item_ModifiedUTC,
                 cast(items.source as varchar) AS Item_Source,
                 items.Title AS Item_Title,
@@ -50,11 +50,11 @@ Queries:
                 items.type AS Item_Type,
                 items.tag AS Item_Tag,
 
-                /* Items Offline Data */ 
+                /* Items Offline Data */
                 items_offline_data.offline_file_data AS Item_OfflineFileData,
 
                 /* Items_Sync Data */
-                datetime(items_sync.date_last_synced/1000, 'unixepoch', 'utc') AS ItemSync_DateLastSynced, 
+                datetime(items_sync.date_last_synced/1000, 'unixepoch', 'utc') AS ItemSync_DateLastSynced,
                 items_sync.is_syncable AS ItemSync_IsSyncable,
 
                 /* Comments table */
@@ -73,10 +73,10 @@ Queries:
 
 
                 FROM
-                items 
-                    left join collections_items_relationship 
+                items
+                    left join collections_items_relationship
                         on items.id = collections_items_relationship.item_id
-                    left join collections 
+                    left join collections
                         on collections_items_relationship.parent_id = collections.id
                     left join collections_sync
                         on collections.id = collections_sync.collection_id
@@ -87,8 +87,8 @@ Queries:
                     left join items_sync
                         on items.id = items_sync.item_id
 
-                ORDER BY 
-                    Collection_Title ASC, items.date_created DESC 
+                ORDER BY
+                    Collection_Title ASC, items.date_created DESC
         BaseFileName: Collections
 
 # Documentation
