@@ -11,7 +11,7 @@ Queries:
     -
         Name: API Keys
         Query: |
-            SELECT 
+            SELECT
             id AS ID,
             name AS Name,
             key AS Key,
@@ -36,7 +36,7 @@ Queries:
     -
         Name: Chat Messages
         Query: |
-            SELECT 
+            SELECT
             id AS MessageID,
             chat_id AS ChatID,
             text AS Text,
@@ -63,7 +63,7 @@ Queries:
     -
         Name: Chats
         Query: |
-            SELECT 
+            SELECT
             id AS ChatID,
             title AS Title,
             model_vendor AS ModelVendor,
@@ -82,7 +82,7 @@ Queries:
     -
         Name: Knowledge Stacks
         Query: |
-            SELECT 
+            SELECT
             id AS StackID,
             title AS Title,
             status AS Status,
@@ -107,5 +107,5 @@ Queries:
 # https://msty.app/
 # https://docs.msty.app/getting-started/onboarding
 # https://github.com/cloudstack-llc/msty-docs
-# Msty is a front end UI used to host local language models. Msty is developed by Cloudstack, LLC.
+# Msty is a front-end UI used to host local language models. Msty is developed by Cloudstack, LLC.
 # Use SQLECmd in conjunction with the MstyDatabase KAPE Target.
