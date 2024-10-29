@@ -8,7 +8,7 @@ FileName: msty.db
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='api_keys' OR name='app_settings' OR name='chat_messages' OR name='chats' OR name='knowledge_stacks');
 IdentifyValue: 5
 Queries:
-    - 
+    -
         Name: API Keys
         Query: |
             SELECT 
@@ -24,7 +24,7 @@ Queries:
             FROM api_keys
         BaseFileName: ApiKeys
 
-    - 
+    -
         Name: App Settings
         Query: |
             SELECT 
@@ -33,7 +33,7 @@ Queries:
             FROM app_settings
         BaseFileName: AppSettings
 
-    - 
+    -
         Name: Chat Messages
         Query: |
             SELECT 
@@ -60,7 +60,7 @@ Queries:
             FROM chat_messages
         BaseFileName: ChatMessages
 
-    - 
+    -
         Name: Chats
         Query: |
             SELECT 
@@ -79,7 +79,7 @@ Queries:
             FROM chats
         BaseFileName: Chats
 
-    - 
+    -
         Name: Knowledge Stacks
         Query: |
             SELECT 
