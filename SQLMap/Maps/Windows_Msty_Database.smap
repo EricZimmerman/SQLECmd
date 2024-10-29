@@ -27,7 +27,7 @@ Queries:
     -
         Name: App Settings
         Query: |
-            SELECT 
+            SELECT
             key AS Key,
             value AS Value
             FROM app_settings
