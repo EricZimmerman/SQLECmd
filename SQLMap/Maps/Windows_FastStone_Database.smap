@@ -1,0 +1,59 @@
+Description: FastStone Database Tables
+Author: DReneau
+Email: dareneau@gmail.com
+Id: 1c3a5b1d-4284-4f47-8fcc-219bc5512acb
+Version: 1.1
+CSVPrefix: FastStone
+FileName: FSIV.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='FolderList' OR name='FileList' OR name='DBSettings');
+IdentifyValue: 3
+Queries:
+    -
+        Name: Folder List
+        Query: |
+            SELECT
+            folderID AS FolderID,
+            folderName AS FolderName,
+            lastAccess AS LastAccess
+            FROM FolderList
+        BaseFileName: FolderList
+
+    -
+        Name: File List
+        Query: |
+            SELECT
+            ID AS ID,
+            folderID AS FolderID,
+            itemNO AS ItemNO,
+            isFolder AS IsFolder,
+            fileName AS FileName,
+            isTag AS IsTag,
+            ratings AS Ratings,
+            XP_rating AS XPRating,
+            fileTime AS FileTime,
+            exifTime AS ExifTime,
+            fileSize AS FileSize,
+            width AS Width,
+            height AS Height,
+            pages AS Pages,
+            imageType AS ImageType,
+            imgSize1 AS ImgSize1,
+            imgSize2 AS ImgSize2,
+            img1 AS Img1,
+            img2 AS Img2
+            FROM FileList
+        BaseFileName: FileList
+
+    -
+        Name: DB Settings
+        Query: |
+            SELECT
+            version AS Version,
+            ThumbnailSizeS AS ThumbnailSizeSmall,
+            ThumbnailSizeB AS ThumbnailSizeBig
+            FROM DBSettings
+        BaseFileName: DBSettings
+
+# Documentation
+# https://www.faststone.org/index.htm
+# FSIV.db is the FastStone's primary database for stored metadata.
