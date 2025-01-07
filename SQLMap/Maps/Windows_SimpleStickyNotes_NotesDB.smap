@@ -1,0 +1,69 @@
+Description: Simple Sticky Notes
+Author: Andrew Rathbun
+Email: andrew.d.rathbun@gmail.com
+Id: dce123b5-afd0-4aca-b422-9as0e176794b
+Version: 1.0
+FileName: Notes.db
+CSVPrefix: SimpleStickyNotes
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='NOTEBOOKS' OR name='NOTES');
+IdentifyValue: 2
+
+Queries:
+    -
+        Name: Simple Sticky Notes DB
+        Query: |
+               SELECT
+                 NOTEBOOKS.ID,
+                 NOTEBOOKS.NAME,
+                 NOTES.STATE,
+                 datetime((NOTES.CREATED - 25569) * 86400, 'unixepoch', 'localtime', 'utc') AS CREATED_UTC,
+                 datetime((NOTES.UPDATED - 25569) * 86400, 'unixepoch', 'localtime', 'utc') AS UPDATED_UTC,
+               CASE
+
+                   WHEN NOTES.DELETED = 0 THEN
+                   'No'
+                   WHEN NOTES.DELETED = 1 THEN
+                   'Yes' ELSE NULL
+                 END AS DELETED_TEXT,
+               CASE
+
+                   WHEN NOTES.STARRED = 0 THEN
+                   'No'
+                   WHEN NOTES.STARRED = 1 THEN
+                   'Yes' ELSE NULL
+                 END AS STARRED_TEXT,
+                 NOTES.AOT,
+               CASE
+
+                   WHEN NOTES.MINIMIZE = 0 THEN
+                   'No'
+                   WHEN NOTES.MINIMIZE = 1 THEN
+                   'Yes' ELSE NULL
+                 END AS MINIMIZED_TEXT,
+                 NOTES.COLOR,
+                 NOTES.OPACITY,
+                 NOTES."LEFT",
+                 NOTES.TOP,
+                 NOTES.WIDTH,
+                 NOTES.HEIGHT,
+                 NOTES.LOCKED,
+                 NOTES.ZORDER,
+                 NOTES.ALARM,
+                 NOTES.ALARM_CURRENT,
+                 NOTES.ALARM_PERIOD,
+                 NOTES.ALARM_DAY,
+                 NOTES.ALARM_SNOOZE,
+                 NOTES.ALARM_SOUND,
+                 NOTES.NOTEBOOK,
+                 NOTES.TITLE,
+                 NOTES.TYPE,
+                 NOTES.DATA,
+                 NOTES.TEXT
+               FROM
+                 NOTEBOOKS
+                 LEFT JOIN NOTES ON NOTEBOOKS.ID = NOTES.ID
+        BaseFileName: NotesDB
+
+# Documentation
+# https://www.simplestickynotes.com/
+# Timestamps for CREATED and UPDATED are in OLE Automation (64-bit local)
