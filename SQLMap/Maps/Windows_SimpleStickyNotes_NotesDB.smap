@@ -13,7 +13,7 @@ Queries:
         Name: Simple Sticky Notes DB
         Query: |
                SELECT
-                 NOTEBOOKS.ID,
+                 COALESCE(NOTEBOOKS.ID, NOTES.ID) AS ID,
                  NOTEBOOKS.NAME,
                  NOTES.STATE,
                  datetime((NOTES.CREATED - 25569) * 86400, 'unixepoch', 'localtime', 'utc') AS CREATED_UTC,
@@ -54,14 +54,14 @@ Queries:
                  NOTES.ALARM_DAY,
                  NOTES.ALARM_SNOOZE,
                  NOTES.ALARM_SOUND,
-                 NOTES.NOTEBOOK,
+                 NOTEBOOKS.NAME AS NotebookName,
                  NOTES.TITLE,
                  NOTES.TYPE,
                  NOTES.DATA,
                  NOTES.TEXT
                FROM
-                 NOTEBOOKS
-                 LEFT JOIN NOTES ON NOTEBOOKS.ID = NOTES.ID
+                 NOTES
+                 LEFT JOIN NOTEBOOKS ON NOTEBOOKS.ID = NOTES.ID;
         BaseFileName: NotesDB
 
 # Documentation
