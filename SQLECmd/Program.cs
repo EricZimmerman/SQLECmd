@@ -506,9 +506,8 @@ internal class Program
                     using var writer = new StreamWriter(new FileStream(fullOutName, FileMode.CreateNew));
                     using var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture);
 
-
                     results.First().SourceFile = fileName;
-                csvWriter.WriteDynamicHeader(results.First());
+                    csvWriter.WriteDynamicHeader(results.First());
                     csvWriter.NextRecord();
 
                     foreach (var result in results)
