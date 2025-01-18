@@ -79,5 +79,15 @@ namespace SQLECmd.Properties {
                 return ((byte[])(obj));
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] x64SQLite_Interop_linux {
+            get {
+                object obj = ResourceManager.GetObject("x64SQLite_Interop_linux", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

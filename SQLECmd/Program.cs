@@ -12,7 +12,7 @@ using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 #if NET6_0_OR_GREATER
-using System.RuntimeInformation.InteropServices;
+using System.Runtime.InteropServices;
 #endif
 using CsvHelper;
 using Exceptionless;
