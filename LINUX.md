@@ -7,7 +7,7 @@ In order to do this you will need to download .NET 9 SDK on Linux. I followed th
 In the case of Ubuntu you will need to install build-essential if you wish to compile the libSQLite.Interop.so yourself by doing sudo apt-get update and sudo apt install build-essential
 
 If you have issues with the bundled libSQLite.Interop.so the steps to build your own are as follows:
-Download the source code for the library by navigating [here] (https://system.data.sqlite.org/index.html/doc/trunk/www/downloads.wiki) and downloading the one that says sqlite-netFx-full-source-1.0.119.0.zip
+Download the source code for the library by navigating [here](https://system.data.sqlite.org/index.html/doc/trunk/www/downloads.wiki) and downloading the one that says sqlite-netFx-full-source-1.0.119.0.zip
 
 Uncompress the zip file and issue the following commands in a Linux terminal:
 cd LOCATIONOFSOURCE/Setup
