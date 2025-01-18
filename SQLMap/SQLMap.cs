@@ -56,7 +56,7 @@ public class SqlMap
 
         IEnumerable<string> files;
 
-#if !NET6_0
+#if !NET6_0_OR_GREATER
   var f = new Alphaleonis.Win32.Filesystem.DirectoryEnumerationFilters
         {
             InclusionFilter = entry => entry.Extension.ToUpperInvariant() == ".SMAP",
