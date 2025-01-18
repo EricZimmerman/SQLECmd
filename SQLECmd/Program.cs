@@ -439,6 +439,9 @@ internal class Program
         {
             //32 Bit Not Tested on Linux
             //File.WriteAllBytes(sqllitefile, Resources.x86SQLite_Interop_linux);
+            Log.Warning("32 Bit Linux Not Supported! Exiting");
+            Console.WriteLine();
+            Environment.Exit(-1);
         }
         } else {
 
