@@ -1,0 +1,30 @@
+name: Download and Compile SQLite Interop Assembly Linux
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Download SQLite source
+      run: wget https://system.data.sqlite.org/blobs/1.0.119.0/sqlite-netFx-full-source-1.0.119.0.zip
+
+    - name: Unzip SQLite source
+      run: unzip sqlite-netFx-full-source-1.0.119.0.zip
+
+    - name: Grant execute permissions
+      run: chmod +x Setup/compile-interop-assembly-release.sh
+
+    - name: Run compile script
+      run: Setup/compile-interop-assembly-release.sh
+
+    - name: Upload compiled library
+      uses: actions/upload-artifact@v4
+      with:
+        name: libSQLite.Interop.so
+        path: bin/2013/Release/bin/libSQLite.Interop.so
