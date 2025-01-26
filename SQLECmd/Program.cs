@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 #if NET6_0_OR_GREATER
@@ -158,7 +159,7 @@ internal class Program
             try
             {
                 Log.Information("{Header}", Header);
-                UpdateFromRepo();
+                Task.Run(UpdateFromRepo).Wait();
             }
             catch (Exception e)
             {
@@ -605,7 +606,7 @@ internal class Program
         Console.WriteLine();
     }
 
-    private static void UpdateFromRepo()
+    private static async Task UpdateFromRepo()
     {
         Console.WriteLine();
 
@@ -619,11 +620,32 @@ internal class Program
             File.Delete(archivePath);
         }
 
-        using (var client = new WebClient())
+
+        using (var handler = new HttpClientHandler())
         {
-            ServicePointManager.Expect100Continue = true;
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            client.DownloadFile("https://github.com/EricZimmerman/SQLECmd/archive/master.zip", archivePath);
+            handler.ServerCertificateCustomValidationCallback = (message, certificate, chain, sslPolicyErrors) => true;
+            var client = new HttpClient(handler);
+
+            try
+            {
+                var response = await client.GetAsync("https://github.com/EricZimmerman/SQLECmd/archive/master.zip");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var contentStream = await response.Content.ReadAsStreamAsync();
+
+                    using (var fileStream = File.Create(archivePath))
+                    {
+                        await contentStream.CopyToAsync(fileStream);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions that occur during the download
+                Console.WriteLine($"Error: {ex.Message}");
+                return;
+            }
         }
 
         var fff = new FastZip();
