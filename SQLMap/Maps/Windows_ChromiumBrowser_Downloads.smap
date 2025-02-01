@@ -1,8 +1,8 @@
 Description: Chromium Browser Downloads
-Author: Andrew Rathbun
+Author: Andrew Rathbun, Reece394
 Email: andrew.d.rathbun@gmail.com
 Id: 0b575bcf-ade3-44e5-8162-eb52a96c2b06
-Version: 1.1
+Version: 1.2
 CSVPrefix: ChromiumBrowser
 FileName: History
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='urls' OR name='visits' OR name='downloads' OR name='segments' OR name='keyword_search_terms');
@@ -59,6 +59,34 @@ Queries:
                 'Potentially Unwanted'
                 WHEN downloads.danger_type = 9 THEN
                 'Whitelisted by Policy'
+                WHEN downloads.danger_type = 10 THEN
+                'Download Pending Detailed Verdict'
+                WHEN downloads.danger_type = 11 THEN
+                'Blocked By Policy Password Protected'
+                WHEN downloads.danger_type = 12 THEN
+                'Blocked By Policy Download Too Large'
+                WHEN downloads.danger_type = 13 THEN
+                'Sensitive Content Warning'
+                WHEN downloads.danger_type = 14 THEN
+                'Sensitive Content Blocked'
+                WHEN downloads.danger_type = 15 THEN
+                'Deep Scanned Safe'
+                WHEN downloads.danger_type = 16 THEN
+                'Deep Scanned Dangerous But Opened By User'
+                WHEN downloads.danger_type = 17 THEN
+                'Prompt For Deep Scanning'
+                WHEN downloads.danger_type = 18 THEN
+                'Blocked Unsupported Filetype'
+                WHEN downloads.danger_type = 19 THEN
+                'Dangerous Associated With Account Compromise'
+                WHEN downloads.danger_type = 20 THEN
+                'Deep Scan Failed'
+                WHEN downloads.danger_type = 21 THEN
+                'Encrypted Archive Prompt for Local Password Scanning'
+                WHEN downloads.danger_type = 22 THEN
+                'Encrypted Archive Prompt for Local Password Scanning Pending Detailed Verdict'
+                WHEN downloads.danger_type = 23 THEN
+                'Blocked by Policy Scan Failed'
                 END AS DangerType,
                 CASE
 
@@ -83,7 +111,11 @@ Queries:
                 WHEN downloads.interrupt_reason = 12 THEN
                 'Security Check Failed'
                 WHEN downloads.interrupt_reason = 13 THEN
-                'Resume Error'
+                'Resume Error File Too Short'
+                WHEN downloads.interrupt_reason = 14 THEN
+                'File Hash Mismatch'
+                WHEN downloads.interrupt_reason = 15 THEN
+                'File Same As Source'
                 WHEN downloads.interrupt_reason = 20 THEN
                 'Network Error'
                 WHEN downloads.interrupt_reason = 21 THEN
@@ -92,6 +124,8 @@ Queries:
                 'Connection Lost'
                 WHEN downloads.interrupt_reason = 23 THEN
                 'Server Down'
+                WHEN downloads.interrupt_reason = 24 THEN
+                'Network Request Invalid'
                 WHEN downloads.interrupt_reason = 30 THEN
                 'Server Error'
                 WHEN downloads.interrupt_reason = 31 THEN
@@ -138,5 +172,7 @@ Queries:
 # https://dfir.blog/chrome-values-lookup-tables/
 # https://forensicswiki.xyz/page/Google_Chrome
 # https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
+# https://source.chromium.org/chromium/chromium/src/+/main:components/download/public/common/download_danger_type.h
+# https://source.chromium.org/chromium/chromium/src/+/main:components/download/public/common/download_interrupt_reason_values.h
 # Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape
 # This Map technically parses any Chromium-based Browser so the name has been changed from Chrome to Chromium as of September 2021
