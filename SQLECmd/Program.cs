@@ -294,7 +294,7 @@ internal class Program
             var enumerationOptions = new EnumerationOptions
             {
                 IgnoreInaccessible = true,
-                MatchCasing = MatchCasing.CaseSensitive,
+                MatchCasing = MatchCasing.CaseInsensitive,
                 RecurseSubdirectories = true,
                 AttributesToSkip = 0
             };
