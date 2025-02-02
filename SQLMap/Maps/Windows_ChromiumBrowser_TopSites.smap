@@ -2,7 +2,7 @@ Description: Chromium Browser Top Sites
 Author: Andrew Rathbun
 Email: andrew.d.rathbun@gmail.com
 Id: 3b2fc9c8-23ea-4694-82a2-266aa819db3b
-Version: 1.0
+Version: 1.1
 CSVPrefix: ChromiumBrowser
 FileName: Top Sites
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='meta' OR name='top_sites');
@@ -14,8 +14,7 @@ Queries:
                 SELECT
                 top_sites.url_rank AS URLRank,
                 top_sites.url AS URL,
-                top_sites.title AS Title,
-                top_sites.redirects AS Redirects
+                top_sites.title AS Title
                 FROM
                 top_sites
                 ORDER BY
