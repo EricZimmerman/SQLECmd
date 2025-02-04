@@ -2,7 +2,7 @@ Description: Chromium Browser Omnibox Shortcuts
 Author: Andrew Rathbun
 Email: andrew.d.rathbun@gmail.com
 Id: 0e137968-371b-4078-9440-a94b3dcf0d2f
-Version: 1.0
+Version: 1.1
 CSVPrefix: ChromiumBrowser
 FileName: Shortcuts
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='meta' OR name='omni_box_shortcuts');
@@ -12,7 +12,7 @@ Queries:
         Name: Chromium Browser Shortcuts
         Query: |
                 SELECT
-                datetime( omni_box_shortcuts.last_access_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS LastAccessTime,
+                datetime( omni_box_shortcuts.last_access_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch' ) AS LastAccessTime,
                 omni_box_shortcuts.text AS TextTyped,
                 omni_box_shortcuts.fill_into_edit AS FillIntoEdit,
                 omni_box_shortcuts.url AS URL,
@@ -37,4 +37,5 @@ Queries:
 # https://forensicswiki.xyz/page/Google_Chrome
 # https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
 # Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape
+# Please note, timestamps will be in UTC, not Local Time
 # This Map technically parses any Chromium-based Browser so the name has been changed from Chrome to Chromium as of September 2021
