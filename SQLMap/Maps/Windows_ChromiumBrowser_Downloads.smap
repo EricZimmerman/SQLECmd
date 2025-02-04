@@ -2,7 +2,7 @@ Description: Chromium Browser Downloads
 Author: Andrew Rathbun, Reece394
 Email: andrew.d.rathbun@gmail.com
 Id: 0b575bcf-ade3-44e5-8162-eb52a96c2b06
-Version: 1.2
+Version: 1.3
 CSVPrefix: ChromiumBrowser
 FileName: History
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='urls' OR name='visits' OR name='downloads' OR name='segments' OR name='keyword_search_terms');
@@ -19,10 +19,10 @@ Queries:
                 downloads.original_mime_type AS OriginalMIMEType,
                 downloads.received_bytes AS ReceivedBytes,
                 downloads.total_bytes AS TotalBytes,
-                datetime( downloads.start_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS StartTime,
-                datetime( downloads.end_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS EndTime,
-                datetime( downloads.opened / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS Opened,
-                datetime( downloads.last_access_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS LastAccessTime,
+                datetime( downloads.start_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch' ) AS StartTime,
+                datetime( downloads.end_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch' ) AS EndTime,
+                datetime( downloads.opened / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch' ) AS Opened,
+                datetime( downloads.last_access_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch' ) AS LastAccessTime,
                 downloads.last_modified AS LastModified,
                 CASE
 
@@ -175,4 +175,5 @@ Queries:
 # https://source.chromium.org/chromium/chromium/src/+/main:components/download/public/common/download_danger_type.h
 # https://source.chromium.org/chromium/chromium/src/+/main:components/download/public/common/download_interrupt_reason_values.h
 # Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape
+# Please note, timestamps will be in UTC, not Local Time
 # This Map technically parses any Chromium-based Browser so the name has been changed from Chrome to Chromium as of September 2021

@@ -2,7 +2,7 @@ Description: Chromium Browser History Visits
 Author: Andrew Rathbun
 Email: andrew.d.rathbun@gmail.com
 Id: 1f37cc07-2b10-4c80-b845-84708e4f7429
-Version: 1.2
+Version: 1.3
 CSVPrefix: ChromiumBrowser
 FileName: History
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='urls' OR name='visits' OR name='downloads' OR name='segments' OR name='keyword_search_terms');
@@ -13,8 +13,8 @@ Queries:
         Query: |
                 SELECT
                 urls.id AS ID,
-                datetime( visits.visit_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS 'VisitTime (Local)',
-                datetime( urls.last_visit_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch', 'localtime' ) AS 'LastVisitedTime (Local)',
+                datetime( visits.visit_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch' ) AS 'VisitTime (UTC)',
+                datetime( urls.last_visit_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch' ) AS 'LastVisitedTime (UTC)',
                 urls.title AS URLTitle,
                 urls.url AS URL,
                 urls.visit_count AS VisitCount,
@@ -43,5 +43,5 @@ Queries:
 # https://forensicswiki.xyz/page/Google_Chrome
 # https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
 # Use SQLECmd in conjunction with the Chrome KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Chrome.tkape
-# Please note, timestamps will be in LOCAL time, not UTC
+# Please note, timestamps will be in UTC, not Local Time
 # This Map technically parses any Chromium-based Browser so the name has been changed from Chrome to Chromium as of September 2021
