@@ -1,0 +1,25 @@
+Description: Ivanti Application Monitoring
+Author: Andrew Rathbun
+Email: andrew.d.rathbun@gmail.com
+Id: bf7b0ce2-c49c-42e4-a690-ce8e1b9d630c
+Version: 1.0
+CSVPrefix: Ivanti
+FileName: IvAppMon.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='applications' OR name='modifiedFiles' OR name='networkOperations' OR name='networkProtocols' OR name='usedApplications' OR name='usedImages');
+IdentifyValue: 6
+Queries:
+    -
+        Name: Ivanti
+        Query: |
+               SELECT
+                 "NO".*,
+                 np.protocol,
+                 a.*
+               FROM
+                 networkOperations AS "NO"
+                 LEFT JOIN networkProtocols AS np ON "NO".applications_id = np.applications_id
+                 LEFT JOIN applications AS a ON "NO".applications_id = a.id
+        BaseFileName: AppMon
+
+# Documentation
+# https://forums.ivanti.com/s/article/Application-Monitoring-Technical-Information-and-Troubleshooting?language=en_US
