@@ -14,7 +14,7 @@ Queries:
                SELECT
                  "NO".*,
                  np.protocol,
-                 a.* 
+                 a.*
                FROM
                  networkOperations AS "NO"
                  LEFT JOIN networkProtocols AS np ON "NO".applications_id = np.applications_id
