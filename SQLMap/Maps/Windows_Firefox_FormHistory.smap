@@ -2,7 +2,7 @@ Description: Firefox Form History database
 Author: Heather Mahalik
 Email: hmahalik@gmail.com
 Id: 928acef8-7035-45f2-b2a0-06613781c158
-Version: 0.2
+Version: 0.3
 CSVPrefix: Firefox
 FileName: formhistory.sqlite
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='moz_formhistory');
@@ -17,8 +17,8 @@ Queries:
                 fieldname AS FieldName,
                 value AS Value,
                 timesUsed AS TimesUsed,
-                datetime( firstUsed / 1000000, 'unixepoch', 'localtime' ) AS "First Used",
-                datetime( lastUsed / 1000000, 'unixepoch', 'localtime' ) AS "Last Used",
+                datetime( firstUsed / 1000000, 'unixepoch' ) AS "First Used",
+                datetime( lastUsed / 1000000, 'unixepoch' ) AS "Last Used",
                 guid AS GUID
                FROM
                 moz_formhistory
@@ -33,3 +33,4 @@ Queries:
 # https://pr1malbyt3s.com/Forensics/SQLite-Browser-Artifacts.html
 # https://nasbench.medium.com/web-browsers-forensics-7e99940c579a
 # Use SQLECmd in conjunction with the Firefox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Firefox.tkape
+# Please note, timestamps will be in UTC, not Local Time

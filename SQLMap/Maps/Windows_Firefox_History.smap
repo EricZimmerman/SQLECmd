@@ -2,7 +2,7 @@ Description: Firefox History
 Author: Andrew Rathbun
 Email: andrew.d.rathbun@gmail.com
 Id: 2f34be88-08d0-43c1-a2fd-60fe0b71f32b
-Version: 1.0
+Version: 1.1
 CSVPrefix: Firefox
 FileName: places.sqlite
 IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='moz_historyvisits' OR name='moz_bookmarks' OR name='moz_places' OR name='moz_inputhistory');
@@ -14,7 +14,7 @@ Queries:
                 SELECT
                 moz_historyvisits.id AS VisitID,
                 moz_historyvisits.from_visit AS FromVisitID,
-                datetime( moz_places.last_visit_date / 1000000, 'unixepoch', 'localtime' ) AS LastVisitDate,
+                datetime( moz_places.last_visit_date / 1000000, 'unixepoch' ) AS LastVisitDate,
                 moz_places.visit_count AS VisitCount,
                 moz_places.url AS URL,
                 moz_places.title AS Title,
@@ -74,3 +74,4 @@ Queries:
 # https://pr1malbyt3s.com/Forensics/SQLite-Browser-Artifacts.html
 # https://stackoverflow.com/questions/52343272/sql-query-on-tags-in-places-sqlite-of-firefox
 # Use SQLECmd in conjunction with the Firefox KAPE Target: https://github.com/EricZimmerman/KapeFiles/blob/master/Targets/Browsers/Firefox.tkape
+# Please note, timestamps will be in UTC, not Local Time
