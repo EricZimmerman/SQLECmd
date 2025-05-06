@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFrameworks>net6.0;net462;net9.0</TargetFrameworks>
+        <TargetFrameworks>net6.0;net9.0</TargetFrameworks>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Version>1.1.0</Version>
         <ApplicationIcon>DatabaseSearch.ico</ApplicationIcon>
