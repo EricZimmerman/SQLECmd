@@ -16,7 +16,7 @@ Queries:
     -
         Name: ConnectionLog
         Query: |
-                SELECT l.ID as ConnectionLogID, l.Username, l.MachineName, l.Message, l.MessageType, l.ConnectionName, l.ConnectionTypeName, l.StartDateTimeUTC, l.EndDateTimeUTC, l.CreationDate, l.LoggedUserName, l.GroupName, l.HostName, l.ActiveTime, l.Application, c.ID as ConnectionID, c.DATA, c.CreationDate, c.ModifiedDate, c.ModifiedUsername, c.ModifiedLoggedUsername, c.SecurityGroup, c.CustomerID, c.ConnectionType, c.ConnectionSubType, c.GroupName, c.Name, c.AttachmentCount, c.AttachmentPrivateCount, c.HandbookCount FROM ConnectionLog AS l INNER JOIN Connections AS c ON l.ConnectionID = c.ID 
+                SELECT l.ID as ConnectionLogID, l.Username, l.MachineName, l.Message, l.MessageType, l.ConnectionName, l.ConnectionTypeName, l.StartDateTimeUTC, l.EndDateTimeUTC, l.CreationDate, l.LoggedUserName, l.GroupName, l.HostName, l.ActiveTime, l.Application, c.ID as ConnectionID, c.DATA, c.CreationDate, c.ModifiedDate, c.ModifiedUsername, c.ModifiedLoggedUsername, c.SecurityGroup, c.CustomerID, c.ConnectionType, c.ConnectionSubType, c.GroupName, c.Name, c.AttachmentCount, c.AttachmentPrivateCount, c.HandbookCount FROM ConnectionLog AS l INNER JOIN Connections AS c ON l.ConnectionID = c.ID
         BaseFileName: ConnectionLog
     -
         Name: Attachments
