@@ -1,0 +1,38 @@
+Description: Remote Desktop Manager Databases
+Author: ogmini
+Email: ogminimk1@gmail.com
+Id: 5dece751-3755-41e4-a9b5-d6fce9b1f524
+Version: 1.0
+CSVPrefix: RemoteDesktopManager
+FileName: Connections.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='Connections' OR name='Attachment' OR name='ConnectionHandbook' OR name='ConnectionHandbookHistory' OR name='ConnectionLog' OR name='ConnectionHistory');
+IdentifyValue: 6
+Queries:
+    -
+        Name: Connections
+        Query: |
+                SELECT c.ID as ConnectionID, c.DATA, c.CreationDate, c.ModifiedDate, c.ModifiedUsername, c.ModifiedLoggedUsername, c.SecurityGroup, c.CustomerID, c.ConnectionType, c.ConnectionSubType, c.GroupName, c.Name, c.AttachmentCount, c.AttachmentPrivateCount, c.HandbookCount    FROM Connections AS c
+        BaseFileName: Connections
+    -
+        Name: ConnectionLog
+        Query: |
+                SELECT l.ID as ConnectionLogID, l.Username, l.MachineName, l.Message, l.MessageType, l.ConnectionName, l.ConnectionTypeName, l.StartDateTimeUTC, l.EndDateTimeUTC, l.CreationDate, l.LoggedUserName, l.GroupName, l.HostName, l.ActiveTime, l.Application, c.ID as ConnectionID, c.DATA, c.CreationDate, c.ModifiedDate, c.ModifiedUsername, c.ModifiedLoggedUsername, c.SecurityGroup, c.CustomerID, c.ConnectionType, c.ConnectionSubType, c.GroupName, c.Name, c.AttachmentCount, c.AttachmentPrivateCount, c.HandbookCount FROM ConnectionLog AS l INNER JOIN Connections AS c ON l.ConnectionID = c.ID
+        BaseFileName: ConnectionLog
+    -
+        Name: Attachments
+        Query: |
+                SELECT a.ID as AttachmentID, a.Description, a.CreationDateTime, a.Username, a.Data, a.AttachmentData, a.FileSize, c.ID as ConnectionID, c.DATA, c.CreationDate, c.ModifiedDate, c.ModifiedUsername, c.ModifiedLoggedUsername, c.SecurityGroup, c.CustomerID, c.ConnectionType, c.ConnectionSubType, c.GroupName, c.Name, c.AttachmentCount, c.AttachmentPrivateCount, c.HandbookCount FROM Attachment AS a INNER JOIN Connections AS c  ON a.ConnectionID = c.ID
+        BaseFileName: Attachments
+    -
+        Name: Handbook
+        Query: |
+                SELECT hb.ID as HandbookID, hb.Name, hb.Data, hb.CreationDate, hb.CreationUsername, hb.CreationLoggedUsername, hb.ModifiedDate, hb.ModifiedUsername, hb.ModifiedLoggedUsername, hb.GroupName, hb.SortPriority, hb.IsDefault, hb.DocumentationType, c.ID as ConnectionID, c.DATA, c.CreationDate, c.ModifiedDate, c.ModifiedUsername, c.ModifiedLoggedUsername, c.SecurityGroup, c.CustomerID, c.ConnectionType, c.ConnectionSubType, c.GroupName, c.Name, c.AttachmentCount, c.AttachmentPrivateCount, c.HandbookCount FROM ConnectionHandbook as hb INNER JOIN Connections as c ON hb.ConnectionID = c.ID
+        BaseFileName: Handbook
+    -
+        Name: HandbookHistory
+        Query: |
+                SELECT hbh.ID as HanbookHistoryID, hbh.HistoryType, hbh.Name, hbh.Data, hbh.ModifiedDate, hbh.ModifiedUsername, hbh.ModifiedLoggedUsername, hbh.GroupName, hbh.SortPriority, hbh.IsDefault, hbh.IsRevertable, hbh.CreationDate, hbh.CreationUsername, hbh.CreationLoggedUsername, hbh.DocumentationType, hb.ID as HandbookID, hb.Name, hb.Data, hb.CreationDate, hb.CreationUsername, hb.CreationLoggedUsername, hb.ModifiedDate, hb.ModifiedUsername, hb.ModifiedLoggedUsername, hb.GroupName, hb.SortPriority, hb.IsDefault, hb.DocumentationType, c.ID as ConnectionID, c.DATA, c.CreationDate, c.ModifiedDate, c.ModifiedUsername, c.ModifiedLoggedUsername, c.SecurityGroup, c.CustomerID, c.ConnectionType, c.ConnectionSubType, c.GroupName, c.Name, c.AttachmentCount, c.AttachmentPrivateCount, c.HandbookCount  FROM ConnectionHandbookHistory as hbh INNER JOIN Connections as c ON hbh.ConnectionID = c.ID INNER JOIN ConnectionHandbook as hb ON hb.ID = hbh.ConnectionHandbookID
+        BaseFileName: HandbookHistory
+
+# Documentation:
+# https://ogmini.github.io/research#remote-desktop-manager
