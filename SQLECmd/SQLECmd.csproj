@@ -15,6 +15,7 @@
         </PackageReference>
         <PackageReference Include="ERZHelpers" Version="1.5.3" />
         <PackageReference Include="Exceptionless" Version="6.1.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Serilog" Version="4.2.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
         <PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="8.5.2" />
