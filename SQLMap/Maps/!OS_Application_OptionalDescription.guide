@@ -27,3 +27,85 @@ Queries:
 # Multiple SQL queries can exist within the same .smap file, if needed. Just follow the format shown above and add on or remove as necessary
 # There are many tools out there to help build SQL queries: Navicat for SQLite, SQLite Expert Professional, and Sanderson Forensic Toolkit, to name a few
 # Free tools like DB Browser for SQLite will require a stronger working knowledge of SQL query building as its done manually without the help of a Query Builder often found in paid tools
+
+# Blob Extraction Documentation
+# SQLECmd supports extracting binary large objects (blobs) from database columns and saving them to separate files
+# To specify blob columns, use the optional BlobColumns property within a query definition
+# BlobColumns only needs to be included in queries that extract blob data - omit it for regular queries
+# Extracted blobs are saved to the --csv directory, or --json directory if --blobdir is not specified
+# When --noblob is used it disables blob extraction entirely for all queries
+# 
+# Output filename format for extracted blobs:
+# This links the blobs to the .csv output
+# {timestamp}_{CSVPrefix}_{BaseFileName}_{MapId}_{Identifier}_{BlobColumnName}.{Extension}
+# - timestamp: YYYYMMDDHHMMSSFFFFFF format
+# - CSVPrefix: From map's CSVPrefix field
+# - BaseFileName: From query's BaseFileName field
+# - MapId: From map's Id field
+# - Identifier: From NameColumn value if provided and valid, otherwise a counter
+# - BlobColumnName: From BlobColumn field
+# - Extension: From BlobExtension if provided, otherwise 'blob'
+# 
+# BlobColumns format (optional):
+# BlobColumns:
+#   - BlobColumn: ActualBlobDataColumn    # Required: Column containing blob data
+#     NameColumn: IdentifierColumnForRow   # Optional: Column to use for filename. If NameColumn is omitted, or if its value in a given row is null or empty, a counter is used for that blob's filename part.
+#                                         # NameColumn values are sanitized:
+#                                         # - Invalid filename characters such as \ / : * ? " < > | and spaces are replaced with underscores
+#                                         # - Leading/trailing underscores are trimmed
+#                                         # - Limited to 50 characters to prevent long filenames
+#                                         # - If value is null/empty after sanitization, falls back to using a counter
+#     BlobExtension: jpg                  # Optional: Extension for blob file (default: blob). Do not include a dot (.)
+#                                         # Note: BlobExtension only renames the output file and does not convert the data format. If BlobExtension is omitted, empty, or invalid, the default extension "blob" will be used.
+#
+# You can specify multiple BlobColumns entries to:
+# - Extract different blob columns from the same query
+# - Extract the same blob column multiple times with different name columns or extensions
+# - Mix and match blob extractions as needed for your analysis
+#
+# Example of multiple BlobColumns:
+#            - BlobColumn: AvatarBlob      # Extract avatar with jpg extension
+#              NameColumn: UserName
+#              BlobExtension: jpg
+#            - BlobColumn: DocumentBlob     # Extract document with original filename
+#              NameColumn: FileName
+#              BlobExtension: pdf
+#            - BlobColumn: AvatarBlob      # Extract same avatar blob with another name column to identify it
+#              NameColumn: AnotherIdentifier
+#              BlobExtension: jpg
+
+# Complete Example Map with BlobColumns:
+# Description: Parses user information including profile pictures and documents from ExampleApp
+# Author: Your Name
+# Email: youremail@here.com
+# Id: ExampleAppUserData
+# Version: 1.0
+# CSVPrefix: ExampleApp
+# FileName: appdata.sqlite
+# IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE name='Users'
+# IdentifyValue: 1
+# Queries:
+#   - Name: ExtractUserAvatars
+#     Query: SELECT UserId, UserName, AvatarBlob, FileExtension, LastModified FROM UserAvatars
+#     BaseFileName: UserAvatars
+#     BlobColumns:
+#       - BlobColumn: AvatarBlob    # Example: Save as jpg
+#         NameColumn: UserName
+#         BlobExtension: jpg
+#       - BlobColumn: AvatarBlob    # Example: Use different name column
+#         NameColumn: LastModified
+#         BlobExtension: bin
+#
+#   - Name: ExtractDocuments        # Example: Another query with blobs
+#     Query: SELECT DocId, RawContent, FileName, AssociatedUser FROM Documents
+#     BaseFileName: UserDocs
+#     BlobColumns:
+#       - BlobColumn: RawContent    # Example: Using filename from DB
+#         NameColumn: FileName
+#         BlobExtension: pdf
+#       - BlobColumn: RawContent    # Example: Counter used in place of NameColumn
+#         BlobExtension: dat
+#
+#   - Name: RegularQuery           # Example: Query without blobs
+#     Query: SELECT DataId, SomeValue FROM OtherTable
+#     BaseFileName: OtherData

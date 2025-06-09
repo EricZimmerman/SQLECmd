@@ -47,6 +47,7 @@ public class QueryInfo
     public string Query { get; set; }
 
     public string BaseFileName { get; set; }
+    public List<BlobColumnConfig> BlobColumns { get; set; } = new List<BlobColumnConfig>();
 
     public override string ToString()
     {
@@ -62,6 +63,28 @@ public class QueryInfoValidator : AbstractValidator<QueryInfo>
         RuleFor(target => target.Name).NotEmpty();
         RuleFor(target => target.Query).NotEmpty();
         RuleFor(target => target.BaseFileName).NotEmpty();
+        RuleForEach(target => target.BlobColumns)
+            .NotNull()
+            .SetValidator(new BlobColumnConfigValidator()).When(target => target.BlobColumns != null);
+    }
+}
+
+public class BlobColumnConfig
+{
+    public string BlobColumn { get; set; }
+    public string NameColumn { get; set; }
+    public string BlobExtension { get; set; }
+}
+
+public class BlobColumnConfigValidator : AbstractValidator<BlobColumnConfig>
+{
+    public BlobColumnConfigValidator()
+    {
+        RuleFor(config => config.BlobColumn).NotEmpty().WithMessage("BlobColumn in BlobColumnConfig cannot be empty.");
+
+        RuleFor(config => config.BlobExtension)
+            .Matches("^[a-zA-Z0-9_]+$").WithMessage("BlobExtension can only contain alphanumeric characters and underscores.")
+            .When(config => !string.IsNullOrEmpty(config.BlobExtension));
     }
 }
 

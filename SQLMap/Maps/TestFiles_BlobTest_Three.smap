@@ -1,0 +1,20 @@
+Description: Test map for blob extraction with custom naming and extensions
+Author: SQLECmd Test
+Email: test@test.com
+Version: 1.2
+Id: a1b2c3d4-e5f6-7890-1234-567890abcdeh
+FileName: BlobTest_Three.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND name='TestBlobs'
+IdentifyValue: 1
+CSVPrefix: BlobTest
+Queries:
+  - Name: ExtractBlobsWithExtensions
+    Query: "SELECT Id, Name, Data, DataTwo FROM TestBlobs ORDER BY Id ASC"
+    BaseFileName: ExtractedBlobs
+    BlobColumns:
+      - BlobColumn: Data       # This will be extracted from all 7 rows
+        NameColumn: Name      # Uses the 'Name' column's value for naming
+        BlobExtension: txt    # Blobs from 'Data' column will have .txt extension
+      - BlobColumn: DataTwo   # This will be extracted only from rows where it's not NULL (first 3 rows)
+        NameColumn: Name      # Uses the 'Name' column's value for naming (will be same as for 'Data' column for that row)
+                              # BlobExtension is omitted, so it should default to .blob
