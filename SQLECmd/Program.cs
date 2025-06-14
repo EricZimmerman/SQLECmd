@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Help;
@@ -22,6 +21,8 @@ using RawCopy;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
+using ServiceStack;
+using ServiceStack.Text;
 using ServiceStack.OrmLite;
 using ServiceStack.OrmLite.Dapper;
 using SQLECmd.Properties;
@@ -68,6 +69,9 @@ internal class Program
     private static async Task Main(string[] args)
     {
         ExceptionlessClient.Default.Startup("DyZCm8aZbNXf2iZ6BV00wY2UoR3U2tymh3cftNZs");
+
+        JsConfig.IncludeNullValues = true;
+        JsConfig.IncludeNullValuesInDictionaries = true;
 
         _rootCommand = new RootCommand
         {
@@ -183,14 +187,14 @@ internal class Program
             return;
         }
 
-        if (string.IsNullOrEmpty(csv))
+        if (string.IsNullOrEmpty(csv) && string.IsNullOrEmpty(json))
         {
             var helpBld = new HelpBuilder(LocalizationResources.Instance, Console.WindowWidth);
             var hc = new HelpContext(helpBld, _rootCommand, Console.Out);
 
             helpBld.Write(hc);
 
-            Log.Warning("--csv is required. Exiting");
+            Log.Warning("--csv or --json is required. Exiting");
             Console.WriteLine();
             return;
         }
@@ -223,7 +227,7 @@ internal class Program
             Log.Information("Maps loaded: {Count:N0}", SqlMap.MapFiles.Count);
         }
 
-        if (Directory.Exists(csv) == false)
+        if (!string.IsNullOrEmpty(csv) && Directory.Exists(csv) == false)
         {
             Log.Information("Path to {Csv} doesn't exist. Creating...", csv);
 
@@ -239,16 +243,44 @@ internal class Program
             }
         }
 
+        if (!string.IsNullOrEmpty(json) && Directory.Exists(json) == false)
+        {
+            Log.Information("Path to {Json} doesn't exist. Creating...", json);
+
+            try
+            {
+                Directory.CreateDirectory(json);
+            }
+            catch (Exception e)
+            {
+                Log.Fatal(e, "Unable to create directory {Json}. Does a file with the same name exist? Exiting", json);
+                Console.WriteLine();
+                return;
+            }
+        }
+
+        StreamWriter jsonWriter = null;
+        string jsonFullOutName = String.Empty;
+        if (!string.IsNullOrEmpty(json))
+        {
+            var baseTime = DateTimeOffset.UtcNow;
+            var jsonOutName = $"{baseTime:yyyyMMddHHmmssffffff}_SQLECmd_Output.json";
+            jsonFullOutName = Path.Combine(json, jsonOutName);
+            jsonWriter = new StreamWriter(new FileStream(jsonFullOutName, FileMode.CreateNew));
+            Log.Information("\tSaving all JSON results to {FullOutName}", jsonFullOutName);
+        }
+
         if (string.IsNullOrEmpty(f) == false)
         {
             if (File.Exists(f) == false)
             {
                 Log.Warning("{F} does not exist! Exiting", f);
                 Console.WriteLine();
+                if (jsonWriter != null) jsonWriter.Dispose();
                 return;
             }
 
-            ProcessFile(Path.GetFullPath(f), hunt, dedupe, csv);
+            ProcessFile(Path.GetFullPath(f), hunt, dedupe, csv, jsonWriter);
         }
         else
         {
@@ -323,13 +355,18 @@ internal class Program
             {
                 try
                 {
-                    ProcessFile(file, hunt, dedupe, csv);
+                    ProcessFile(file, hunt, dedupe, csv, jsonWriter);
                 }
                 catch (Exception e)
                 {
                     Log.Error(e, "Error processing {File}: {Message}", file, e.Message);
                 }
             }
+        }
+
+        if (jsonWriter != null)
+        {
+            jsonWriter.Dispose();
         }
 
         sw.Stop();
@@ -471,7 +508,7 @@ internal class Program
 #endif        
     }
 
-    private static void ProcessFile(string fileName, bool hunt, bool dedupe, string csv)
+    private static void ProcessFile(string fileName, bool hunt, bool dedupe, string csv, StreamWriter jsonWriter)
     {
         Log.Debug("Checking if {FileName} is a SQLite file", fileName);
         if (SqLiteFile.IsSqLiteFile(fileName) == false)
@@ -559,35 +596,55 @@ internal class Program
                 {
                     var results = db.Query<dynamic>(queryInfo.Query).ToList();
 
-                    var outName =
-                        $"{baseTime:yyyyMMddHHmmssffffff}_{map.CSVPrefix}_{queryInfo.BaseFileName}_{map.Id}.csv";
-
-                    var fullOutName = Path.Combine(csv, outName);
-
-                    if (results.Any() == false)
+                    if (!string.IsNullOrEmpty(csv))
                     {
-                        Log.Warning("\t {Name} did not return any results. CSV will not be saved", queryInfo.Name);
-                        continue;
-                    }
+                        var outName =
+                            $"{baseTime:yyyyMMddHHmmssffffff}_{map.CSVPrefix}_{queryInfo.BaseFileName}_{map.Id}.csv";
 
-                    Log.Information("\tDumping {Name} to {FullOutName}", queryInfo.Name, fullOutName);
+                        var fullOutName = Path.Combine(csv, outName);
 
-                    using var writer = new StreamWriter(new FileStream(fullOutName, FileMode.CreateNew));
-                    using var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                        if (results.Any() == false)
+                        {
+                            Log.Warning("\t {Name} did not return any results. CSV will not be saved", queryInfo.Name);
+                            continue;
+                        }
 
-                    results.First().SourceFile = fileName;
-                    csvWriter.WriteDynamicHeader(results.First());
-                    csvWriter.NextRecord();
+                        Log.Information("\tDumping {Name} to {FullOutName}", queryInfo.Name, fullOutName);
 
-                    foreach (var result in results)
-                    {
-                        result.SourceFile = fileName;
-                        csvWriter.WriteRecord(result);
+                        using var writer = new StreamWriter(new FileStream(fullOutName, FileMode.CreateNew));
+                        using var csvWriter = new CsvHelper.CsvWriter(writer, CultureInfo.InvariantCulture);
+
+                        results.First().SourceFile = fileName;
+                        csvWriter.WriteDynamicHeader(results.First());
                         csvWriter.NextRecord();
-                    }
 
-                    csvWriter.Flush();
-                    writer.Flush();
+                        foreach (var result in results)
+                        {
+                            result.SourceFile = fileName;
+                            csvWriter.WriteRecord(result);
+                            csvWriter.NextRecord();
+                        }
+
+                        csvWriter.Flush();
+                        writer.Flush();
+                    }
+                    if (jsonWriter != null)
+                    {
+                        if (results.Any() == false)
+                        {
+                            Log.Warning("\t {Name} did not return any results. JSON will not be saved", queryInfo.Name);
+                            continue;
+                        }
+
+                        foreach (var result in results)
+                        {
+                            result.SourceFile = fileName;
+                            result.MapDescription = map.Description;
+                            var jsonLine = JsonSerializer.SerializeToString(result);
+                            jsonWriter.WriteLine(jsonLine);
+                        }
+                        jsonWriter.Flush();
+                    }
                 }
                 catch (Exception e)
                 {
