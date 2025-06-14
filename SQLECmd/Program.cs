@@ -87,6 +87,9 @@ internal class Program
             new Option<string>(
                 "--json",
                 "Directory to save JSON formatted results to"),
+            new Option<string>(
+                "--blobdir",
+                "Directory to save blob files to"),    
 
             new Option<bool>(
                 "--dedupe",
@@ -116,7 +119,12 @@ internal class Program
             new Option<bool>(
                 "--trace",
                 () => false,
-                "Show trace information during processing")
+                "Show trace information during processing"),
+
+            new Option<bool>(
+                "--noblob",
+                () => false,
+                "If true, disables blob extraction from query results")
         };
 
         _rootCommand.Description = Header + "\r\n\r\n" + Footer;
@@ -128,7 +136,7 @@ internal class Program
         Log.CloseAndFlush();
     }
 
-    private static void DoWork(string f, string d, string csv, string json, bool dedupe, bool hunt, string maps, bool sync, bool debug, bool trace)
+    private static void DoWork(string f, string d, string csv, string json, string blobdir, bool dedupe, bool hunt, string maps, bool sync, bool debug, bool trace, bool noblob)
     {
         var levelSwitch = new LoggingLevelSwitch();
 
@@ -259,6 +267,22 @@ internal class Program
             }
         }
 
+        if (!string.IsNullOrEmpty(blobdir) && Directory.Exists(blobdir) == false)
+        {
+            Log.Information("Path to {Blobdir} doesn't exist. Creating...", blobdir);
+
+            try
+            {
+                Directory.CreateDirectory(blobdir);
+            }
+            catch (Exception e)
+            {
+                Log.Fatal(e, "Unable to create directory {Blobdir}. Does a file with the same name exist? Exiting", blobdir);
+                Console.WriteLine();
+                return;
+            }
+        }
+
         StreamWriter jsonWriter = null;
         string jsonFullOutName = String.Empty;
         if (!string.IsNullOrEmpty(json))
@@ -280,7 +304,7 @@ internal class Program
                 return;
             }
 
-            ProcessFile(Path.GetFullPath(f), hunt, dedupe, csv, jsonWriter);
+            ProcessFile(Path.GetFullPath(f), hunt, dedupe, csv, json, blobdir, jsonWriter, noblob);
         }
         else
         {
@@ -355,7 +379,7 @@ internal class Program
             {
                 try
                 {
-                    ProcessFile(file, hunt, dedupe, csv, jsonWriter);
+                    ProcessFile(file, hunt, dedupe, csv, json, blobdir, jsonWriter, noblob);
                 }
                 catch (Exception e)
                 {
@@ -508,7 +532,40 @@ internal class Program
 #endif        
     }
 
-    private static void ProcessFile(string fileName, bool hunt, bool dedupe, string csv, StreamWriter jsonWriter)
+    private static string SanitizeFilenamePart(string input, int maxLength = 50)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return null;
+        }
+
+        string sanitized = input;
+        char[] invalidChars = Path.GetInvalidFileNameChars();
+        
+        foreach (char invalidChar in invalidChars)
+        {
+            sanitized = sanitized.Replace(invalidChar.ToString(), "_");
+        }
+
+        sanitized = sanitized.Replace(" ", "_");
+
+        sanitized = sanitized.Trim('_');
+
+        if (sanitized.Length > maxLength)
+        {
+            sanitized = sanitized.Substring(0, maxLength);
+        }
+        sanitized = sanitized.Trim('_');
+
+        if (string.IsNullOrWhiteSpace(sanitized.Replace("_", "")))
+        {
+            return null;
+        }
+
+        return sanitized;
+    }
+
+    private static void ProcessFile(string fileName, bool hunt, bool dedupe, string csv, string json, string blobdir, StreamWriter jsonWriter, bool noblob)
     {
         Log.Debug("Checking if {FileName} is a SQLite file", fileName);
         if (SqLiteFile.IsSqLiteFile(fileName) == false)
@@ -595,6 +652,93 @@ internal class Program
                 try
                 {
                     var results = db.Query<dynamic>(queryInfo.Query).ToList();
+
+                    if (queryInfo.BlobColumns != null && queryInfo.BlobColumns.Any() && !noblob)
+                    {
+                        string outDir = null;
+                        if (!string.IsNullOrEmpty(blobdir))
+                        {
+                            outDir = blobdir;
+                        }
+                        if (!string.IsNullOrEmpty(csv) && string.IsNullOrEmpty(outDir))
+                        {
+                            outDir = csv;
+                        }
+                        else if (!string.IsNullOrEmpty(json) && string.IsNullOrEmpty(outDir))
+                        {
+                            outDir = json;
+                        }
+
+                        Log.Information("\tProcessing blobs for query {Name} into directory {OutDir}", queryInfo.Name, outDir);
+                        var blobCounter = 0;
+                        foreach (var result in results)
+                        {
+                            foreach (var blobConfig in queryInfo.BlobColumns)
+                            {
+                                try
+                                {
+                                    var blobData = ((IDictionary<string, object>)result)[blobConfig.BlobColumn] as byte[];
+
+                                    if (blobData != null && blobData.Length > 0)
+                                    {
+                                        blobCounter++;
+                                        string namePart = null;
+
+                                        if (!string.IsNullOrEmpty(blobConfig.NameColumn))
+                                        {
+                                            if (((IDictionary<string, object>)result).TryGetValue(blobConfig.NameColumn, out var nameValueRaw) && nameValueRaw != null)
+                                            {
+                                                string nameValueString = nameValueRaw.ToString();
+                                                namePart = SanitizeFilenamePart(nameValueString);
+                                            }
+                                        }
+
+                                        var uniqueIdentifier = namePart ?? blobCounter.ToString();
+
+                                        string finalExtension = ".blob";
+                                        if (!string.IsNullOrEmpty(blobConfig.BlobExtension))
+                                        {
+                                            finalExtension = "." + blobConfig.BlobExtension;
+                                        }
+
+                                        var blobFileNameWithoutExt = $"{baseTime:yyyyMMddHHmmssffffff}_{map.CSVPrefix}_{queryInfo.BaseFileName}_{map.Id}_{uniqueIdentifier}_{blobConfig.BlobColumn}";
+                                        var blobFileNameWithExt = $"{blobFileNameWithoutExt}{finalExtension}";
+
+                                        var fullBlobPath = Path.Combine(outDir, blobFileNameWithExt);
+
+                                        File.WriteAllBytes(fullBlobPath, blobData);
+                                        Log.Information("	Dumping blob from column {BlobColumn} to {FullBlobPath}", blobConfig.BlobColumn, fullBlobPath);
+                                    }
+                                }
+                                catch (KeyNotFoundException)
+                                {
+                                    Log.Warning("	Data column {BlobColumn} or Name column {NameColumn} not found in query {Name} results.", blobConfig.BlobColumn, blobConfig.NameColumn, queryInfo.Name);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log.Error(ex, "	Error processing blob column {BlobColumn} for query {Name}: {Message}", blobConfig.BlobColumn, queryInfo.Name, ex.Message);
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (queryInfo.BlobColumns != null && queryInfo.BlobColumns.Any())
+                    {
+                        var blobColumnsForQuery = queryInfo.BlobColumns.ToDictionary(bc => bc.BlobColumn, StringComparer.OrdinalIgnoreCase);
+
+                        foreach (var result in results)
+                        {
+                            var resultDict = (IDictionary<string, object>)result;
+                            var blobKeys = resultDict.Keys
+                                .Where(key => blobColumnsForQuery.ContainsKey(key) && resultDict[key] is byte[])
+                                .ToList();
+
+                            foreach (var key in blobKeys)
+                            {
+                                resultDict.Remove(key);
+                            }
+                        }
+                    }
 
                     if (!string.IsNullOrEmpty(csv))
                     {

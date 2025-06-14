@@ -1,0 +1,15 @@
+Description: Test map for blob extraction
+Author: SQLECmd Test
+Email: test@test.com
+Version: 1.0
+Id: a1b2c3d4-e5f6-7890-1234-567890abcdef
+FileName: BlobTest.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND name='TestBlobs'
+IdentifyValue: 1
+CSVPrefix: BlobTest
+Queries:
+  - Name: ExtractBlobs
+    Query: "SELECT Id, Name, Data FROM TestBlobs ORDER BY Id ASC"
+    BaseFileName: ExtractedBlobs
+    BlobColumns:
+      - BlobColumn: Data

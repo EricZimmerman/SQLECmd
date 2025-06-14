@@ -1,0 +1,19 @@
+Description: Test map for blob extraction with custom naming
+Author: SQLECmd Test
+Email: test@test.com
+Version: 1.1
+Id: a1b2c3d4-e5f6-7890-1234-567890abcdeg
+FileName: BlobTest_Two.db
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND name='TestBlobs'
+IdentifyValue: 1
+CSVPrefix: BlobTest
+Queries:
+  - Name: ExtractBlobs
+    Query: "SELECT Id, Name, Data FROM TestBlobs ORDER BY Id ASC"
+    BaseFileName: ExtractedBlobs
+    BlobColumns:
+      - BlobColumn: Data
+        NameColumn: Name   # Use the 'Name' column's value from the query for the filename part
+                           # Fallback to counter will be tested by rows with NULL/empty 'Name'
+                           # Sanitization will be tested by rows with special chars in 'Name'
+                           # Truncation by rows with very long 'Name' values.
