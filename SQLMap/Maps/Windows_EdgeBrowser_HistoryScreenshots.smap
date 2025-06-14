@@ -1,0 +1,37 @@
+Description: Edge Browser History Screenshots
+Author: Michal Minar, Reece394
+Email: michal.minar@istrosec.com
+Id: 2ff9fe76-b191-422b-abf7-976e8e540326
+Version: 1.1
+CSVPrefix: EdgeBrowser
+FileName: History
+IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND (name='edge_visits');
+IdentifyValue: 1
+Queries:
+    -
+        Name: Edge Browser History Screenshots
+        Query: |
+                SELECT
+                datetime( visit_time / 1000000 + ( strftime( '%s', '1601-01-01' ) ), 'unixepoch' ) as VisitTime,
+                u.url as URL,
+                u.title as Title,
+                ev.data AS Data,
+                ev.visit_id AS VisitID,
+                'To view the image match the .csv name and VisitID e.g CSVNAME_262_Data.jpg would be VisitID 262 or use an SQL Browser and navigate to History (file)/edge_visits (table)/data (column)' as Hint
+                FROM edge_visits ev
+                JOIN visits v
+                on v.id = ev.visit_id
+                JOIN urls u
+                on u.id=v.url
+                WHERE ev.data NOT NULL
+                ORDER BY visit_time ASC;
+        BaseFileName: ScreenshotsList
+        BlobColumns:
+            - BlobColumn: Data
+              NameColumn: VisitID
+              BlobExtension: jpg
+
+# Documentation
+# https://medium.com/@DCSO_CyTec/microsoft-edge-forensics-screenshot-history-703b9b8392f8
+# So far I found only a few (one to be precise) articles regarding screenshots saved into History file when browsing the Web using Microsoft Edge.
+# Please note, timestamps will be in UTC, not Local Time
