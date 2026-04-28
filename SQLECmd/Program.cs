@@ -95,7 +95,7 @@ internal class Program
         var blobdirOpt = new Option<string>(
             "--blobdir")
         {
-            Description = "Directory to save JSON formatted results to. Be sure to include the full path in double quotes"
+            Description = "Directory to save blob files to"
         };
         var mapsOpt = new Option<string>(
             "--maps")
@@ -152,15 +152,15 @@ internal class Program
            debugOpt,
            traceOpt,
            noblobOpt
-         
+
         };
 
         _rootCommand.Description = Header + "\r\n\r\n" + Footer;
 
         _rootCommand.SetAction(result => DoWork(result.GetValue(fOpt), result.GetValue(dOpt), result.GetValue(csvOpt),
             result.GetValue(jsonOpt), result.GetValue(blobdirOpt), result.GetValue(dedupeOpt), result.GetValue(huntOpt),
-            result.GetValue(mapsOpt),result.GetValue(syncOpt),result.GetValue(debugOpt),result.GetValue(traceOpt),result.GetValue(noblobOpt)));
-            
+            result.GetValue(mapsOpt), result.GetValue(syncOpt), result.GetValue(debugOpt), result.GetValue(traceOpt), result.GetValue(noblobOpt)));
+
         var foo = _rootCommand.Parse(args).InvokeAsync();
 
         Log.CloseAndFlush();
@@ -218,7 +218,7 @@ internal class Program
             var aaa = new CustomHelpAction(new HelpAction());
             aaa.Invoke(_rootCommand.Parse("-f or -d is required. Exiting"));
 
-            
+
             Console.WriteLine();
             return;
         }
@@ -228,7 +228,7 @@ internal class Program
             var aaa = new CustomHelpAction(new HelpAction());
             aaa.Invoke(_rootCommand.Parse("--csv or --json is required. Exiting"));
 
-            
+
             Console.WriteLine();
             return;
         }
@@ -447,36 +447,39 @@ internal class Program
         Console.WriteLine();
 
 #if NET6_0_OR_GREATER
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)){ 
-        if (!File.Exists("libSQLite.Interop.so"))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            return;
-        }
+            if (!File.Exists("libSQLite.Interop.so"))
+            {
+                return;
+            }
 
-        try
-        {
-            File.Delete("libSQLite.Interop.so");
+            try
+            {
+                File.Delete("libSQLite.Interop.so");
+            }
+            catch (Exception)
+            {
+                Log.Warning("Unable to delete {File}. Delete manually if needed", "libSQLite.Interop.so");
+                Console.WriteLine();
+            }
         }
-        catch (Exception)
+        else
         {
-            Log.Warning("Unable to delete {File}. Delete manually if needed", "libSQLite.Interop.so");
-            Console.WriteLine();
-        }
-        } else {
             if (!File.Exists("SQLite.Interop.dll"))
-        {
-            return;
-        }
+            {
+                return;
+            }
 
-        try
-        {
-            File.Delete("SQLite.Interop.dll");
-        }
-        catch (Exception)
-        {
-            Log.Warning("Unable to delete {File}. Delete manually if needed", "SQLite.Interop.dll");
-            Console.WriteLine();
-        }
+            try
+            {
+                File.Delete("SQLite.Interop.dll");
+            }
+            catch (Exception)
+            {
+                Log.Warning("Unable to delete {File}. Delete manually if needed", "SQLite.Interop.dll");
+                Console.WriteLine();
+            }
         }
 #else
         if (!File.Exists("SQLite.Interop.dll"))
@@ -516,33 +519,36 @@ internal class Program
     private static void DumpSqliteDll()
     {
 #if NET6_0_OR_GREATER
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)){
-        var sqllitefile = "libSQLite.Interop.so"; 
-
-        if (Environment.Is64BitProcess)
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            File.WriteAllBytes(sqllitefile, Resources.x64SQLite_Interop_linux);
+            var sqllitefile = "libSQLite.Interop.so";
+
+            if (Environment.Is64BitProcess)
+            {
+                File.WriteAllBytes(sqllitefile, Resources.x64SQLite_Interop_linux);
+            }
+            else
+            {
+                //32 Bit Not Tested on Linux
+                //File.WriteAllBytes(sqllitefile, Resources.x86SQLite_Interop_linux);
+                Log.Warning("32 Bit Linux Not Supported! Exiting");
+                Console.WriteLine();
+                Environment.Exit(-1);
+            }
         }
         else
         {
-            //32 Bit Not Tested on Linux
-            //File.WriteAllBytes(sqllitefile, Resources.x86SQLite_Interop_linux);
-            Log.Warning("32 Bit Linux Not Supported! Exiting");
-            Console.WriteLine();
-            Environment.Exit(-1);
-        }
-        } else {
 
-        var sqllitefile = "SQLite.Interop.dll";
+            var sqllitefile = "SQLite.Interop.dll";
 
-        if (Environment.Is64BitProcess)
-        {
-            File.WriteAllBytes(sqllitefile, Resources.x64SQLite_Interop);
-        }
-        else
-        {
-            File.WriteAllBytes(sqllitefile, Resources.x86SQLite_Interop);
-        }
+            if (Environment.Is64BitProcess)
+            {
+                File.WriteAllBytes(sqllitefile, Resources.x64SQLite_Interop);
+            }
+            else
+            {
+                File.WriteAllBytes(sqllitefile, Resources.x86SQLite_Interop);
+            }
         }
 #else               
         var sqllitefile = "SQLite.Interop.dll";
@@ -567,7 +573,7 @@ internal class Program
 
         string sanitized = input;
         char[] invalidChars = Path.GetInvalidFileNameChars();
-        
+
         foreach (char invalidChar in invalidChars)
         {
             sanitized = sanitized.Replace(invalidChar.ToString(), "_");
@@ -747,7 +753,7 @@ internal class Program
                             }
                         }
                     }
-                    
+
                     if (queryInfo.BlobColumns != null && queryInfo.BlobColumns.Any())
                     {
                         var blobColumnsForQuery = queryInfo.BlobColumns.ToDictionary(bc => bc.BlobColumn, StringComparer.OrdinalIgnoreCase);
@@ -1020,12 +1026,12 @@ internal class Program
         {
             var result = _defaultHelp.Invoke(parseResult);
 
-            Log.Warning("{Msg}", string.Join(" ",parseResult.Tokens));
+            Log.Warning("{Msg}", string.Join(" ", parseResult.Tokens));
 
             return result;
         }
     }
-    
+
 }
 
 internal class ApplicationArguments
