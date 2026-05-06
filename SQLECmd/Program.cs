@@ -849,11 +849,8 @@ internal class Program
         }
 
 
-        using (var handler = new HttpClientHandler())
+        using (var client = new HttpClient())
         {
-            handler.ServerCertificateCustomValidationCallback = (message, certificate, chain, sslPolicyErrors) => true;
-            var client = new HttpClient(handler);
-
             try
             {
                 var response = await client.GetAsync("https://github.com/EricZimmerman/SQLECmd/archive/master.zip");
