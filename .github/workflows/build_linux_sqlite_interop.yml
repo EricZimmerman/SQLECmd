@@ -9,7 +9,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v7
 
     - name: Download SQLite source
       run: wget https://system.data.sqlite.org/blobs/1.0.119.0/sqlite-netFx-full-source-1.0.119.0.zip
