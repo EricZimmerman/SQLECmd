@@ -13,11 +13,12 @@ public static class SqLiteFile
         if (File.Exists(path) == false)
         {
             Log.Warning("{Path} not found!", path);
+            return false;
         }
 
         try
         {
-            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
+            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
             if (fs.Length < 8)
             {
                 return false;

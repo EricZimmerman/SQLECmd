@@ -1,0 +1,55 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Overview
+
+Part of Eric Zimmerman's DFIR tool suite. Three things in one repo:
+- **`SQLMap/` (`SQLMaps`)**: a `netstandard2.0;net10.0` NuGet library that loads and validates map files (`.smap`, YAML). Released to NuGet from a GitHub release.
+- **`SQLMap/Maps/`**: the maps themselves, one per database type. `--sync` downloads this folder from `master`, so a merged map reaches users without a release. `.github/workflows/verify.yml` runs yamllint (`.yamllint`) on them. `!OS_Application_OptionalDescription.guide` and `.template` document the format.
+- **`SQLECmd/`**: the CLI (`net10.0`, Windows, Linux and macOS). It references the library as a project and runs each matching map's queries against SQLite databases, writing CSV, JSON lines and blobs. Built, signed and staged manually.
+
+Input may be corrupt or hostile: report problems and keep going with the other files and maps.
+
+## Commands
+
+The SDK is pinned in `global.json` (.NET 10). All projects use `LangVersion 10`, so avoid newer C# syntax. Tests use NUnit 5 + FluentAssertions 7 (pinned to `[7.2.2,8.0.0)`, since 8.x requires a commercial license).
+
+```bash
+dotnet build -c Release                                  # builds SQLECmd.slnx
+dotnet test -c Release                                   # all tests
+dotnet test --filter "FullyQualifiedName~CliTests"       # one fixture
+dotnet test --filter "Name=EveryShippedMapLoads"         # one test
+dotnet pack -c Release                                   # SQLMaps package (README.md and icon.png from the repo root)
+dotnet run --project SQLECmd -- -d SQLMap.Test/TestFiles --csv out --maps SQLMap/Maps
+```
+
+## Maps (`SQLMap/`)
+
+- `MapFile` and `QueryInfo` are the YAML schema; YamlDotNet rejects unknown properties. `MapFileMapValidator` (FluentValidation 11; 12 dropped netstandard2.0) requires the identity fields and at least one query. `BlobColumns` is optional; `BlobExtension` is alphanumeric/underscore only, because it ends up in file names.
+- `SqlMap.LoadMaps(dir)` loads every `*.smap` under `dir`, recursively, into the static `MapFiles` (keyed by upper-case `Id`). It returns true if any map had errors; the CLI then exits. A duplicate `Id` is a warning and the first one wins.
+- `SqLiteFile.IsSqLiteFile` checks the 8 byte `SQLite f` header and opens with `FileShare.ReadWrite | Delete`, since databases are often in use.
+
+## CLI (`SQLECmd/Program.cs`)
+
+- `Main` awaits `InvokeAsync` and returns `DoWork`'s exit code: 0, or 1 for invalid arguments, map errors, `--sync` failing, or any file that could not be processed.
+- With `--hunt` (the default), every file under `-d` whose header says SQLite is tried against every map; a map applies when its `IdentifyQuery` returns `IdentifyValue` (compared as strings). Without it, only maps whose `FileName` matches are tried. When hunting, mismatches and failing `IdentifyQuery`s are only logged with `--debug`. If every map's `IdentifyQuery` fails, the database can't be read and the file counts as failed.
+- One connection per database. A failing query is logged and the other queries still run. `--dedupe` (default) skips files with a SHA-1 already seen.
+- Output names are `<timestamp>_<CSVPrefix>_<BaseFileName>_<map Id>.csv`, with a `SourceFile` column added. JSON is one file with one object per row (plus `SourceFile` and `MapDescription`). Blob columns are written to files (named from `NameColumn`, sanitized) and removed from the CSV/JSON.
+- **Native SQLite (`NativeSqlite.cs`)**: System.Data.SQLite needs `SQLite.Interop.dll`. The csproj embeds the four from the `Stub.System.Data.SQLite.Core.NetStandard` package (win-x64, win-x86, linux-x64, osx-x64) as resources `SQLite.Interop.<rid>`, so there are no native files in the repo or to copy by hand. At startup the one for this process is extracted to `%LOCALAPPDATA%\SQLECmd\<rid>-<sha256>\` (`~/.local/share` elsewhere), reused while the hash matches, and loaded through `NativeLibrary.SetDllImportResolver` on the System.Data.SQLite assembly. Nothing goes in the working directory (`CliTests` checks this). Fallback: a 0700 temp directory, deleted at exit where possible. The Stub package version must equal the System.Data.SQLite.Core version from ServiceStack.OrmLite.Sqlite; NuGet and the `CheckSqliteNatives` target fail the build otherwise, so update them together.
+- SQLite opens databases read-write (OrmLite default), so SQLite may checkpoint a `-wal` into the database. Run against copies.
+
+## Tests
+
+`SQLMap.Test` (net10.0) references the library and the CLI, and copies `TestFiles/` and all of `SQLMap/Maps/` to its output.
+- `MapTests`: every shipped map loads with a unique Id, plus validation cases. Non-parallelizable, because `MapFiles` is static.
+- `SqLiteFileTests`, `NativeSqliteTests` (the embedded libraries are byte-identical to the package's `runtimes/`, and load).
+- `CliTests`: runs the built `SQLECmd.dll` with `dotnet` from an empty working directory against `TestFiles/` (the `TestFiles_*.smap` maps): CSV/JSON/blob output, dedupe, unmatched and corrupt databases, exit codes.
+
+## Versioning and release
+
+- **Library:** MinVer sets the version from the git tag (bare tags like `2026.10.0`); there is no `<Version>` in its csproj. To release: push to `master`, then `git tag <ver> && git push origin <ver> && gh release create <ver> --verify-tag --generate-notes`.
+- **CLI:** `<Version>` in `SQLECmd/SQLECmd.csproj`, bumped by hand per release.
+- Versions are `yyyy.mm.x`.
+- `.github/workflows/publish.yml` (identical to GuidMapping's) packs, validates and tests on PRs and pushes to `master`. When a GitHub Release is published, it pushes to NuGet.org using trusted publishing (`NuGet/login` with the `NUGET_USER` repo variable).
+- Dependabot (`.github/dependabot.yml`) opens monthly PRs for GitHub Actions and NuGet updates.

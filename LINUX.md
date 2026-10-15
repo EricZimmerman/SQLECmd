@@ -1,29 +1,19 @@
-# Building SQLECmd on Linux
+# Running SQLECmd on Linux
 
-Recent changes have allowed SQLECmd to run natively on Linux. This has been tested on Ubuntu 22.04 LTS and .NET 9
+SQLECmd runs natively on 64-bit Linux (x64) with .NET 10. Install the .NET 10 runtime (or the SDK, to build it) by following the instructions [here](https://learn.microsoft.com/en-us/dotnet/core/install/linux).
 
-In order to do this you will need to download .NET 9 SDK on Linux. I followed the instructions [here](https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install?tabs=dotnet9&pivots=os-linux-ubuntu-2404). 
+## SQLite library
 
-In the case of Ubuntu, you will need to install build-essential if you wish to compile the `libSQLite.Interop.so` yourself by doing sudo apt-get update and sudo apt install build-essential
+SQLECmd includes the native SQLite library (`SQLite.Interop.dll`) from the System.Data.SQLite NuGet package for Windows (x64, x86), Linux (x64) and macOS (x64), so there is nothing to download or build. At startup the library for the current platform is extracted to `~/.local/share/SQLECmd/<platform>-<hash>/` (or `$XDG_DATA_HOME/SQLECmd`) and loaded from there. SQLECmd can be run from any directory and writes nothing to the working directory. If that location is not writable, a private temporary directory is used instead and removed when SQLECmd exits.
 
-If you have issues with the bundled `libSQLite.Interop.so` the steps to build your own are as follows:
-Download the source code for the library by navigating [here](https://system.data.sqlite.org/index.html/doc/trunk/www/downloads.wiki) and downloading the one that says `sqlite-netFx-full-source-1.0.119.0.zip`
+The Linux library needs glibc 2.14 or later and zlib (`libz.so.1`), which every current distribution has.
 
-Uncompress the zip file and issue the following commands in a Linux terminal:
+## Building
+
 ```
-cd LOCATIONOFSOURCE/Setup
-chmod +x compile-interop-assembly-release.sh
-./compile-interop-assembly-release.sh
-```
-Now, you will have a freshly built library file called libSQLite.Interop.so in the `LOCATIONOFSOURCE/bin/2013/Release/bin` folder.
-
-Download the SQLECmd source code if you haven't already [here](https://github.com/EricZimmerman/SQLECmd/archive/refs/heads/master.zip) and copy and replace the `libSQLite.Interop.so` file located in `SQLEcmd/Dependencies/x64/libSQLite.Interop.so`
-
-To build the native Linux Binary, issue the following commands in a Linux terminal:
-```
-cd LOCATIONOFSQLECMDMASTERFOLDER - This will have SQLECmd.sln 
-dotnet publish -f net9.0 -r linux-x64
+git clone https://github.com/EricZimmerman/SQLECmd.git
+cd SQLECmd
+dotnet publish SQLECmd -c Release -r linux-x64
 ```
 
-When this finishes, the resulting files will be located in `LOCATIONOFSQLECMDMASTERFOLDER/SQLECmd/bin/Release/net9.0/linux-x64/publish`
-All you need to do is copy these files to another folder and copy the Maps folder from `LOCATIONOFSQLECMDMASTERFOLDER/SQLMap` into the same folder and run it in terminal with `./SQLECmd`
+When this finishes, the program is in `SQLECmd/bin/Release/net10.0/linux-x64/publish`. Copy those files to another folder, copy the `Maps` folder from `SQLMap` into the same folder, and run `./SQLECmd`. `./SQLECmd --sync` downloads the latest maps into that `Maps` folder.

@@ -1,27 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <Version>0.6.0</Version>
+        <TargetFramework>net10.0</TargetFramework>
         <LangVersion>10</LangVersion>
         <IsPackable>false</IsPackable>
+        <Copyright>Eric Zimmerman</Copyright>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="AlphaFS.New" Version="2.3.0" />
-        <PackageReference Include="FluentAssertions" Version="[7.0.0,8.0.0)" />
-        <PackageReference Include="Serilog" Version="4.3.1" />
-        <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
-        <PackageReference Include="NUnit" Version="4.5.1" />
-        <PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="10.0.6" />
+        <PackageReference Include="FluentAssertions" Version="[7.2.2,8.0.0)" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+        <PackageReference Include="NUnit" Version="5.0.0" />
+        <PackageReference Include="NUnit3TestAdapter" Version="6.3.1" />
+        <PackageReference Include="Serilog" Version="4.4.0" />
     </ItemGroup>
     <ItemGroup>
-        <Folder Include="TestFiles\" />
+        <ProjectReference Include="../SQLMap/SQLMaps.csproj" />
+        <!-- CliTests run the built SQLECmd.dll, which this copies next to the tests -->
+        <ProjectReference Include="../SQLECmd/SQLECmd.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\SQLMap\SQLMaps.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-        <None Update="TestFiles\Contacts.db">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
+        <!-- Sample databases; their maps are SQLMap/Maps/TestFiles_*.smap -->
+        <None Include="TestFiles/**" CopyToOutputDirectory="PreserveNewest" />
+        <!-- Every shipped map, so the tests check that all of them load -->
+        <None Include="../SQLMap/Maps/**" LinkBase="Maps" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 </Project>

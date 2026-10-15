@@ -1,10 +1,10 @@
 Description: Test map for blob extraction with custom naming and extensions
 Author: SQLECmd Test
 Email: test@test.com
-Version: 1.2
+Version: 1.3
 Id: a1b2c3d4-e5f6-7890-1234-567890abcdeh
 FileName: BlobTest_Three.db
-IdentifyQuery: SELECT count(*) FROM sqlite_master WHERE type='table' AND name='TestBlobs'
+IdentifyQuery: SELECT count(*) FROM pragma_table_info('TestBlobs') WHERE name='DataTwo'
 IdentifyValue: 1
 CSVPrefix: BlobTest
 Queries:

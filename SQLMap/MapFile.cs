@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FluentValidation;
 
 namespace SQLMaps;
@@ -52,7 +53,7 @@ public class QueryInfo
     public override string ToString()
     {
         return
-            $"Name: {Name} Query (10 chars): {Query.Substring(0, 10)}, BaseFileName: {BaseFileName}";
+            $"Name: {Name} Query (10 chars): {Query?.Substring(0, Math.Min(10, Query.Length))}, BaseFileName: {BaseFileName}";
     }
 }
 
@@ -102,7 +103,7 @@ public class MapFileMapValidator : AbstractValidator<MapFile>
         RuleFor(q => q.IdentifyQuery).NotEmpty();
         RuleFor(q => q.IdentifyValue).NotEmpty();
 
-        RuleFor(q => q.Queries.Count).GreaterThan(0).When(t => t.Queries != null);
+        RuleFor(q => q.Queries).NotEmpty().WithMessage("Queries must contain at least one query");
 
         RuleForEach(target => target.Queries).NotNull()
             .WithMessage(

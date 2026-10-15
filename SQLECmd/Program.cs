@@ -11,9 +11,6 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
-#if NET9_0_OR_GREATER
-using System.Runtime.InteropServices;
-#endif
 using CsvHelper;
 using Exceptionless;
 using ICSharpCode.SharpZipLib.Zip;
@@ -25,19 +22,7 @@ using ServiceStack;
 using ServiceStack.Text;
 using ServiceStack.OrmLite;
 using ServiceStack.OrmLite.Dapper;
-using SQLECmd.Properties;
 using SQLMaps;
-#if !NET9_0_OR_GREATER
-using Alphaleonis.Win32.Filesystem;
-using Alphaleonis.Win32.Security;
-using Directory = Alphaleonis.Win32.Filesystem.Directory;
-using File = Alphaleonis.Win32.Filesystem.File;
-using Path = Alphaleonis.Win32.Filesystem.Path;
-#else
-using Directory = System.IO.Directory;
-using File = System.IO.File;
-using Path = System.IO.Path;
-#endif
 
 namespace SQLECmd;
 
@@ -65,8 +50,10 @@ internal class Program
     private static readonly HashSet<string> UnmatchedDbs = new(StringComparer.InvariantCultureIgnoreCase);
     private static readonly HashSet<string> SeenHashes = new(StringComparer.InvariantCultureIgnoreCase);
 
+    private static int _failedFiles;
 
-    private static async Task Main(string[] args)
+
+    private static async Task<int> Main(string[] args)
     {
         ExceptionlessClient.Default.Startup("DyZCm8aZbNXf2iZ6BV00wY2UoR3U2tymh3cftNZs");
 
@@ -162,12 +149,15 @@ internal class Program
             result.GetValue(jsonOpt), result.GetValue(blobdirOpt), result.GetValue(dedupeOpt), result.GetValue(huntOpt),
             result.GetValue(mapsOpt),result.GetValue(syncOpt),result.GetValue(debugOpt),result.GetValue(traceOpt),result.GetValue(noblobOpt)));
             
-        var foo = _rootCommand.Parse(args).InvokeAsync();
+        var exitCode = await _rootCommand.Parse(args).InvokeAsync();
 
         Log.CloseAndFlush();
+
+        return exitCode;
     }
 
-    private static void DoWork(string f, string d, string csv, string json, string blobdir, bool dedupe, bool hunt, string maps, bool sync, bool debug, bool trace, bool noblob)
+    /// <returns>0 on success, 1 for invalid arguments, map errors or files that could not be processed</returns>
+    private static int DoWork(string f, string d, string csv, string json, string blobdir, bool dedupe, bool hunt, string maps, bool sync, bool debug, bool trace, bool noblob)
     {
         var levelSwitch = new LoggingLevelSwitch();
 
@@ -199,18 +189,19 @@ internal class Program
 
         if (sync)
         {
+            var updated = false;
             try
             {
                 Log.Information("{Header}", Header);
-                Task.Run(UpdateFromRepo).Wait();
+                updated = Task.Run(UpdateFromRepo).Result;
             }
             catch (Exception e)
             {
-                Log.Error(e, "There was an error checking for updates: {Message}", e.Message);
+                Log.Error(e, "There was an error checking for updates: {Message}", e.GetBaseException().Message);
             }
 
             Console.WriteLine();
-            Environment.Exit(0);
+            return updated ? 0 : 1;
         }
 
         if (string.IsNullOrEmpty(f) &&
@@ -221,7 +212,7 @@ internal class Program
 
             
             Console.WriteLine();
-            return;
+            return 1;
         }
 
         if (string.IsNullOrEmpty(csv) && string.IsNullOrEmpty(json))
@@ -231,7 +222,7 @@ internal class Program
 
             
             Console.WriteLine();
-            return;
+            return 1;
         }
 
         Log.Information("{Header}", Header);
@@ -239,7 +230,16 @@ internal class Program
         Log.Information("Command line: {Args}", string.Join(" ", Environment.GetCommandLineArgs().Skip(1)));
         Console.WriteLine();
 
-        DumpSqliteDll();
+        try
+        {
+            NativeSqlite.Setup();
+        }
+        catch (Exception e)
+        {
+            Log.Fatal(e, "Unable to load the SQLite library: {Message}. Exiting", e.Message);
+            Console.WriteLine();
+            return 1;
+        }
 
         var sw = new Stopwatch();
         sw.Start();
@@ -256,7 +256,7 @@ internal class Program
 
             if (errors)
             {
-                return;
+                return 1;
             }
 
             Log.Information("Maps loaded: {Count:N0}", SqlMap.MapFiles.Count);
@@ -274,7 +274,7 @@ internal class Program
             {
                 Log.Fatal(e, "Unable to create directory {Csv}. Does a file with the same name exist? Exiting", csv);
                 Console.WriteLine();
-                return;
+                return 1;
             }
         }
 
@@ -290,7 +290,7 @@ internal class Program
             {
                 Log.Fatal(e, "Unable to create directory {Json}. Does a file with the same name exist? Exiting", json);
                 Console.WriteLine();
-                return;
+                return 1;
             }
         }
 
@@ -306,7 +306,7 @@ internal class Program
             {
                 Log.Fatal(e, "Unable to create directory {Blobdir}. Does a file with the same name exist? Exiting", blobdir);
                 Console.WriteLine();
-                return;
+                return 1;
             }
         }
 
@@ -328,10 +328,18 @@ internal class Program
                 Log.Warning("{F} does not exist! Exiting", f);
                 Console.WriteLine();
                 if (jsonWriter != null) jsonWriter.Dispose();
-                return;
+                return 1;
             }
 
-            ProcessFile(Path.GetFullPath(f), hunt, dedupe, csv, json, blobdir, jsonWriter, noblob);
+            try
+            {
+                ProcessFile(Path.GetFullPath(f), hunt, dedupe, csv, json, blobdir, jsonWriter, noblob);
+            }
+            catch (Exception e)
+            {
+                _failedFiles += 1;
+                Log.Error(e, "Error processing {File}: {Message}", f, e.Message);
+            }
         }
         else
         {
@@ -341,39 +349,6 @@ internal class Program
 
             var files = new List<string>();
 
-#if !NET9_0_OR_GREATER
-            Privilege[] privs = {Privilege.EnableDelegation, Privilege.Impersonate, Privilege.Tcb};
-            using var enabler = new PrivilegeEnabler(Privilege.Backup, privs);
-            var dirEnumOptions =
-                DirectoryEnumerationOptions.Files | DirectoryEnumerationOptions.Recursive |
-                DirectoryEnumerationOptions.SkipReparsePoints | DirectoryEnumerationOptions.ContinueOnException |
-                DirectoryEnumerationOptions.BasicSearch;
-
-            var directoryEnumerationFilters = new DirectoryEnumerationFilters
-            {
-                RecursionFilter = entryInfo => !entryInfo.IsMountPoint && !entryInfo.IsSymbolicLink,
-                ErrorFilter = (_, errorMessage, pathProcessed) => true
-            };
-
-            var dbNames = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
-
-            if (hunt)
-            {
-                directoryEnumerationFilters.InclusionFilter = _ => true;
-            }
-            else
-            {
-                foreach (var mapFile in SqlMap.MapFiles)
-                {
-                    dbNames.Add(mapFile.Value.FileName);
-                }
-
-                directoryEnumerationFilters.InclusionFilter = fsei => dbNames.Contains(fsei.FileName);
-            }
-
-            files =
-                Directory.EnumerateFileSystemEntries(Path.GetFullPath(d), dirEnumOptions, directoryEnumerationFilters).ToList();
-#else
             var enumerationOptions = new EnumerationOptions
             {
                 IgnoreInaccessible = true,
@@ -401,7 +376,6 @@ internal class Program
                 }
             }
 
-#endif
             foreach (var file in files)
             {
                 try
@@ -410,6 +384,7 @@ internal class Program
                 }
                 catch (Exception e)
                 {
+                    _failedFiles += 1;
                     Log.Error(e, "Error processing {File}: {Message}", file, e.Message);
                 }
             }
@@ -429,7 +404,14 @@ internal class Program
 
             foreach (var unmatchedDb in UnmatchedDbs)
             {
-                DumpUnmatched(unmatchedDb);
+                try
+                {
+                    DumpUnmatched(unmatchedDb);
+                }
+                catch (Exception e)
+                {
+                    Log.Information("\tFile name: {UnmatchedDb}, Tables: (unable to read: {Message})", unmatchedDb, e.Message);
+                }
             }
         }
 
@@ -447,54 +429,16 @@ internal class Program
 
         Console.WriteLine();
 
-#if NET6_0_OR_GREATER
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)){ 
-        if (!File.Exists("libSQLite.Interop.so"))
+        NativeSqlite.Cleanup();
+
+        if (_failedFiles > 0)
         {
-            return;
+            Log.Warning("{Count:N0} file(s) could not be processed. See the errors above", _failedFiles);
+            Console.WriteLine();
+            return 1;
         }
 
-        try
-        {
-            File.Delete("libSQLite.Interop.so");
-        }
-        catch (Exception)
-        {
-            Log.Warning("Unable to delete {File}. Delete manually if needed", "libSQLite.Interop.so");
-            Console.WriteLine();
-        }
-        } else {
-            if (!File.Exists("SQLite.Interop.dll"))
-        {
-            return;
-        }
-
-        try
-        {
-            File.Delete("SQLite.Interop.dll");
-        }
-        catch (Exception)
-        {
-            Log.Warning("Unable to delete {File}. Delete manually if needed", "SQLite.Interop.dll");
-            Console.WriteLine();
-        }
-        }
-#else
-        if (!File.Exists("SQLite.Interop.dll"))
-        {
-            return;
-        }
-
-        try
-        {
-            File.Delete("SQLite.Interop.dll");
-        }
-        catch (Exception)
-        {
-            Log.Warning("Unable to delete {File}. Delete manually if needed", "SQLite.Interop.dll");
-            Console.WriteLine();
-        }
-#endif        
+        return 0;
     }
 
     private static void DumpUnmatched(string unmatchedDb)
@@ -514,50 +458,6 @@ internal class Program
         Log.Information("\tFile name: {UnmatchedDb}, Tables: {Tables}", unmatchedDb, string.Join(",", tables));
     }
 
-    private static void DumpSqliteDll()
-    {
-#if NET6_0_OR_GREATER
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)){
-        var sqllitefile = "libSQLite.Interop.so"; 
-
-        if (Environment.Is64BitProcess)
-        {
-            File.WriteAllBytes(sqllitefile, Resources.x64SQLite_Interop_linux);
-        }
-        else
-        {
-            //32 Bit Not Tested on Linux
-            //File.WriteAllBytes(sqllitefile, Resources.x86SQLite_Interop_linux);
-            Log.Warning("32 Bit Linux Not Supported! Exiting");
-            Console.WriteLine();
-            Environment.Exit(-1);
-        }
-        } else {
-
-        var sqllitefile = "SQLite.Interop.dll";
-
-        if (Environment.Is64BitProcess)
-        {
-            File.WriteAllBytes(sqllitefile, Resources.x64SQLite_Interop);
-        }
-        else
-        {
-            File.WriteAllBytes(sqllitefile, Resources.x86SQLite_Interop);
-        }
-        }
-#else               
-        var sqllitefile = "SQLite.Interop.dll";
-
-        if (Environment.Is64BitProcess)
-        {
-            File.WriteAllBytes(sqllitefile, Resources.x64SQLite_Interop);
-        }
-        else
-        {
-            File.WriteAllBytes(sqllitefile, Resources.x86SQLite_Interop);
-        }
-#endif        
-    }
 
     private static string SanitizeFilenamePart(string input, int maxLength = 50)
     {
@@ -603,7 +503,7 @@ internal class Program
             }
             else
             {
-                Log.Warning("\t{FileName} is not a SQLite file! Skipping...", fileName);
+                Log.Debug("\t{FileName} is not a SQLite file! Skipping...", fileName);
             }
 
             return;
@@ -613,8 +513,11 @@ internal class Program
 
         if (dedupe)
         {
-            var s1 = new StreamReader(fileName);
-            var newSha = Helper.GetSha1FromStream(s1.BaseStream, 0);
+            string newSha;
+            using (var s1 = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                newSha = Helper.GetSha1FromStream(s1, 0);
+            }
 
 
             if (SeenHashes.Contains(newSha))
@@ -647,24 +550,42 @@ internal class Program
 
         var foundMap = false;
 
+        var dbFactory = new OrmLiteConnectionFactory($"{fileName}", SqliteDialect.Provider);
+
+        using var db = dbFactory.Open();
+
+        var identifyErrors = 0;
+        Exception identifyError = null;
+
         //need to run thru each map and see if we get any IdentityQuery matches
         //process each one that matches
         foreach (var map in maps)
         {
             Log.Debug("Processing map {Description} with Id {Id}", map.Description, map.Id);
 
-            var dbFactory = new OrmLiteConnectionFactory($"{fileName}", SqliteDialect.Provider);
-
             var baseTime = DateTimeOffset.UtcNow;
 
-            using var db = dbFactory.Open();
             Log.Debug("\tVerifying database via {IdentifyQuery}", map.IdentifyQuery);
 
-            var id = db.ExecuteScalar<string>(map.IdentifyQuery);
+            string id;
+            try
+            {
+                id = db.ExecuteScalar<string>(map.IdentifyQuery);
+            }
+            catch (Exception e)
+            {
+                identifyErrors += 1;
+                identifyError = e;
+                Log.Write(hunt ? LogEventLevel.Debug : LogEventLevel.Warning,
+                    "\tIdentifyQuery for map {Description} with Id {Id} failed: {Message}", map.Description, map.Id, e.Message);
+                continue;
+            }
 
             if (string.Equals(id, map.IdentifyValue, StringComparison.InvariantCultureIgnoreCase) == false)
             {
-                Log.Warning("\tFor map w/ description {Description}, got value {Id} from IdentityQuery, but expected {IdentifyValue}. Queries will not be processed!", map.Description, id, map.IdentifyValue);
+                //when hunting, every map is tried against every database, so a mismatch is normal
+                Log.Write(hunt ? LogEventLevel.Debug : LogEventLevel.Warning,
+                    "\tFor map w/ description {Description}, got value {Id} from IdentityQuery, but expected {IdentifyValue}. Queries will not be processed!", map.Description, id, map.IdentifyValue);
                 continue;
             }
 
@@ -825,6 +746,12 @@ internal class Program
             }
         }
 
+        if (maps.Count > 0 && identifyErrors == maps.Count)
+        {
+            //not one IdentifyQuery could run, so the database itself cannot be read (corrupt, encrypted, ...)
+            throw new InvalidDataException($"Unable to read database: {identifyError.Message}", identifyError);
+        }
+
         if (foundMap == false)
         {
             Log.Information("\tNo maps found for {FileName}. Adding to unmatched database list", fileName);
@@ -834,7 +761,7 @@ internal class Program
         Console.WriteLine();
     }
 
-    private static async Task UpdateFromRepo()
+    private static async Task<bool> UpdateFromRepo()
     {
         Console.WriteLine();
 
@@ -855,21 +782,23 @@ internal class Program
             {
                 var response = await client.GetAsync("https://github.com/EricZimmerman/SQLECmd/archive/master.zip");
 
-                if (response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode == false)
                 {
-                    var contentStream = await response.Content.ReadAsStreamAsync();
+                    Log.Error("Unable to download maps: {Status} {Reason}", (int)response.StatusCode, response.ReasonPhrase);
+                    return false;
+                }
 
-                    using (var fileStream = File.Create(archivePath))
-                    {
-                        await contentStream.CopyToAsync(fileStream);
-                    }
+                var contentStream = await response.Content.ReadAsStreamAsync();
+
+                using (var fileStream = File.Create(archivePath))
+                {
+                    await contentStream.CopyToAsync(fileStream);
                 }
             }
             catch (Exception ex)
             {
-                // Handle any exceptions that occur during the download
-                Console.WriteLine($"Error: {ex.Message}");
-                return;
+                Log.Error("Unable to download maps: {Message}", ex.GetBaseException().Message);
+                return false;
             }
         }
 
@@ -895,6 +824,12 @@ internal class Program
             Directory.CreateDirectory(orgMapPath);
         }
 
+        if (Directory.Exists(newMapPath) == false)
+        {
+            Log.Error("The downloaded archive does not contain {Path}", "SQLMap/Maps");
+            return false;
+        }
+
         var newMaps = Directory.GetFiles(newMapPath);
 
         var newlocalMaps = new List<string>();
@@ -915,15 +850,14 @@ internal class Program
             {
                 //current destination file exists, so compare to new
 
-                var s1 = new StreamReader(newMap);
-                var newSha = Helper.GetSha1FromStream(s1.BaseStream, 0);
-
-                var s2 = new StreamReader(dest);
-
-                var destSha = Helper.GetSha1FromStream(s2.BaseStream, 0);
-
-                s2.Close();
-                s1.Close();
+                string newSha;
+                string destSha;
+                using (var s1 = File.OpenRead(newMap))
+                using (var s2 = File.OpenRead(dest))
+                {
+                    newSha = Helper.GetSha1FromStream(s1, 0);
+                    destSha = Helper.GetSha1FromStream(s2, 0);
+                }
 
                 if (newSha != destSha)
                 {
@@ -972,6 +906,8 @@ internal class Program
         }
 
         Directory.Delete(Path.Combine(BaseDirectory, "SQLECmd-master"), true);
+
+        return true;
     }
 
     private class DateTimeOffsetFormatter : IFormatProvider, ICustomFormatter

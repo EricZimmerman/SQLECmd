@@ -1,0 +1,8 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+  </Configurations>
+  <Project Path="SQLECmd/SQLECmd.csproj" />
+  <Project Path="SQLMap.Test/SQLMap.Test.csproj" />
+  <Project Path="SQLMap/SQLMaps.csproj" />
+</Solution>

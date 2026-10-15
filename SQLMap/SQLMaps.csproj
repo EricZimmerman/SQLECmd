@@ -1,15 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;net9.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;net10.0</TargetFrameworks>
         <LangVersion>10</LangVersion>
-        <Version>0.6.0</Version>
         <Authors>Eric R. Zimmerman</Authors>
-        <Description>SQLite maps manager</Description>
+        <Description>Loads and validates SQLECmd SQLite map (.smap) files</Description>
         <PackageProjectUrl>https://github.com/EricZimmerman/SQLECmd</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/EricZimmerman/SQLECmd</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <Version>1.1.0</Version>
-
-        <PackageTags>SRUM</PackageTags>
+        <PackageTags>SQLite, SQLECmd, maps</PackageTags>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageIcon>icon.png</PackageIcon>
         <GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -17,25 +15,23 @@
         <NoWarn>$(NoWarn);CS1591</NoWarn>
     </PropertyGroup>
     <ItemGroup>
+        <InternalsVisibleTo Include="SQLMap.Test" />
         <PackageReference Include="AlphaFS.New" Version="2.3.0" />
         <PackageReference Include="CsvHelper" Version="33.1.0" />
-        <PackageReference Include="FluentValidation" Version="11.11.0" />
-        <PackageReference Include="Serilog" Version="4.3.1" />
-        <PackageReference Include="ServiceStack.Text" Version="10.0.6" />
-        <PackageReference Include="YamlDotNet" Version="17.0.1" />
+        <PackageReference Include="FluentValidation" Version="11.12.0" />
+        <PackageReference Include="Serilog" Version="4.4.0" />
+        <PackageReference Include="ServiceStack.Text" Version="10.4.0" />
+        <PackageReference Include="YamlDotNet" Version="17.1.0" />
 
         <None Include="../README.md" Pack="true" PackagePath="" />
         <None Include="../icon.png" Pack="true" PackagePath="" />
-        <PackageReference Include="DotNet.ReproducibleBuilds" Version="2.0.2">
+        <PackageReference Include="DotNet.ReproducibleBuilds" Version="2.0.5">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="MinVer" Version="7.0.0">
+        <PackageReference Include="MinVer" Version="8.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-    </ItemGroup>
-    <ItemGroup>
-        <Folder Include="Maps\" />
     </ItemGroup>
 </Project>
