@@ -10,7 +10,7 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="AlphaFS.New" Version="2.3.0"/>
-        <PackageReference Include="Costura.Fody" Version="6.1.0">
+        <PackageReference Include="Costura.Fody" Version="6.2.0">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="ERZHelpers" Version="2026.5.3" />
