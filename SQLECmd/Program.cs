@@ -53,8 +53,38 @@ internal class Program
     private static int _failedFiles;
 
 
+    // JSON time stamps: ISO 8601 in UTC (2024-01-02T03:04:05.6780000Z), as JLECmd writes them, instead of ServiceStack's \/Date(ms)\/
+    private const string JsonDateFormat = "yyyy-MM-ddTHH:mm:ss.fffffffZ";
+
+    private static void ConfigureJsonDates()
+    {
+        JsConfig.DateHandler = DateHandler.ISO8601;
+        JsConfig<DateTimeOffset>.SerializeFn = JsonDate;
+        JsConfig<DateTimeOffset?>.SerializeFn = d => d.HasValue ? JsonDate(d.Value) : null;
+        JsConfig<DateTime>.SerializeFn = JsonDate;
+        JsConfig<DateTime?>.SerializeFn = d => d.HasValue ? JsonDate(d.Value) : null;
+    }
+
+    private static string JsonDate(DateTimeOffset d)
+    {
+        return d.UtcDateTime.ToString(JsonDateFormat, CultureInfo.InvariantCulture);
+    }
+
+    private static string JsonDate(DateTime d)
+    {
+        //timestamps without a kind are already UTC; ToUniversalTime would treat them as local time
+        if (d.Kind == DateTimeKind.Unspecified)
+        {
+            d = DateTime.SpecifyKind(d, DateTimeKind.Utc);
+        }
+
+        return d.ToUniversalTime().ToString(JsonDateFormat, CultureInfo.InvariantCulture);
+    }
+
     private static async Task<int> Main(string[] args)
     {
+        ConfigureJsonDates();
+
         ExceptionlessClient.Default.Startup("DyZCm8aZbNXf2iZ6BV00wY2UoR3U2tymh3cftNZs");
 
         JsConfig.IncludeNullValues = true;
@@ -441,9 +471,19 @@ internal class Program
         return 0;
     }
 
+    /// <summary>
+    ///     DATETIME values are read as UTC: otherwise System.Data.SQLite converts a value with a zone (2024-01-02T03:04:05Z)
+    ///     to the local time of the machine running SQLECmd and leaves its kind unspecified. The builder also quotes paths
+    ///     with a ; in them, which a plain Data Source=path does not
+    /// </summary>
+    private static string ConnectionString(string file)
+    {
+        return new System.Data.SQLite.SQLiteConnectionStringBuilder { DataSource = file, DateTimeKind = DateTimeKind.Utc }.ToString();
+    }
+
     private static void DumpUnmatched(string unmatchedDb)
     {
-        var dbFactory = new OrmLiteConnectionFactory($"{unmatchedDb}", SqliteDialect.Provider);
+        var dbFactory = new OrmLiteConnectionFactory(ConnectionString(unmatchedDb), SqliteDialect.Provider);
 
         using var db = dbFactory.Open();
         Log.Verbose("\tGetting table names for {UnmatchedDb}", unmatchedDb);
@@ -550,7 +590,7 @@ internal class Program
 
         var foundMap = false;
 
-        var dbFactory = new OrmLiteConnectionFactory($"{fileName}", SqliteDialect.Provider);
+        var dbFactory = new OrmLiteConnectionFactory(ConnectionString(fileName), SqliteDialect.Provider);
 
         using var db = dbFactory.Open();
 
