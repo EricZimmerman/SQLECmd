@@ -42,6 +42,7 @@ internal class Program
         "\r\n\t " +
         @"   SQLECmd.exe -d ""C:\Temp\"" --csv ""c:\temp\out""" + "\r\n\t " +
         @"   SQLECmd.exe -d ""C:\Temp\"" --hunt --csv ""c:\temp\out""" + "\r\n\t " +
+        @"   SQLECmd.exe -d ""C:\Temp\"" --csv ""c:\temp\out"" --ifn" + "\r\n\t " +
         "\r\n\t" +
         "    Short options (single letter) are prefixed with a single dash. Long commands are prefixed with two dashes";
 
@@ -155,6 +156,12 @@ internal class Program
             DefaultValueFactory = _ => false
         };
 
+        var ifnOpt = new Option<bool>("--ifn")
+        {
+            Description = "If true, the name of each database is added to the names of its CSV and blob files, so databases processed with the same map can be told apart",
+            DefaultValueFactory = _ => false
+        };
+
         _rootCommand = new RootCommand
         {
            fOpt,
@@ -163,6 +170,7 @@ internal class Program
            jsonOpt,
            blobdirOpt,
            noblobOpt,
+           ifnOpt,
            dedupeOpt,
            huntOpt,
            mapsOpt,
@@ -177,7 +185,7 @@ internal class Program
 
         _rootCommand.SetAction(result => DoWork(result.GetValue(fOpt), result.GetValue(dOpt), result.GetValue(csvOpt),
             result.GetValue(jsonOpt), result.GetValue(blobdirOpt), result.GetValue(dedupeOpt), result.GetValue(huntOpt),
-            result.GetValue(mapsOpt),result.GetValue(syncOpt),result.GetValue(debugOpt),result.GetValue(traceOpt),result.GetValue(noblobOpt)));
+            result.GetValue(mapsOpt),result.GetValue(syncOpt),result.GetValue(debugOpt),result.GetValue(traceOpt),result.GetValue(noblobOpt),result.GetValue(ifnOpt)));
             
         var exitCode = await _rootCommand.Parse(args).InvokeAsync();
 
@@ -187,7 +195,7 @@ internal class Program
     }
 
     /// <returns>0 on success, 1 for invalid arguments, map errors or files that could not be processed</returns>
-    private static int DoWork(string f, string d, string csv, string json, string blobdir, bool dedupe, bool hunt, string maps, bool sync, bool debug, bool trace, bool noblob)
+    private static int DoWork(string f, string d, string csv, string json, string blobdir, bool dedupe, bool hunt, string maps, bool sync, bool debug, bool trace, bool noblob, bool ifn)
     {
         var levelSwitch = new LoggingLevelSwitch();
 
@@ -363,7 +371,7 @@ internal class Program
 
             try
             {
-                ProcessFile(Path.GetFullPath(f), hunt, dedupe, csv, json, blobdir, jsonWriter, noblob);
+                ProcessFile(Path.GetFullPath(f), hunt, dedupe, csv, json, blobdir, jsonWriter, noblob, ifn);
             }
             catch (Exception e)
             {
@@ -410,7 +418,7 @@ internal class Program
             {
                 try
                 {
-                    ProcessFile(file, hunt, dedupe, csv, json, blobdir, jsonWriter, noblob);
+                    ProcessFile(file, hunt, dedupe, csv, json, blobdir, jsonWriter, noblob, ifn);
                 }
                 catch (Exception e)
                 {
@@ -532,7 +540,7 @@ internal class Program
         return sanitized;
     }
 
-    private static void ProcessFile(string fileName, bool hunt, bool dedupe, string csv, string json, string blobdir, StreamWriter jsonWriter, bool noblob)
+    private static void ProcessFile(string fileName, bool hunt, bool dedupe, string csv, string json, string blobdir, StreamWriter jsonWriter, bool noblob, bool ifn)
     {
         Log.Debug("Checking if {FileName} is a SQLite file", fileName);
         if (SqLiteFile.IsSqLiteFile(fileName) == false)
@@ -589,6 +597,9 @@ internal class Program
         }
 
         var foundMap = false;
+
+        //--ifn (#54): the database's name at the end of the output names, as in _notplaces.sqlite.csv
+        var dbNamePart = ifn ? $"_{SanitizeFilenamePart(Path.GetFileName(fileName), 100) ?? "db"}" : string.Empty;
 
         var dbFactory = new OrmLiteConnectionFactory(ConnectionString(fileName), SqliteDialect.Provider);
 
@@ -689,7 +700,7 @@ internal class Program
                                             finalExtension = "." + blobConfig.BlobExtension;
                                         }
 
-                                        var blobFileNameWithoutExt = $"{baseTime:yyyyMMddHHmmssffffff}_{map.CSVPrefix}_{queryInfo.BaseFileName}_{map.Id}_{uniqueIdentifier}_{blobConfig.BlobColumn}";
+                                        var blobFileNameWithoutExt = $"{baseTime:yyyyMMddHHmmssffffff}_{map.CSVPrefix}_{queryInfo.BaseFileName}_{map.Id}_{uniqueIdentifier}_{blobConfig.BlobColumn}{dbNamePart}";
                                         var blobFileNameWithExt = $"{blobFileNameWithoutExt}{finalExtension}";
 
                                         var fullBlobPath = Path.Combine(outDir, blobFileNameWithExt);
@@ -731,7 +742,7 @@ internal class Program
                     if (!string.IsNullOrEmpty(csv))
                     {
                         var outName =
-                            $"{baseTime:yyyyMMddHHmmssffffff}_{map.CSVPrefix}_{queryInfo.BaseFileName}_{map.Id}.csv";
+                            $"{baseTime:yyyyMMddHHmmssffffff}_{map.CSVPrefix}_{queryInfo.BaseFileName}_{map.Id}{dbNamePart}.csv";
 
                         var fullOutName = Path.Combine(csv, outName);
 
