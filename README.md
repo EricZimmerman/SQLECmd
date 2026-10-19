@@ -36,6 +36,8 @@ This repo that contains all the Maps used by Eric Zimmerman's SQLECmd.
     
               Short options (single letter) are prefixed with a single dash. Long commands are prefixed with two dashes
 
+See [LINUX.md](LINUX.md) for Linux: the download runs there with `dotnet SQLECmd.dll`, step by step.
+
 ## Documentation
 
 SQLECmd parses any SQLite database from any OS. As long as a Map exists for the database, SQLECmd will parse it! If there's a Map that's missing, please create an issue or submit your own via a Pull Request. 
