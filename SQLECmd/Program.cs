@@ -467,8 +467,6 @@ internal class Program
 
         Console.WriteLine();
 
-        NativeSqlite.Cleanup();
-
         if (_failedFiles > 0)
         {
             Log.Warning("{Count:N0} file(s) could not be processed. See the errors above", _failedFiles);

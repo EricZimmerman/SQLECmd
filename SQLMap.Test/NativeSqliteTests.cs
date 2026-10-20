@@ -1,3 +1,4 @@
+using System;
 using System.Data.SQLite;
 using System.IO;
 using FluentAssertions;
@@ -7,34 +8,33 @@ using SQLECmd;
 namespace SQLMaps.Test;
 
 /// <summary>
-///     The SQLite.Interop libraries embedded in SQLECmd. The package copies its own under runtimes/ next to the tests
+///     The SQLite.Interop libraries next to SQLECmd. The package copies them under runtimes\&lt;rid&gt;\native next to
+///     the tests, as the release has them next to SQLECmd.dll
 /// </summary>
 [TestFixture]
 [NonParallelizable]
 public class NativeSqliteTests
 {
-    [TestCase("win-x64")]
-    [TestCase("win-x86")]
-    [TestCase("linux-x64")]
-    [TestCase("osx-x64")]
-    public void EmbeddedLibraryIsThePackageOne(string rid)
+    [Test]
+    public void EveryPlatformHasItsLibrary()
     {
-        var fromPackage = Path.Combine(TestContext.CurrentContext.TestDirectory, "runtimes", rid, "native",
-            "SQLite.Interop.dll");
-
-        NativeSqlite.GetEmbedded(rid).Should().Equal(File.ReadAllBytes(fromPackage));
+        foreach (var rid in NativeSqlite.Rids)
+        {
+            File.Exists(NativeSqlite.Candidates(rid)[0]).Should().BeTrue($"{rid} is supported");
+        }
     }
 
     [Test]
-    public void LoadsAndWorks()
+    public void LoadsFromTheProgramFolderAndWorks()
     {
-        NativeSqlite.CurrentRid().Should().NotBeNull("the tests run on a supported platform");
+        var rid = NativeSqlite.CurrentRid();
+        rid.Should().NotBeNull("the tests run on a supported platform");
 
         NativeSqlite.Setup();
         NativeSqlite.Setup(); // a second call does nothing
 
-        File.Exists(NativeSqlite.LoadedFrom).Should().BeTrue();
-        File.ReadAllBytes(NativeSqlite.LoadedFrom).Should().Equal(NativeSqlite.GetEmbedded(NativeSqlite.CurrentRid()));
+        // the file in the program's folder, never a copy elsewhere
+        NativeSqlite.LoadedFrom.Should().Be(Path.Combine(AppContext.BaseDirectory, "runtimes", rid, "native", "SQLite.Interop.dll"));
 
         using var connection = new SQLiteConnection("Data Source=:memory:");
         connection.Open();

@@ -23,20 +23,13 @@
         <PackageReference Include="ServiceStack.Text" Version="10.4.0" />
         <PackageReference Include="SharpZipLib" Version="1.4.2" />
         <PackageReference Include="System.CommandLine" Version="2.0.13" />
-        <!-- Native SQLite.Interop libraries. Must be the same version as the System.Data.SQLite.Core
-             that ServiceStack.OrmLite.Sqlite brings in; CheckSqliteNatives below fails the build if not -->
+        <!-- Native SQLite.Interop libraries, copied to runtimes\<rid>\native next to SQLECmd and loaded from there by
+             NativeSqlite.cs (nothing is extracted). Must be the same version as the System.Data.SQLite.Core that
+             ServiceStack.OrmLite.Sqlite brings in; CheckSqliteNatives below fails the build if not -->
         <PackageReference Include="Stub.System.Data.SQLite.Core.NetStandard" Version="1.0.119" GeneratePathProperty="true" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\SQLMap\SQLMaps.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-        <!-- Embedded straight from the package and extracted at runtime by NativeSqlite.cs, so SQLECmd
-             still runs as one file (plus Maps) from any directory, with no native files to copy by hand -->
-        <EmbeddedResource Include="$(PkgStub_System_Data_SQLite_Core_NetStandard)/runtimes/win-x64/native/SQLite.Interop.dll" LogicalName="SQLite.Interop.win-x64" Visible="false" />
-        <EmbeddedResource Include="$(PkgStub_System_Data_SQLite_Core_NetStandard)/runtimes/win-x86/native/SQLite.Interop.dll" LogicalName="SQLite.Interop.win-x86" Visible="false" />
-        <EmbeddedResource Include="$(PkgStub_System_Data_SQLite_Core_NetStandard)/runtimes/linux-x64/native/SQLite.Interop.dll" LogicalName="SQLite.Interop.linux-x64" Visible="false" />
-        <EmbeddedResource Include="$(PkgStub_System_Data_SQLite_Core_NetStandard)/runtimes/osx-x64/native/SQLite.Interop.dll" LogicalName="SQLite.Interop.osx-x64" Visible="false" />
     </ItemGroup>
     <Target Name="CheckSqliteNatives" AfterTargets="ResolvePackageAssets">
         <ItemGroup>
@@ -47,7 +40,7 @@
             <_SdsCoreVersion>@(_SdsCore->'%(NuGetPackageVersion)'->Distinct())</_SdsCoreVersion>
             <_SdsStubVersion>@(_SdsStub->'%(NuGetPackageVersion)'->Distinct())</_SdsStubVersion>
         </PropertyGroup>
-        <Error Condition="'$(_SdsCoreVersion)' != '' and '$(_SdsCoreVersion)' != '$(_SdsStubVersion)'" Text="System.Data.SQLite.Core is $(_SdsCoreVersion) but the embedded SQLite.Interop natives come from Stub.System.Data.SQLite.Core.NetStandard $(_SdsStubVersion). Update the Stub package reference to match." />
+        <Error Condition="'$(_SdsCoreVersion)' != '' and '$(_SdsCoreVersion)' != '$(_SdsStubVersion)'" Text="System.Data.SQLite.Core is $(_SdsCoreVersion) but the SQLite.Interop natives come from Stub.System.Data.SQLite.Core.NetStandard $(_SdsStubVersion). Update the Stub package reference to match." />
         <Error Condition="!Exists('$(PkgStub_System_Data_SQLite_Core_NetStandard)/runtimes/win-x64/native/SQLite.Interop.dll')" Text="SQLite.Interop natives not found under '$(PkgStub_System_Data_SQLite_Core_NetStandard)'. Run dotnet restore." />
     </Target>
 </Project>

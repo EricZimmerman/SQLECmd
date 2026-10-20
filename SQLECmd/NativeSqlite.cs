@@ -2,34 +2,35 @@ using System;
 using System.Data.SQLite;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using Serilog;
 
 namespace SQLECmd;
 
 /// <summary>
-///     System.Data.SQLite needs the native SQLite.Interop library. SQLECmd embeds the ones from the
-///     Stub.System.Data.SQLite.Core.NetStandard package; this extracts the one for the current platform and makes
-///     System.Data.SQLite load that exact file, wherever SQLECmd is run from.
+///     System.Data.SQLite needs the native SQLite.Interop library. SQLECmd ships the ones from the
+///     Stub.System.Data.SQLite.Core.NetStandard package as files next to it, in runtimes\&lt;rid&gt;\native (the
+///     package's own layout, which the build makes too); this makes System.Data.SQLite load that exact file for this
+///     platform, wherever SQLECmd is run from.
 /// </summary>
 /// <remarks>
-///     The library is extracted once per version to a per-user cache (%LOCALAPPDATA%\SQLECmd on Windows,
-///     ~/.local/share/SQLECmd elsewhere), in a folder named after its SHA-256, and reused while the hash matches.
-///     Nothing is written to the working directory. If the cache cannot be used, a private temporary directory is used
-///     instead and removed at exit where the OS allows it.
+///     Nothing is extracted or written anywhere: the library is loaded from SQLECmd's folder (Eric, 2026-10-20: nothing
+///     outside the program's folder). A build for one runtime (dotnet publish -r linux-x64) has it right next to
+///     SQLECmd.dll instead; that is tried second.
 /// </remarks>
 internal static class NativeSqlite
 {
-    // The library name System.Data.SQLite imports
-    private const string InteropName = "SQLite.Interop.dll";
+    // The library name System.Data.SQLite imports (the same file name on every OS)
+    internal const string InteropName = "SQLite.Interop.dll";
+
+    // The platforms the package has a library for
+    internal static readonly string[] Rids = { "win-x64", "win-x86", "linux-x64", "osx-x64" };
 
     private static IntPtr _handle;
-    private static string _tempDirectory;
 
     /// <summary>Full path of the loaded library, or null before <see cref="Setup" /></summary>
     public static string LoadedFrom { get; private set; }
 
-    /// <summary>The runtime identifier of the embedded library for this process, or null if none is embedded</summary>
+    /// <summary>The runtime identifier of the library for this process, or null if none is shipped for it</summary>
     internal static string CurrentRid()
     {
         var arch = RuntimeInformation.ProcessArchitecture;
@@ -57,21 +58,20 @@ internal static class NativeSqlite
         return RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? "osx-x64" : null;
     }
 
-    internal static byte[] GetEmbedded(string rid)
+    /// <summary>Where the library for <paramref name="rid" /> is looked for, in order</summary>
+    internal static string[] Candidates(string rid)
     {
-        using var res = typeof(NativeSqlite).Assembly.GetManifestResourceStream($"SQLite.Interop.{rid}");
-        if (res == null)
+        var dir = AppContext.BaseDirectory;
+        return new[]
         {
-            return null;
-        }
-
-        using var ms = new MemoryStream();
-        res.CopyTo(ms);
-        return ms.ToArray();
+            Path.Combine(dir, "runtimes", rid, "native", InteropName),
+            Path.Combine(dir, InteropName)
+        };
     }
 
-    /// <summary>Extracts and loads the library. Call before anything uses SQLite; later calls do nothing</summary>
-    /// <exception cref="PlatformNotSupportedException">No library is embedded for this OS/architecture</exception>
+    /// <summary>Loads the library from SQLECmd's folder. Call before anything uses SQLite; later calls do nothing</summary>
+    /// <exception cref="PlatformNotSupportedException">No library is shipped for this OS/architecture</exception>
+    /// <exception cref="FileNotFoundException">The library is not in SQLECmd's folder</exception>
     public static void Setup()
     {
         if (LoadedFrom != null)
@@ -80,16 +80,22 @@ internal static class NativeSqlite
         }
 
         var rid = CurrentRid();
-        var bytes = rid == null ? null : GetEmbedded(rid);
-        if (bytes == null)
+        if (rid == null)
         {
             throw new PlatformNotSupportedException(
-                $"No SQLite.Interop library is included for {RuntimeInformation.OSDescription} ({RuntimeInformation.ProcessArchitecture}). Supported: win-x64, win-x86, linux-x64, osx-x64");
+                $"No SQLite.Interop library is included for {RuntimeInformation.OSDescription} ({RuntimeInformation.ProcessArchitecture}). Supported: {string.Join(", ", Rids)}");
         }
 
-        var hash = Sha256(bytes);
+        var candidates = Candidates(rid);
+        var path = Array.Find(candidates, File.Exists);
+        if (path == null)
+        {
+            throw new FileNotFoundException(
+                $"{InteropName} for {rid} was not found next to SQLECmd (looked for {string.Join(" and ", candidates)}). Unzip the whole download, with its runtimes folder", candidates[0]);
+        }
 
-        var path = ExtractToCache(bytes, rid, hash) ?? ExtractToTemp(bytes, hash);
+        // System.Data.SQLite's own pre-loader looks in x86\ and x64\ folders next to it: off, this file is the one
+        Environment.SetEnvironmentVariable("No_PreLoadSQLite", "1");
 
         _handle = NativeLibrary.Load(path);
 
@@ -99,90 +105,5 @@ internal static class NativeSqlite
         LoadedFrom = path;
 
         Log.Debug("Loaded {Interop} ({Rid}) from {Path}", InteropName, rid, path);
-    }
-
-    /// <summary>Removes the temporary directory, if one had to be used. The per-user cache is kept</summary>
-    public static void Cleanup()
-    {
-        if (_tempDirectory == null)
-        {
-            return;
-        }
-
-        try
-        {
-            // Works where a loaded library can be deleted (Linux, macOS). On Windows it stays until the next run
-            Directory.Delete(_tempDirectory, true);
-            _tempDirectory = null;
-        }
-        catch (Exception e)
-        {
-            Log.Debug("Unable to delete {Dir}: {Message}", _tempDirectory, e.Message);
-        }
-    }
-
-    private static string ExtractToCache(byte[] bytes, string rid, string hash)
-    {
-        try
-        {
-            var root = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData,
-                Environment.SpecialFolderOption.DoNotVerify);
-            if (string.IsNullOrEmpty(root))
-            {
-                return null;
-            }
-
-            var dir = Path.Combine(root, "SQLECmd", $"{rid}-{hash.Substring(0, 16)}");
-            var path = Path.Combine(dir, InteropName);
-
-            if (File.Exists(path) && Sha256(File.ReadAllBytes(path)) == hash)
-            {
-                return path;
-            }
-
-            Directory.CreateDirectory(dir);
-
-            // Write to a unique name then move it into place, so a concurrent run never sees a partial file
-            var tmp = Path.Combine(dir, $"{Guid.NewGuid():N}.tmp");
-            File.WriteAllBytes(tmp, bytes);
-            try
-            {
-                File.Move(tmp, path, true);
-            }
-            catch (IOException) when (File.Exists(path))
-            {
-                // Another run put it in place first and has it loaded
-                File.Delete(tmp);
-            }
-
-            return Sha256(File.ReadAllBytes(path)) == hash ? path : null;
-        }
-        catch (Exception e)
-        {
-            Log.Debug("Unable to use the SQLite.Interop cache: {Message}", e.Message);
-            return null;
-        }
-    }
-
-    private static string ExtractToTemp(byte[] bytes, string hash)
-    {
-        // A new directory only this user can read or write (0700 on Linux and macOS)
-        var dir = Directory.CreateTempSubdirectory("SQLECmd-").FullName;
-        _tempDirectory = dir;
-
-        var path = Path.Combine(dir, InteropName);
-        File.WriteAllBytes(path, bytes);
-
-        if (Sha256(File.ReadAllBytes(path)) != hash)
-        {
-            throw new IOException($"Extracted {path} does not match the embedded library");
-        }
-
-        return path;
-    }
-
-    private static string Sha256(byte[] bytes)
-    {
-        return Convert.ToHexString(SHA256.HashData(bytes));
     }
 }

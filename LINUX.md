@@ -4,7 +4,7 @@ SQLECmd runs natively on 64-bit Linux (x64) with .NET 10. There are two ways to 
 
 ## SQLite library
 
-SQLECmd includes the native SQLite library (`SQLite.Interop.dll`) from the System.Data.SQLite NuGet package for Windows (x64, x86), Linux (x64) and macOS (x64), so there is nothing to download or build. At startup the library for the current platform is extracted to `~/.local/share/SQLECmd/<platform>-<hash>/` (or `$XDG_DATA_HOME/SQLECmd`) and loaded from there. SQLECmd can be run from any directory and writes nothing to the working directory. If that location is not writable, a private temporary directory is used instead and removed when SQLECmd exits.
+SQLECmd comes with the native SQLite library (`SQLite.Interop.dll`) from the System.Data.SQLite NuGet package for Windows (x64, x86), Linux (x64) and macOS (x64), so there is nothing to download or build. They are files in the `runtimes` folder next to `SQLECmd.dll` (`runtimes/linux-x64/native/SQLite.Interop.dll` and so on), and the one for the current platform is loaded from there. Nothing is extracted or written anywhere else (earlier 2026.10 builds extracted it to `~/.local/share/SQLECmd`; that folder can be deleted). SQLECmd can be run from any directory and writes nothing to the working directory.
 
 The Linux library needs glibc 2.14 or later and zlib (`libz.so.1`), which every current distribution has.
 
@@ -28,7 +28,7 @@ The Linux library needs glibc 2.14 or later and zlib (`libz.so.1`), which every 
    cd SQLECmd
    ```
 
-   The folder has `SQLECmd.dll` (the program), `SQLECmd.runtimeconfig.json`, `SQLECmd.exe` (Windows only) and `Maps`.
+   The folder has `SQLECmd.dll` (the program), `SQLECmd.runtimeconfig.json`, `SQLECmd.exe` (Windows only), `runtimes` (the SQLite libraries) and `Maps`.
 
 3. Run it with `dotnet`:
 

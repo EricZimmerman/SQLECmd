@@ -21,12 +21,18 @@ public class CliTests
     private string _cwd;
     private string Csv => Path.Combine(_dir, "csv");
 
+    // the per-user folders earlier SQLECmd builds extracted SQLite.Interop.dll to (LOCALAPPDATA, ~/.local/share), or
+    // a temp folder: pointed at an empty folder, which must stay empty (Windows takes LocalApplicationData from the
+    // shell, not the variable; NativeSqliteTests checks where the library is loaded from)
+    private string Profile => Path.Combine(_dir, "profile");
+
     [SetUp]
     public void SetUp()
     {
         _dir = Path.Combine(Path.GetTempPath(), "sqlecmd-test-" + Guid.NewGuid().ToString("N"));
         _cwd = Path.Combine(_dir, "cwd");
         Directory.CreateDirectory(_cwd);
+        Directory.CreateDirectory(Profile);
     }
 
     [TearDown]
@@ -45,6 +51,11 @@ public class CliTests
             UseShellExecute = false,
             WorkingDirectory = _cwd
         };
+        foreach (var name in new[] { "LOCALAPPDATA", "XDG_DATA_HOME", "TEMP", "TMP", "TMPDIR" })
+        {
+            start.Environment[name] = Profile;
+        }
+
         start.ArgumentList.Add(Path.Combine(TestContext.CurrentContext.TestDirectory, "SQLECmd.dll"));
         foreach (var arg in args)
         {
@@ -60,6 +71,8 @@ public class CliTests
 
         // SQLECmd must not leave anything (such as SQLite.Interop.dll) in the working directory
         Directory.GetFileSystemEntries(_cwd).Should().BeEmpty();
+        // nor anything anywhere else: the native library is loaded from SQLECmd's folder, never extracted
+        Directory.GetFileSystemEntries(Profile).Should().BeEmpty();
 
         return (process.ExitCode, stdout.Result + stderr.Result);
     }
