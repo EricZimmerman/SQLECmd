@@ -32,6 +32,9 @@ internal class Program
     private static RootCommand _rootCommand;
     private static readonly string BaseDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
+    // where the copies of the databases are made (--temp, or Temp next to SQLECmd)
+    private static string _tempFolder;
+
     private static readonly string Header =
         $"SQLECmd version {Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}" +
         "\r\n\r\nAuthor: Eric Zimmerman (saericzimmerman@gmail.com)" +
@@ -156,6 +159,11 @@ internal class Program
             DefaultValueFactory = _ => false
         };
 
+        var tempOpt = new Option<string>("--temp")
+        {
+            Description = TempFolder.Help
+        };
+
         var ifnOpt = new Option<bool>("--ifn")
         {
             Description = "If true, the name of each database is added to the names of its CSV and blob files, so databases processed with the same map can be told apart",
@@ -174,6 +182,7 @@ internal class Program
            dedupeOpt,
            huntOpt,
            mapsOpt,
+           tempOpt,
            syncOpt,
            debugOpt,
            traceOpt,
@@ -185,7 +194,7 @@ internal class Program
 
         _rootCommand.SetAction(result => DoWork(result.GetValue(fOpt), result.GetValue(dOpt), result.GetValue(csvOpt),
             result.GetValue(jsonOpt), result.GetValue(blobdirOpt), result.GetValue(dedupeOpt), result.GetValue(huntOpt),
-            result.GetValue(mapsOpt),result.GetValue(syncOpt),result.GetValue(debugOpt),result.GetValue(traceOpt),result.GetValue(noblobOpt),result.GetValue(ifnOpt)));
+            result.GetValue(mapsOpt),result.GetValue(syncOpt),result.GetValue(debugOpt),result.GetValue(traceOpt),result.GetValue(noblobOpt),result.GetValue(ifnOpt),result.GetValue(tempOpt)));
             
         var exitCode = await _rootCommand.Parse(args).InvokeAsync();
 
@@ -195,7 +204,7 @@ internal class Program
     }
 
     /// <returns>0 on success, 1 for invalid arguments, map errors or files that could not be processed</returns>
-    private static int DoWork(string f, string d, string csv, string json, string blobdir, bool dedupe, bool hunt, string maps, bool sync, bool debug, bool trace, bool noblob, bool ifn)
+    private static int DoWork(string f, string d, string csv, string json, string blobdir, bool dedupe, bool hunt, string maps, bool sync, bool debug, bool trace, bool noblob, bool ifn, string temp)
     {
         var levelSwitch = new LoggingLevelSwitch();
 
@@ -359,16 +368,87 @@ internal class Program
             Log.Information("\tSaving all JSON results to {FullOutName}", jsonFullOutName);
         }
 
+        if (string.IsNullOrEmpty(f) == false && File.Exists(f) == false)
+        {
+            Log.Warning("{F} does not exist! Exiting", f);
+            Console.WriteLine();
+            jsonWriter?.Dispose();
+            return 1;
+        }
+
+        //the databases are read from copies, made in --temp or Temp next to SQLECmd (never the user's %TEMP%)
+        _tempFolder = TempFolder.Prepare(temp, out var tempCreated, out var tempError);
+        if (_tempFolder == null)
+        {
+            Log.Error("The folder for the temporary copies of the databases can't be written to ({Error}). Give one with --temp. Exiting", tempError);
+            Console.WriteLine();
+            jsonWriter?.Dispose();
+            return 1;
+        }
+
+        try
+        {
+            ProcessAll(f, d, csv, json, blobdir, dedupe, hunt, noblob, ifn, jsonWriter);
+        }
+        finally
+        {
+            TempFolder.RemoveIfEmpty(_tempFolder, tempCreated);
+        }
+
+        if (jsonWriter != null)
+        {
+            jsonWriter.Dispose();
+        }
+
+        sw.Stop();
+
+        if (UnmatchedDbs.Any())
+        {
+            Console.WriteLine();
+            Log.Fatal("At least one database was found with no corresponding map (Use {Switch} for more details about discovery process)", "--debug");
+
+            foreach (var unmatchedDb in UnmatchedDbs)
+            {
+                try
+                {
+                    DumpUnmatched(unmatchedDb, tempCreated);
+                }
+                catch (Exception e)
+                {
+                    Log.Information("\tFile name: {UnmatchedDb}, Tables: (unable to read: {Message})", unmatchedDb, e.Message);
+                }
+            }
+        }
+
+        Console.WriteLine();
+
+        if (ProcessedFiles.Count == 1)
+        {
+            Log.Information("Processed {Count:N0} file in {TotalSeconds:N4} seconds", ProcessedFiles.Count, sw.Elapsed.TotalSeconds);
+        }
+        else
+        {
+            Log.Information("Processed {Count:N0} files in {TotalSeconds:N4} seconds", ProcessedFiles.Count, sw.Elapsed.TotalSeconds);
+        }
+
+
+        Console.WriteLine();
+
+        if (_failedFiles > 0)
+        {
+            Log.Warning("{Count:N0} file(s) could not be processed. See the errors above", _failedFiles);
+            Console.WriteLine();
+            return 1;
+        }
+
+        return 0;
+    }
+
+    /// <summary>-f, or the files under -d</summary>
+    private static void ProcessAll(string f, string d, string csv, string json, string blobdir, bool dedupe, bool hunt, bool noblob, bool ifn, StreamWriter jsonWriter)
+    {
         if (string.IsNullOrEmpty(f) == false)
         {
-            if (File.Exists(f) == false)
-            {
-                Log.Warning("{F} does not exist! Exiting", f);
-                Console.WriteLine();
-                if (jsonWriter != null) jsonWriter.Dispose();
-                return 1;
-            }
-
             try
             {
                 ProcessFile(Path.GetFullPath(f), hunt, dedupe, csv, json, blobdir, jsonWriter, noblob, ifn);
@@ -427,54 +507,6 @@ internal class Program
                 }
             }
         }
-
-        if (jsonWriter != null)
-        {
-            jsonWriter.Dispose();
-        }
-
-        sw.Stop();
-
-        if (UnmatchedDbs.Any())
-        {
-            Console.WriteLine();
-            Log.Fatal("At least one database was found with no corresponding map (Use {Switch} for more details about discovery process)", "--debug");
-
-            foreach (var unmatchedDb in UnmatchedDbs)
-            {
-                try
-                {
-                    DumpUnmatched(unmatchedDb);
-                }
-                catch (Exception e)
-                {
-                    Log.Information("\tFile name: {UnmatchedDb}, Tables: (unable to read: {Message})", unmatchedDb, e.Message);
-                }
-            }
-        }
-
-        Console.WriteLine();
-
-        if (ProcessedFiles.Count == 1)
-        {
-            Log.Information("Processed {Count:N0} file in {TotalSeconds:N4} seconds", ProcessedFiles.Count, sw.Elapsed.TotalSeconds);
-        }
-        else
-        {
-            Log.Information("Processed {Count:N0} files in {TotalSeconds:N4} seconds", ProcessedFiles.Count, sw.Elapsed.TotalSeconds);
-        }
-
-
-        Console.WriteLine();
-
-        if (_failedFiles > 0)
-        {
-            Log.Warning("{Count:N0} file(s) could not be processed. See the errors above", _failedFiles);
-            Console.WriteLine();
-            return 1;
-        }
-
-        return 0;
     }
 
     /// <summary>
@@ -487,13 +519,29 @@ internal class Program
         return new System.Data.SQLite.SQLiteConnectionStringBuilder { DataSource = file, DateTimeKind = DateTimeKind.Utc }.ToString();
     }
 
-    private static void DumpUnmatched(string unmatchedDb)
+    private static void DumpUnmatched(string unmatchedDb, bool tempCreated)
     {
-        var dbFactory = new OrmLiteConnectionFactory(ConnectionString(unmatchedDb), SqliteDialect.Provider);
+        //from a copy too (the temporary folder may be gone: it is made again, and removed again when empty)
+        Directory.CreateDirectory(_tempFolder);
+        var copy = DatabaseCopy.Create(unmatchedDb, _tempFolder);
+        try
+        {
+            DumpTables(unmatchedDb, copy.Path);
+        }
+        finally
+        {
+            copy.Dispose();
+            TempFolder.RemoveIfEmpty(_tempFolder, tempCreated);
+        }
+    }
+
+    private static void DumpTables(string unmatchedDb, string copyPath)
+    {
+        var dbFactory = new OrmLiteConnectionFactory(ConnectionString(copyPath), SqliteDialect.Provider);
 
         using var db = dbFactory.Open();
         Log.Verbose("\tGetting table names for {UnmatchedDb}", unmatchedDb);
-        var reader = db.ExecuteReader("SELECT name FROM sqlite_master WHERE type='table' order by name");
+        using var reader = db.ExecuteReader("SELECT name FROM sqlite_master WHERE type='table' order by name");
 
         var tables = new List<string>();
         while (reader.Read())
@@ -599,7 +647,9 @@ internal class Program
         //--ifn (#54): the database's name at the end of the output names, as in _notplaces.sqlite.csv
         var dbNamePart = ifn ? $"_{SanitizeFilenamePart(Path.GetFileName(fileName), 100) ?? "db"}" : string.Empty;
 
-        var dbFactory = new OrmLiteConnectionFactory(ConnectionString(fileName), SqliteDialect.Provider);
+        //only a copy is opened (SQLite opens read-write and would checkpoint a -wal into the evidence); disposed after db
+        using var copy = DatabaseCopy.Create(fileName, _tempFolder);
+        var dbFactory = new OrmLiteConnectionFactory(ConnectionString(copy.Path), SqliteDialect.Provider);
 
         using var db = dbFactory.Open();
 

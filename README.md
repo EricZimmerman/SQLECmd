@@ -23,6 +23,7 @@ This repo that contains all the Maps used by Eric Zimmerman's SQLECmd.
             hunt            When true, all files are looked at regardless of name and file header is used to identify SQLite files, else filename in map is used to find databases. Default is FALSE
     
             maps            The path where event maps are located. Defaults to 'Maps' folder where program was executed
+            temp            Folder for the temporary copies of the SQLite databases, which are opened instead of the evidence and deleted when done. Default: a Temp folder next to SQLECmd. A folder that isn't there is created, and removed again when done. If that folder can't be written to, SQLECmd stops: give a writable folder with --temp
     
             sync            If true, the latest maps from https://github.com/EricZimmerman/SQLECmd/tree/master/SQLMap/Maps are downloaded and local maps updated. Default is FALSE
     

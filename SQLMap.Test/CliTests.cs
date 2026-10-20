@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
+using SQLECmd;
 
 namespace SQLMaps.Test;
 
@@ -73,6 +75,11 @@ public class CliTests
         Directory.GetFileSystemEntries(_cwd).Should().BeEmpty();
         // nor anything anywhere else: the native library is loaded from SQLECmd's folder, never extracted
         Directory.GetFileSystemEntries(Profile).Should().BeEmpty();
+        // and every copy of a database is deleted (a statement left open kept one on Windows)
+        if (Directory.Exists(TempNextToProgram))
+        {
+            Directory.GetDirectories(TempNextToProgram, "SQLECmd-*").Should().BeEmpty();
+        }
 
         return (process.ExitCode, stdout.Result + stderr.Result);
     }
@@ -239,5 +246,86 @@ public class CliTests
         output.Should().Contain("Unable to read database: database disk image is malformed");
         output.Should().Contain("1 file(s) could not be processed");
         output.Should().NotContain("No maps found");
+    }
+    private static string TempNextToProgram => Path.Combine(TestContext.CurrentContext.TestDirectory, "Temp");
+
+    private static string Sha256(string file) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(file)));
+
+    [Test]
+    public void TheEvidenceIsNotChanged()
+    {
+        //a database with rows only in its -wal: opening it would checkpoint them into the database and delete the -wal
+        NativeSqlite.Setup();
+        var live = Directory.CreateDirectory(Path.Combine(_dir, "live")).FullName;
+        var evidence = Directory.CreateDirectory(Path.Combine(_dir, "evidence")).FullName;
+        using (var connection = new SQLiteConnection($"Data Source={Path.Combine(live, "w.db")};Pooling=False"))
+        {
+            connection.Open();
+            using var command = connection.CreateCommand();
+            command.CommandText = "PRAGMA journal_mode=WAL; PRAGMA wal_autocheckpoint=0; CREATE TABLE t(a); INSERT INTO t VALUES (1), (2);";
+            command.ExecuteNonQuery();
+            foreach (var name in new[] { "w.db", "w.db-wal" })
+            {
+                using var input = new FileStream(Path.Combine(live, name), FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+                using var target = File.Create(Path.Combine(evidence, name));
+                input.CopyTo(target);
+            }
+        }
+
+        var before = Directory.GetFiles(evidence).ToDictionary(Path.GetFileName, Sha256);
+        before.Should().ContainKey("w.db-wal");
+
+        var (exitCode, output) = Run("-d", evidence, "--csv", Csv);
+
+        exitCode.Should().Be(0, output);
+        output.Should().Contain("w.db");
+        Directory.GetFiles(evidence).ToDictionary(Path.GetFileName, Sha256).Should().BeEquivalentTo(before);
+    }
+
+    [Test]
+    public void CopiesGoToTempNextToTheProgram()
+    {
+        var existed = Directory.Exists(TempNextToProgram);
+
+        var (exitCode, output) = Run("-f", SqLiteFileTests.TestFile("Contacts.db"), "--csv", Csv, "--hunt", "false");
+
+        exitCode.Should().Be(0, output);
+        //the copies' folders are deleted, and Temp too when this run made it and it is empty
+        if (Directory.Exists(TempNextToProgram))
+        {
+            existed.Should().BeTrue("Temp is removed when the run created it and it is empty");
+            Directory.GetDirectories(TempNextToProgram, "SQLECmd-*").Should().BeEmpty();
+        }
+    }
+
+    [Test]
+    public void CopiesGoToTheTempGiven()
+    {
+        var temp = Directory.CreateDirectory(Path.Combine(_dir, "my temp")).FullName;
+
+        var (exitCode, output) = Run("-d", SqLiteFileTests.TestFile(""), "--csv", Csv, "--temp", temp);
+
+        exitCode.Should().Be(0, output);
+        Directory.Exists(temp).Should().BeTrue("a folder that was there is kept");
+        Directory.GetFileSystemEntries(temp).Should().BeEmpty("the copies are deleted when done");
+
+        //one that wasn't there is created, and removed again
+        var newTemp = Path.Combine(_dir, "new temp");
+        Run("-f", SqLiteFileTests.TestFile("Contacts.db"), "--csv", Csv, "--hunt", "false", "--temp", newTemp).ExitCode.Should().Be(0);
+        Directory.Exists(newTemp).Should().BeFalse();
+    }
+
+    [Test]
+    public void TempThatCantBeWrittenStops()
+    {
+        //a folder under a file can't be created
+        var file = Path.Combine(_dir, "a file");
+        File.WriteAllText(file, "x");
+
+        var (exitCode, output) = Run("-f", SqLiteFileTests.TestFile("Contacts.db"), "--csv", Csv, "--temp", Path.Combine(file, "temp"));
+
+        exitCode.Should().Be(1, output);
+        output.Should().Contain("Give one with --temp");
+        output.Should().NotContain("Processing ");
     }
 }
