@@ -212,6 +212,38 @@ public class CliTests
         Run().ExitCode.Should().Be(1);
         Run("-f", SqLiteFileTests.TestFile("Contacts.db")).ExitCode.Should().Be(1, "--csv or --json is required");
         Run("-f", Path.Combine(_dir, "missing.db"), "--csv", Csv).ExitCode.Should().Be(1);
+        Run("-d", Path.Combine(_dir, "missing"), "--csv", Csv).ExitCode.Should().Be(1);
+        Run("--help").ExitCode.Should().Be(0);
+    }
+
+    [Test]
+    public void NotASqliteFileFails()
+    {
+        var file = Path.Combine(_dir, "notsqlite.db");
+        File.WriteAllText(file, "not a database");
+
+        var (exitCode, output) = Run("-f", file, "--csv", Csv);
+
+        exitCode.Should().Be(1, output);
+        output.Should().Contain("is not a SQLite file");
+        output.Should().Contain("1 file(s) could not be processed");
+    }
+
+    [Test]
+    public void FailingQueryFails()
+    {
+        //the map matches, but one of its queries reads a table that isn't there
+        var maps = Path.Combine(_dir, "maps");
+        Directory.CreateDirectory(maps);
+        var map = File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory, "Maps", "TestFiles_Contacts.smap"));
+        File.WriteAllText(Path.Combine(maps, "TestFiles_Contacts.smap"),
+            map.Replace("SELECT FirstName,LastName from Customers", "SELECT FirstName,LastName from NoSuchTable"));
+
+        var (exitCode, output) = Run("-f", SqLiteFileTests.TestFile("Contacts.db"), "--csv", Csv, "--hunt", "false", "--maps", maps);
+
+        exitCode.Should().Be(1, output);
+        output.Should().Contain("no such table: NoSuchTable");
+        output.Should().Contain("1 query/export error(s)");
     }
 
     [Test]

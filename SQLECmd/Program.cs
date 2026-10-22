@@ -56,6 +56,9 @@ internal class Program
 
     private static int _failedFiles;
 
+    //queries that failed and CSV/JSON/blob output that could not be written (exit code 1)
+    private static int _exportErrors;
+
 
     // JSON time stamps: ISO 8601 in UTC (2024-01-02T03:04:05.6780000Z), as JLECmd writes them, instead of ServiceStack's \/Date(ms)\/
     private const string JsonDateFormat = "yyyy-MM-ddTHH:mm:ss.fffffffZ";
@@ -376,6 +379,14 @@ internal class Program
             return 1;
         }
 
+        if (string.IsNullOrEmpty(f) && Directory.Exists(d) == false)
+        {
+            Log.Warning("Directory {D} does not exist! Exiting", d);
+            Console.WriteLine();
+            jsonWriter?.Dispose();
+            return 1;
+        }
+
         //the databases are read from copies, made in --temp or Temp next to SQLECmd (never the user's %TEMP%)
         _tempFolder = TempFolder.Prepare(temp, out var tempCreated, out var tempError);
         if (_tempFolder == null)
@@ -441,6 +452,13 @@ internal class Program
             return 1;
         }
 
+        if (_exportErrors > 0)
+        {
+            Log.Warning("{Count:N0} query/export error(s). See the errors above", _exportErrors);
+            Console.WriteLine();
+            return 1;
+        }
+
         return 0;
     }
 
@@ -449,6 +467,14 @@ internal class Program
     {
         if (string.IsNullOrEmpty(f) == false)
         {
+            //a file given with -f must be a database (under -d, other files are skipped)
+            if (SqLiteFile.IsSqLiteFile(f) == false)
+            {
+                _failedFiles += 1;
+                Log.Error("{File} is not a SQLite file", f);
+                return;
+            }
+
             try
             {
                 ProcessFile(Path.GetFullPath(f), hunt, dedupe, csv, json, blobdir, jsonWriter, noblob, ifn);
@@ -764,6 +790,7 @@ internal class Program
                                 catch (Exception ex)
                                 {
                                     Log.Error(ex, "	Error processing blob column {BlobColumn} for query {Name}: {Message}", blobConfig.BlobColumn, queryInfo.Name, ex.Message);
+                                    _exportErrors += 1;
                                 }
                             }
                         }
@@ -841,6 +868,7 @@ internal class Program
                 {
                     Log.Fatal(e, "Error processing map {Description} with Id {Id} for query {Name}", map.Description, map.Id, queryInfo.Name);
                     Log.Error("\t{Replace}", e.Message.Replace("\r\n", "\r\n\t"));
+                    _exportErrors += 1;
                 }
             }
         }

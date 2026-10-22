@@ -32,7 +32,7 @@ dotnet run --project SQLECmd -- -d SQLMap.Test/TestFiles --csv out --maps SQLMap
 
 ## CLI (`SQLECmd/Program.cs`)
 
-- `Main` awaits `InvokeAsync` and returns `DoWork`'s exit code: 0, or 1 for invalid arguments, map errors, `--sync` failing, or any file that could not be processed.
+- `Main` awaits `InvokeAsync` and returns `DoWork`'s exit code: 0, or 1 for invalid arguments (including a missing `-f` file or `-d` folder), map errors, `--sync` failing, any file that could not be processed (a `-f` file that is not SQLite counts; under `-d` such files are skipped), or any query, CSV/JSON or blob write that failed. Databases with no matching map don't change it.
 - With `--hunt` (the default), every file under `-d` whose header says SQLite is tried against every map; a map applies when its `IdentifyQuery` returns `IdentifyValue` (compared as strings). Without it, only maps whose `FileName` matches are tried. When hunting, mismatches and failing `IdentifyQuery`s are only logged with `--debug`. If every map's `IdentifyQuery` fails, the database can't be read and the file counts as failed.
 - One connection per database. A failing query is logged and the other queries still run. `--dedupe` (default) skips files with a SHA-1 already seen.
 - Output names are `<timestamp>_<CSVPrefix>_<BaseFileName>_<map Id>.csv`, with a `SourceFile` column added. JSON is one file with one object per row (plus `SourceFile` and `MapDescription`), with dates in ISO 8601 UTC (`ConfigureJsonDates`, as in JLECmd). Connections use `DateTimeKind=Utc` (`ConnectionString`): without it System.Data.SQLite converts DATETIME text with a zone to the local time of the machine. Blob columns are written to files (named from `NameColumn`, sanitized) and removed from the CSV/JSON.
