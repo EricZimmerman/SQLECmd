@@ -87,23 +87,37 @@ internal class Program
     }
 
     /// <summary>
-    ///     Entries under a folder, recursively, matching a pattern (case-insensitive). Folders that can't be read are skipped
+    ///     Files under a folder, recursively, matching a pattern (case-insensitive). Folders that can't be read are skipped
     ///     and counted (IgnoreInaccessible skipped them silently)
     /// </summary>
     private sealed class EntryFinder : System.IO.Enumeration.FileSystemEnumerator<string>
     {
         private readonly string _pattern;
 
-        public int Errors;
+        //the folder whose handle is opened right after ShouldRecurseIntoEntry returns true: when that fails, ContinueOnError
+        //is called before ShouldIncludeEntry for the same entry. Null: the folder being searched (the root, when the base
+        //constructor can't open it; field initializers run before the base constructor, so Unreadable is there)
+        private string _lastRecursed;
+
+        /// <summary>Folders that could not be read (null: the root folder) and why</summary>
+        public readonly List<(string Folder, string Reason)> Unreadable = new();
 
         public EntryFinder(string directory, string pattern) : base(directory, new EnumerationOptions { IgnoreInaccessible = false, RecurseSubdirectories = true, AttributesToSkip = 0 })
         {
             _pattern = pattern;
         }
 
+        protected override bool ShouldRecurseIntoEntry(ref System.IO.Enumeration.FileSystemEntry entry)
+        {
+            _lastRecursed = entry.ToFullPath();
+            return true;
+        }
+
         protected override bool ShouldIncludeEntry(ref System.IO.Enumeration.FileSystemEntry entry)
         {
-            return System.IO.Enumeration.FileSystemName.MatchesSimpleExpression(_pattern, entry.FileName, true);
+            _lastRecursed = null;
+            //files only: folders were passed on as files, and each one logged "<folder> not found!" (with --hunt, every subfolder)
+            return entry.IsDirectory == false && System.IO.Enumeration.FileSystemName.MatchesSimpleExpression(_pattern, entry.FileName, true);
         }
 
         protected override string TransformEntry(ref System.IO.Enumeration.FileSystemEntry entry)
@@ -113,10 +127,14 @@ internal class Program
 
         protected override bool ContinueOnError(int error)
         {
-            Errors += 1;
+            Unreadable.Add((_lastRecursed, new System.ComponentModel.Win32Exception(error).Message));
+            _lastRecursed = null;
             return true;
         }
     }
+
+    //each folder that can't be read is reported once (without --hunt the folder is searched once per map)
+    private static readonly HashSet<string> UnreadableFolders = new(StringComparer.OrdinalIgnoreCase);
 
     private static IEnumerable<string> FindEntries(string directory, string pattern)
     {
@@ -127,10 +145,20 @@ internal class Program
             entries.Add(finder.Current);
         }
 
-        if (finder.Errors > 0)
+        var count = 0;
+        foreach (var (folder, reason) in finder.Unreadable)
+        {
+            if (UnreadableFolders.Add(folder ?? directory))
+            {
+                Log.Error("Unable to read folder {Folder}: {Reason}", folder ?? directory, reason);
+                count += 1;
+            }
+        }
+
+        if (count > 0)
         {
             _accessErrors += 1;
-            Log.Error("Could not access all files in {Directory}: {Count:N0} folder(s) could not be read", directory, finder.Errors);
+            Log.Error("Could not access all files in {Directory}: {Count:N0} folder(s) could not be read", directory, count);
         }
 
         return entries;

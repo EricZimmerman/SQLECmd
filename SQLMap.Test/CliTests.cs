@@ -130,6 +130,66 @@ public class CliTests
     }
 
     [Test]
+    public void HuntDoesNotReportFoldersAsMissing()
+    {
+        //every subfolder was passed on as a file and logged "<folder> not found!"
+        var input = Path.Combine(_dir, "input");
+        var sub = Directory.CreateDirectory(Path.Combine(input, "sub", "deeper")).FullName;
+        File.Copy(SqLiteFileTests.TestFile("Contacts.db"), Path.Combine(sub, "Contacts.db"));
+
+        var (exitCode, output) = Run("-d", input, "--csv", Csv, "--debug");
+
+        exitCode.Should().Be(0, output);
+        output.Should().NotContain("not found!");
+        CsvLines($"_Contacts_Users_{ContactsId}.csv").Should().HaveCount(21);
+    }
+
+    [Test]
+    public void UnreadableSubfolderFails()
+    {
+        if (!OperatingSystem.IsWindows())
+        {
+            Assert.Ignore("Folder ACLs are Windows only");
+            return;
+        }
+
+        //a folder under -d that can't be read is reported by name and gives 1; the rest is still processed
+        var input = Path.Combine(_dir, "input");
+        Directory.CreateDirectory(Path.Combine(input, "good"));
+        File.Copy(SqLiteFileTests.TestFile("Contacts.db"), Path.Combine(input, "good", "Contacts.db"));
+        var denied = Directory.CreateDirectory(Path.Combine(input, "denied"));
+        File.Copy(SqLiteFileTests.TestFile("Contacts.db"), Path.Combine(denied.FullName, "Contacts.db"));
+
+        var rule = new System.Security.AccessControl.FileSystemAccessRule(System.Security.Principal.WindowsIdentity.GetCurrent().User!,
+            System.Security.AccessControl.FileSystemRights.ReadAndExecute,
+            System.Security.AccessControl.InheritanceFlags.ContainerInherit | System.Security.AccessControl.InheritanceFlags.ObjectInherit,
+            System.Security.AccessControl.PropagationFlags.None, System.Security.AccessControl.AccessControlType.Deny);
+        var security = denied.GetAccessControl();
+        security.AddAccessRule(rule);
+        denied.SetAccessControl(security);
+        try
+        {
+            foreach (var hunt in new[] { "true", "false" })
+            {
+                var (exitCode, output) = Run("-d", input, "--csv", Path.Combine(_dir, "csv" + hunt), "--hunt", hunt);
+
+                exitCode.Should().Be(1, output);
+                output.Should().Contain($"Unable to read folder {denied.FullName}");
+                output.Should().Contain("Could not access all files");
+                //once, though without --hunt the folder is searched once per map
+                output.Split($"Unable to read folder {denied.FullName}").Should().HaveCount(2, output);
+                Directory.GetFiles(Path.Combine(_dir, "csv" + hunt), $"*_Contacts_Users_{ContactsId}.csv").Should().ContainSingle();
+            }
+        }
+        finally
+        {
+            security = denied.GetAccessControl();
+            security.RemoveAccessRule(rule);
+            denied.SetAccessControl(security);
+        }
+    }
+
+    [Test]
     public void BlobsAreExtracted()
     {
         var db = SqLiteFileTests.TestFile("BlobTest_Three.db");
