@@ -217,20 +217,21 @@ public class CliTests
     }
 
     [Test]
-    public void NotASqliteFileFails()
+    public void NotASqliteFileIsListedAndExitsWithZero()
     {
+        //a bad file is not a failure of SQLECmd (exit code 0), but it is still reported
         var file = Path.Combine(_dir, "notsqlite.db");
         File.WriteAllText(file, "not a database");
 
         var (exitCode, output) = Run("-f", file, "--csv", Csv);
 
-        exitCode.Should().Be(1, output);
+        exitCode.Should().Be(0, output);
         output.Should().Contain("is not a SQLite file");
         output.Should().Contain("1 file(s) could not be processed");
     }
 
     [Test]
-    public void FailingQueryFails()
+    public void FailingQueryIsListedAndExitsWithZero()
     {
         //the map matches, but one of its queries reads a table that isn't there
         var maps = Path.Combine(_dir, "maps");
@@ -241,9 +242,43 @@ public class CliTests
 
         var (exitCode, output) = Run("-f", SqLiteFileTests.TestFile("Contacts.db"), "--csv", Csv, "--hunt", "false", "--maps", maps);
 
-        exitCode.Should().Be(1, output);
+        exitCode.Should().Be(0, output);
         output.Should().Contain("no such table: NoSuchTable");
         output.Should().Contain("1 query/export error(s)");
+    }
+
+    [Test]
+    public void CsvThatCantBeWrittenFails()
+    {
+        //--csv pointing at an existing file can't be created as a folder
+        var file = Path.Combine(_dir, "a file");
+        File.WriteAllText(file, "x");
+
+        var (exitCode, output) = Run("-f", SqLiteFileTests.TestFile("Contacts.db"), "--csv", file, "--hunt", "false");
+
+        exitCode.Should().Be(1, output);
+        output.Should().Contain("Unable to create directory");
+    }
+
+    [Test]
+    public void LockedFileFails()
+    {
+        if (OperatingSystem.IsWindows() == false)
+        {
+            Assert.Ignore("FileShare.None locks only on Windows");
+        }
+
+        //a file SQLECmd can't open is a failure (exit code 1), unlike a damaged one
+        var db = Path.Combine(_dir, "Contacts.db");
+        File.Copy(SqLiteFileTests.TestFile("Contacts.db"), db);
+
+        using (new FileStream(db, FileMode.Open, FileAccess.Read, FileShare.None))
+        {
+            var (exitCode, output) = Run("-f", db, "--csv", Csv, "--hunt", "false");
+
+            exitCode.Should().Be(1, output);
+            output.Should().Contain("1 file(s) could not be processed");
+        }
     }
 
     [Test]
@@ -260,7 +295,7 @@ public class CliTests
     }
 
     [Test]
-    public void CorruptDatabaseFails()
+    public void CorruptDatabaseIsListedAndExitsWithZero()
     {
         var db = Path.Combine(_dir, "Contacts.db");
         var bytes = File.ReadAllBytes(SqLiteFileTests.TestFile("Contacts.db"));
@@ -274,7 +309,7 @@ public class CliTests
 
         var (exitCode, output) = Run("-f", db, "--csv", Csv, "--hunt", "false");
 
-        exitCode.Should().Be(1, output);
+        exitCode.Should().Be(0, output);
         output.Should().Contain("Unable to read database: database disk image is malformed");
         output.Should().Contain("1 file(s) could not be processed");
         output.Should().NotContain("No maps found");

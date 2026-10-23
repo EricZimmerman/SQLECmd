@@ -54,10 +54,87 @@ internal class Program
     private static readonly HashSet<string> UnmatchedDbs = new(StringComparer.InvariantCultureIgnoreCase);
     private static readonly HashSet<string> SeenHashes = new(StringComparer.InvariantCultureIgnoreCase);
 
+    //files that could not be processed because they are not SQLite or are damaged: listed, but the exit code stays 0
     private static int _failedFiles;
 
-    //queries that failed and CSV/JSON/blob output that could not be written (exit code 1)
+    //files or folders that could not be read (access denied, locked, IO errors): exit code 1
+    private static int _accessErrors;
+
+    //CSV/JSON/blob output that could not be written (exit code 1)
     private static int _exportErrors;
+
+    //map queries that failed on a database (a damaged database, or one the map does not fit): listed, exit code stays 0
+    private static int _queryErrors;
+
+    /// <summary>A file or folder that could not be read (exit code 1), as opposed to one whose contents are bad (0)</summary>
+    private static bool IsAccessError(Exception e)
+    {
+        return e is IOException or UnauthorizedAccessException || e.InnerException is IOException or UnauthorizedAccessException;
+    }
+
+    /// <summary>true when the file can be opened for reading (as SqLiteFile.IsSqLiteFile opens it)</summary>
+    private static bool CanOpen(string path)
+    {
+        try
+        {
+            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    ///     Entries under a folder, recursively, matching a pattern (case-insensitive). Folders that can't be read are skipped
+    ///     and counted (IgnoreInaccessible skipped them silently)
+    /// </summary>
+    private sealed class EntryFinder : System.IO.Enumeration.FileSystemEnumerator<string>
+    {
+        private readonly string _pattern;
+
+        public int Errors;
+
+        public EntryFinder(string directory, string pattern) : base(directory, new EnumerationOptions { IgnoreInaccessible = false, RecurseSubdirectories = true, AttributesToSkip = 0 })
+        {
+            _pattern = pattern;
+        }
+
+        protected override bool ShouldIncludeEntry(ref System.IO.Enumeration.FileSystemEntry entry)
+        {
+            return System.IO.Enumeration.FileSystemName.MatchesSimpleExpression(_pattern, entry.FileName, true);
+        }
+
+        protected override string TransformEntry(ref System.IO.Enumeration.FileSystemEntry entry)
+        {
+            return entry.ToFullPath();
+        }
+
+        protected override bool ContinueOnError(int error)
+        {
+            Errors += 1;
+            return true;
+        }
+    }
+
+    private static IEnumerable<string> FindEntries(string directory, string pattern)
+    {
+        using var finder = new EntryFinder(directory, pattern);
+        var entries = new List<string>();
+        while (finder.MoveNext())
+        {
+            entries.Add(finder.Current);
+        }
+
+        if (finder.Errors > 0)
+        {
+            _accessErrors += 1;
+            Log.Error("Could not access all files in {Directory}: {Count:N0} folder(s) could not be read", directory, finder.Errors);
+        }
+
+        return entries;
+    }
 
 
     // JSON time stamps: ISO 8601 in UTC (2024-01-02T03:04:05.6780000Z), as JLECmd writes them, instead of ServiceStack's \/Date(ms)\/
@@ -367,7 +444,16 @@ internal class Program
             var baseTime = DateTimeOffset.UtcNow;
             var jsonOutName = $"{baseTime:yyyyMMddHHmmssffffff}_SQLECmd_Output.json";
             jsonFullOutName = Path.Combine(json, jsonOutName);
-            jsonWriter = new StreamWriter(new FileStream(jsonFullOutName, FileMode.CreateNew));
+            try
+            {
+                jsonWriter = new StreamWriter(new FileStream(jsonFullOutName, FileMode.CreateNew));
+            }
+            catch (Exception e)
+            {
+                Log.Fatal(e, "Unable to create {File}: {Message}. Exiting", jsonFullOutName, e.Message);
+                Console.WriteLine();
+                return 1;
+            }
             Log.Information("\tSaving all JSON results to {FullOutName}", jsonFullOutName);
         }
 
@@ -445,21 +531,21 @@ internal class Program
 
         Console.WriteLine();
 
-        if (_failedFiles > 0)
+        //exit code 1 only when SQLECmd could not do its job (a file or folder it could not read, output it could not
+        //write); files that are not SQLite or are damaged, and queries that fail on a database, are listed but give 0
+        if (_failedFiles + _accessErrors > 0)
         {
-            Log.Warning("{Count:N0} file(s) could not be processed. See the errors above", _failedFiles);
+            Log.Warning("{Count:N0} file(s) could not be processed. See the errors above", _failedFiles + _accessErrors);
             Console.WriteLine();
-            return 1;
         }
 
-        if (_exportErrors > 0)
+        if (_exportErrors + _queryErrors > 0)
         {
-            Log.Warning("{Count:N0} query/export error(s). See the errors above", _exportErrors);
+            Log.Warning("{Count:N0} query/export error(s). See the errors above", _exportErrors + _queryErrors);
             Console.WriteLine();
-            return 1;
         }
 
-        return 0;
+        return _accessErrors > 0 || _exportErrors > 0 ? 1 : 0;
     }
 
     /// <summary>-f, or the files under -d</summary>
@@ -470,6 +556,13 @@ internal class Program
             //a file given with -f must be a database (under -d, other files are skipped)
             if (SqLiteFile.IsSqLiteFile(f) == false)
             {
+                if (CanOpen(f) == false)
+                {
+                    //IsSqLiteFile logged why it could not be read
+                    _accessErrors += 1;
+                    return;
+                }
+
                 _failedFiles += 1;
                 Log.Error("{File} is not a SQLite file", f);
                 return;
@@ -481,7 +574,15 @@ internal class Program
             }
             catch (Exception e)
             {
-                _failedFiles += 1;
+                if (IsAccessError(e))
+                {
+                    _accessErrors += 1;
+                }
+                else
+                {
+                    _failedFiles += 1;
+                }
+
                 Log.Error(e, "Error processing {File}: {Message}", f, e.Message);
             }
         }
@@ -493,19 +594,11 @@ internal class Program
 
             var files = new List<string>();
 
-            var enumerationOptions = new EnumerationOptions
-            {
-                IgnoreInaccessible = true,
-                MatchCasing = MatchCasing.CaseInsensitive,
-                RecurseSubdirectories = true,
-                AttributesToSkip = 0
-            };
-
             IEnumerable<string> files2;
 
             if (hunt)
             {
-                files2 = Directory.EnumerateFileSystemEntries(d, "*", enumerationOptions);
+                files2 = FindEntries(d, "*");
 
                 files.AddRange(files2);
             }
@@ -514,7 +607,7 @@ internal class Program
                 foreach (var mapFile in SqlMap.MapFiles)
                 {
                     //search here
-                    files2 = Directory.EnumerateFileSystemEntries(d, mapFile.Value.FileName, enumerationOptions);
+                    files2 = FindEntries(d, mapFile.Value.FileName);
 
                     files.AddRange(files2);
                 }
@@ -528,7 +621,15 @@ internal class Program
                 }
                 catch (Exception e)
                 {
-                    _failedFiles += 1;
+                    if (IsAccessError(e))
+                    {
+                        _accessErrors += 1;
+                    }
+                    else
+                    {
+                        _failedFiles += 1;
+                    }
+
                     Log.Error(e, "Error processing {File}: {Message}", file, e.Message);
                 }
             }
@@ -617,6 +718,13 @@ internal class Program
         Log.Debug("Checking if {FileName} is a SQLite file", fileName);
         if (SqLiteFile.IsSqLiteFile(fileName) == false)
         {
+            if (File.Exists(fileName) && CanOpen(fileName) == false)
+            {
+                //IsSqLiteFile logged why it could not be read
+                _accessErrors += 1;
+                return;
+            }
+
             if (hunt == false)
             {
                 Log.Warning("\t{FileName} is not a SQLite file! Skipping...", fileName);
@@ -868,7 +976,15 @@ internal class Program
                 {
                     Log.Fatal(e, "Error processing map {Description} with Id {Id} for query {Name}", map.Description, map.Id, queryInfo.Name);
                     Log.Error("\t{Replace}", e.Message.Replace("\r\n", "\r\n\t"));
-                    _exportErrors += 1;
+                    //output that can't be written is a failure; a query that fails on this database is not
+                    if (IsAccessError(e))
+                    {
+                        _exportErrors += 1;
+                    }
+                    else
+                    {
+                        _queryErrors += 1;
+                    }
                 }
             }
         }
