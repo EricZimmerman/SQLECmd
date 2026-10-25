@@ -7,7 +7,7 @@ files.
 
 | | |
 |---|---|
-| **Version** | 2026.10.1 |
+| **Version** | 2026.10.2 |
 | **Download** | [.NET 10](https://download.ericzimmermanstools.com/net/SQLECmd.zip) |
 | **All tools** | [ericzimmerman.github.io](https://ericzimmerman.github.io) or [Get-ZimmermanTools](https://download.ericzimmermanstools.com/Get-ZimmermanTools.zip), which downloads them all and keeps them current |
 | **Changes** | [ChangeLog](https://ericzimmerman.github.io/changelog/) |
@@ -41,6 +41,7 @@ Options:
   --sync               If true, the latest maps from https://github.com/EricZimmerman/SQLECmd/tree/master/SQLMap/Maps are downloaded and local maps updated
   --debug              Show debug information during processing
   --trace              Show trace information during processing
+  --co                 Save all console messages to <timestamp>_SQLECmd_<version>_ConsoleLog.txt in the output directory (the first of --csv, --json given)
   -?, -h, --help       Show help and usage information
   --version            Show version information
 ```
@@ -99,6 +100,9 @@ database and which queries to run on it, and how to name the output.
 
 ## What's new in 2026.10
 
+- 2026.10.2: `--co` saves everything written to the console to `<timestamp>_SQLECmd_<version>_ConsoleLog.txt` in
+  the output directory (Issues #259); `--debug` and `--trace` show the time of each message again (they showed the
+  date in the default format).
 - One connection per database instead of one per map (faster).
 - The evidence is no longer changed: databases were opened in place, which wrote the `-wal` into the database and
   deleted the `-wal` and `-shm` files. Only a copy is opened now (new `--temp`).

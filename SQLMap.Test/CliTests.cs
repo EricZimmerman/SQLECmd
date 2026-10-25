@@ -455,4 +455,35 @@ public class CliTests
         output.Should().Contain("Give one with --temp");
         output.Should().NotContain("Processing ");
     }
+    [Test]
+    public void ConsoleLog()
+    {
+        // Issues #259: --co saves the console messages to <yyyyMMddHHmmss>_SQLECmd_<version>_ConsoleLog.txt in the first output directory given
+        var db = SqLiteFileTests.TestFile("Contacts.db");
+        var json = Path.Combine(_dir, "json");
+
+        var (exitCode, output) = Run("-f", db, "--csv", Csv, "--json", json, "--co");
+        exitCode.Should().Be(0, output);
+        var log = Directory.GetFiles(Csv, "*_ConsoleLog.txt").Should().ContainSingle().Subject;
+        Path.GetFileName(log).Should().MatchRegex(@"^\d{14}_SQLECmd_\d+\.\d+\.\d+_ConsoleLog\.txt$");
+        Directory.GetFiles(json, "*_ConsoleLog.txt").Should().BeEmpty();
+        output.Should().Contain("Console log: " + log);
+        // the same time stamp as the JSON output
+        Directory.GetFiles(json, "*_SQLECmd_Output.json").Should().ContainSingle().Which.Should().Contain(Path.GetFileName(log)[..14]);
+        var text = File.ReadAllText(log);
+        text.Should().MatchRegex(@"\[\d\d:\d\d:\d\d\.\d{3} INF\] SQLECmd version ");
+        text.Should().Contain("Command line: -f ");
+
+        // --json alone: there
+        (exitCode, output) = Run("-f", db, "--json", json, "--co");
+        exitCode.Should().Be(0, output);
+        Directory.GetFiles(json, "*_ConsoleLog.txt").Should().ContainSingle();
+
+        // without --co, none
+        var other = Path.Combine(_dir, "other");
+        (exitCode, output) = Run("-f", db, "--csv", other);
+        exitCode.Should().Be(0, output);
+        Directory.GetFiles(other, "*_ConsoleLog.txt").Should().BeEmpty();
+        output.Should().NotContain("Console log:");
+    }
 }

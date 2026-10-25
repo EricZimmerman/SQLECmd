@@ -254,6 +254,11 @@ internal class Program
             Description = "Show trace information during processing",
             DefaultValueFactory = _ => false
         };
+        var coOpt = new Option<bool>("--co")
+        {
+            Description = "Save all console messages to <timestamp>_SQLECmd_<version>_ConsoleLog.txt in the output directory (the first of --csv, --json given)",
+            DefaultValueFactory = _ => false
+        };
         
         var syncOpt = new Option<bool>("--sync")
         {
@@ -294,6 +299,7 @@ internal class Program
            syncOpt,
            debugOpt,
            traceOpt,
+           coOpt
            
          
         };
@@ -302,7 +308,7 @@ internal class Program
 
         _rootCommand.SetAction(result => DoWork(result.GetValue(fOpt), result.GetValue(dOpt), result.GetValue(csvOpt),
             result.GetValue(jsonOpt), result.GetValue(blobdirOpt), result.GetValue(dedupeOpt), result.GetValue(huntOpt),
-            result.GetValue(mapsOpt),result.GetValue(syncOpt),result.GetValue(debugOpt),result.GetValue(traceOpt),result.GetValue(noblobOpt),result.GetValue(ifnOpt),result.GetValue(tempOpt)));
+            result.GetValue(mapsOpt),result.GetValue(syncOpt),result.GetValue(debugOpt),result.GetValue(traceOpt),result.GetValue(noblobOpt),result.GetValue(ifnOpt),result.GetValue(tempOpt),result.GetValue(coOpt)));
             
         var exitCode = await _rootCommand.Parse(args).InvokeAsync();
 
@@ -312,7 +318,7 @@ internal class Program
     }
 
     /// <returns>0 on success, 1 for invalid arguments, map errors or files that could not be processed</returns>
-    private static int DoWork(string f, string d, string csv, string json, string blobdir, bool dedupe, bool hunt, string maps, bool sync, bool debug, bool trace, bool noblob, bool ifn, string temp)
+    private static int DoWork(string f, string d, string csv, string json, string blobdir, bool dedupe, bool hunt, string maps, bool sync, bool debug, bool trace, bool noblob, bool ifn, string temp, bool co)
     {
         var levelSwitch = new LoggingLevelSwitch();
 
@@ -338,6 +344,14 @@ internal class Program
         var conf = new LoggerConfiguration()
             .WriteTo.Console(outputTemplate: template, formatProvider: formatter)
             .MinimumLevel.ControlledBy(levelSwitch);
+
+        var runTime = DateTimeOffset.UtcNow;
+
+        var consoleLog = co ? ConsoleLog.GetPath(runTime, csv, json) : null;
+        if (consoleLog != null)
+        {
+            conf.WriteTo.File(consoleLog, outputTemplate: ConsoleLog.Template, formatProvider: formatter);
+        }
 
         Log.Logger = conf.CreateLogger();
 
@@ -384,6 +398,12 @@ internal class Program
 
         Log.Information("Command line: {Args}", string.Join(" ", Environment.GetCommandLineArgs().Skip(1)));
         Console.WriteLine();
+
+        if (consoleLog != null)
+        {
+            Log.Information("Console log: {Path}", consoleLog);
+            Console.WriteLine();
+        }
 
         try
         {
@@ -469,8 +489,7 @@ internal class Program
         string jsonFullOutName = String.Empty;
         if (!string.IsNullOrEmpty(json))
         {
-            var baseTime = DateTimeOffset.UtcNow;
-            var jsonOutName = $"{baseTime:yyyyMMddHHmmssffffff}_SQLECmd_Output.json";
+            var jsonOutName = $"{runTime:yyyyMMddHHmmssffffff}_SQLECmd_Output.json";
             jsonFullOutName = Path.Combine(json, jsonOutName);
             try
             {
@@ -1194,8 +1213,9 @@ internal class Program
         {
             if (arg is DateTimeOffset)
             {
+                //an explicit format, such as the log time stamps' HH:mm:ss.fff, is kept; time stamps in messages use the default format
                 var size = (DateTimeOffset)arg;
-                return size.ToString(_activeDateTimeFormat);
+                return size.ToString(string.IsNullOrEmpty(format) ? _activeDateTimeFormat : format);
             }
 
             var formattable = arg as IFormattable;
