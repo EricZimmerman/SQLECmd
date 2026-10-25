@@ -256,7 +256,7 @@ internal class Program
         };
         var coOpt = new Option<bool>("--co")
         {
-            Description = "When true, save all console messages to <timestamp>_SQLECmd_<version>_ConsoleLog.txt in the output directory (the first of --csv, --json given). Use --co false to turn it off",
+            Description = "When true, save all console messages to <timestamp>_SQLECmd_<version>_ConsoleLog.txt in the output directory (the first of --csv, --json, --blobdir given). Use --co false to turn it off",
             DefaultValueFactory = _ => true
         };
         
@@ -347,7 +347,7 @@ internal class Program
 
         var runTime = DateTimeOffset.UtcNow;
 
-        var consoleLog = co ? ConsoleLog.GetPath(runTime, csv, json) : null;
+        var consoleLog = co ? ConsoleLog.GetPath(runTime, csv, json, blobdir) : null;
         if (consoleLog != null)
         {
             conf.WriteTo.File(consoleLog, outputTemplate: ConsoleLog.Template, formatProvider: formatter);

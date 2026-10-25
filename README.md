@@ -41,7 +41,7 @@ Options:
   --sync               If true, the latest maps from https://github.com/EricZimmerman/SQLECmd/tree/master/SQLMap/Maps are downloaded and local maps updated
   --debug              Show debug information during processing
   --trace              Show trace information during processing
-  --co                 When true, save all console messages to <timestamp>_SQLECmd_<version>_ConsoleLog.txt in the output directory (the first of --csv, --json given). Use --co false to turn it off
+  --co                 When true, save all console messages to <timestamp>_SQLECmd_<version>_ConsoleLog.txt in the output directory (the first of --csv, --json, --blobdir given). Use --co false to turn it off
   -?, -h, --help       Show help and usage information
   --version            Show version information
 ```
@@ -100,6 +100,7 @@ database and which queries to run on it, and how to name the output.
 
 ## What's new in 2026.10
 
+- 2026.10.3: `--blobdir` is in the list of folders for the console log (after `--csv` and `--json`), like every other output folder.
 - 2026.10.2: `--co` (on by default; `--co false` turns it off) saves everything written to the console to `<timestamp>_SQLECmd_<version>_ConsoleLog.txt` in
   the output directory (Issues #259); `--debug` and `--trace` show the time of each message again (they showed the
   date in the default format).
