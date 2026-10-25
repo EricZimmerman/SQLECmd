@@ -256,8 +256,8 @@ internal class Program
         };
         var coOpt = new Option<bool>("--co")
         {
-            Description = "Save all console messages to <timestamp>_SQLECmd_<version>_ConsoleLog.txt in the output directory (the first of --csv, --json given)",
-            DefaultValueFactory = _ => false
+            Description = "When true, save all console messages to <timestamp>_SQLECmd_<version>_ConsoleLog.txt in the output directory (the first of --csv, --json given). Use --co false to turn it off",
+            DefaultValueFactory = _ => true
         };
         
         var syncOpt = new Option<bool>("--sync")

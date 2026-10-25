@@ -213,7 +213,7 @@ public class CliTests
     public void NoBlobSkipsExtraction()
     {
         var (exitCode, output) = Run("-f", SqLiteFileTests.TestFile("BlobTest_Three.db"), "--csv", Csv, "--hunt",
-            "false", "--noblob");
+            "false", "--noblob", "--co", "false");
 
         exitCode.Should().Be(0, output);
         Directory.GetFiles(Csv).Should().ContainSingle().Which.Should().EndWith(".csv");
@@ -458,11 +458,11 @@ public class CliTests
     [Test]
     public void ConsoleLog()
     {
-        // Issues #259: --co saves the console messages to <yyyyMMddHHmmss>_SQLECmd_<version>_ConsoleLog.txt in the first output directory given
+        // Issues #259: --co (on by default) saves the console messages to <yyyyMMddHHmmss>_SQLECmd_<version>_ConsoleLog.txt in the first output directory given
         var db = SqLiteFileTests.TestFile("Contacts.db");
         var json = Path.Combine(_dir, "json");
 
-        var (exitCode, output) = Run("-f", db, "--csv", Csv, "--json", json, "--co");
+        var (exitCode, output) = Run("-f", db, "--csv", Csv, "--json", json);
         exitCode.Should().Be(0, output);
         var log = Directory.GetFiles(Csv, "*_ConsoleLog.txt").Should().ContainSingle().Subject;
         Path.GetFileName(log).Should().MatchRegex(@"^\d{14}_SQLECmd_\d+\.\d+\.\d+_ConsoleLog\.txt$");
@@ -479,9 +479,9 @@ public class CliTests
         exitCode.Should().Be(0, output);
         Directory.GetFiles(json, "*_ConsoleLog.txt").Should().ContainSingle();
 
-        // without --co, none
+        // --co false: none
         var other = Path.Combine(_dir, "other");
-        (exitCode, output) = Run("-f", db, "--csv", other);
+        (exitCode, output) = Run("-f", db, "--csv", other, "--co", "false");
         exitCode.Should().Be(0, output);
         Directory.GetFiles(other, "*_ConsoleLog.txt").Should().BeEmpty();
         output.Should().NotContain("Console log:");
