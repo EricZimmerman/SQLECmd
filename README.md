@@ -7,7 +7,7 @@ files.
 
 | | |
 |---|---|
-| **Version** | 2026.10.2 |
+| **Version** | 2026.10.3 |
 | **Download** | [.NET 10](https://download.ericzimmermanstools.com/net/SQLECmd.zip) |
 | **All tools** | [ericzimmerman.github.io](https://ericzimmerman.github.io) or [Get-ZimmermanTools](https://download.ericzimmermanstools.com/Get-ZimmermanTools.zip), which downloads them all and keeps them current |
 | **Changes** | [ChangeLog](https://ericzimmerman.github.io/changelog/) |
