@@ -23,7 +23,7 @@
         <PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="10.4.0" />
         <PackageReference Include="ServiceStack.Text" Version="10.4.0" />
         <PackageReference Include="SharpZipLib" Version="1.4.2" />
-        <PackageReference Include="System.CommandLine" Version="2.0.13" />
+        <PackageReference Include="System.CommandLine" Version="2.0.14" />
         <!-- Native SQLite.Interop libraries, copied to runtimes\<rid>\native next to SQLECmd and loaded from there by
              NativeSqlite.cs (nothing is extracted). Must be the same version as the System.Data.SQLite.Core that
              ServiceStack.OrmLite.Sqlite brings in; CheckSqliteNatives below fails the build if not -->
