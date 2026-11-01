@@ -21,7 +21,7 @@
         <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
         <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
         <PackageReference Include="ServiceStack.OrmLite.Sqlite" Version="10.4.0" />
-        <PackageReference Include="ServiceStack.Text" Version="10.4.0" />
+        <PackageReference Include="ServiceStack.Text" Version="10.4.2" />
         <PackageReference Include="SharpZipLib" Version="1.4.2" />
         <PackageReference Include="System.CommandLine" Version="2.0.13" />
         <!-- Native SQLite.Interop libraries, copied to runtimes\<rid>\native next to SQLECmd and loaded from there by
