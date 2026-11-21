@@ -727,6 +727,34 @@ internal class Program
     }
 
 
+    /// <summary>
+    ///     CsvHelper 34 options that keep CsvHelper 33's output: fields with leading or trailing spaces quoted, and no
+    ///     check of the field count (a row whose blob column is NULL keeps that column, as in 33)
+    /// </summary>
+    private static readonly CsvWriterOptions CsvOptions = new()
+    {
+        //33 quoted text that starts or ends with a space (not a tab, as CsvQuoting.WhenNeededOrWhitespace does)
+        ShouldQuote = (field, fieldType, fieldIndex, recordIndex) => field.Length > 0 && (field[0] == ' ' || field[field.Length - 1] == ' '),
+        ValidateFieldCount = false
+    };
+
+    /// <summary>
+    ///     The text CsvHelper 33 wrote for a value of a query row: byte arrays as 0x and upper case hex, other values that
+    ///     can be formatted (numbers, dates, Guids) in their default format with the invariant culture, the rest (True/False)
+    ///     with ToString
+    /// </summary>
+    private static string CsvValue(object value)
+    {
+        return value switch
+        {
+            null => null,
+            string text => text,
+            byte[] bytes => "0x" + Convert.ToHexString(bytes),
+            IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
+            _ => value.ToString()
+        };
+    }
+
     private static string SanitizeFilenamePart(string input, int maxLength = 50)
     {
         if (string.IsNullOrWhiteSpace(input))
@@ -984,22 +1012,28 @@ internal class Program
 
                         Log.Information("\tDumping {Name} to {FullOutName}", queryInfo.Name, fullOutName);
 
-                        using var writer = new StreamWriter(new FileStream(fullOutName, FileMode.CreateNew));
-                        using var csvWriter = new CsvHelper.CsvWriter(writer, CultureInfo.InvariantCulture);
+                        using var csvWriter = CsvHelper.CsvWriter.Create(new FileStream(fullOutName, FileMode.CreateNew), CsvOptions);
 
+                        //the header is the columns of the first row (and SourceFile); each row writes its own values,
+                        //as CsvHelper 33 did with dynamic records (a row whose blob column is NULL keeps that column)
                         results.First().SourceFile = fileName;
-                        csvWriter.WriteDynamicHeader(results.First());
-                        csvWriter.NextRecord();
+                        foreach (var column in ((IDictionary<string, object>)results.First()).Keys)
+                        {
+                            csvWriter.WriteField(column);
+                        }
+
+                        csvWriter.EndRecord();
 
                         foreach (var result in results)
                         {
                             result.SourceFile = fileName;
-                            csvWriter.WriteRecord(result);
-                            csvWriter.NextRecord();
-                        }
+                            foreach (var column in (IDictionary<string, object>)result)
+                            {
+                                csvWriter.WriteField(CsvValue(column.Value));
+                            }
 
-                        csvWriter.Flush();
-                        writer.Flush();
+                            csvWriter.EndRecord();
+                        }
                     }
                     if (jsonWriter != null)
                     {
