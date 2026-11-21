@@ -7,7 +7,7 @@ files.
 
 | | |
 |---|---|
-| **Version** | 2026.10.3 |
+| **Version** | 2026.11.0 |
 | **Download** | [.NET 10](https://download.ericzimmermanstools.com/net/SQLECmd.zip) |
 | **All tools** | [ericzimmerman.github.io](https://ericzimmerman.github.io) or [Get-ZimmermanTools](https://download.ericzimmermanstools.com/Get-ZimmermanTools.zip), which downloads them all and keeps them current |
 | **Changes** | [ChangeLog](https://ericzimmerman.github.io/changelog/) |
@@ -97,6 +97,10 @@ database and which queries to run on it, and how to name the output.
 |---|---|
 | `0` | Success. Databases that are damaged or not SQLite, map queries that fail on a database and databases no map matches are reported but are not a failure |
 | `1` | The tool failed: invalid arguments or maps, a missing `-f` or `-d` path, `--sync` failing, a `--temp` folder that can't be written to, output that can't be written, or files or folders it can't read. Folders under `-d` that can't be read are reported (`Unable to read folder <path>: <reason>`, once per folder, then `Could not access all files`) and the rest is still processed |
+
+## What's new in 2026.11
+
+- Moved to CsvHelper 34, a rewrite of the CSV library; the CSV output is byte for byte the same as 2026.10's.
 
 ## What's new in 2026.10
 
